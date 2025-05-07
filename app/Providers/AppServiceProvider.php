@@ -25,8 +25,5 @@ class AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') === 'production') {
             URL::forceScheme('https');
         }
-
-        // Share data with views globally
-        View::share('appraisalPeriod', $appService->appraisalPeriod());
     }
 }

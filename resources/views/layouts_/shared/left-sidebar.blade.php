@@ -4,20 +4,20 @@
     <!-- Brand Logo Light -->
     <a href="{{ Url('/') }}" class="logo logo-light">
         <span class="logo-lg">
-            <img src="{{ asset('storage/img/logo.png') }}" alt="logo">
+            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="logo">
         </span>
         <span class="logo-sm">
-            <img src="{{ asset('storage/img/logo-sm.png') }}" alt="small logo">
+            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="small logo">
         </span>
     </a>
 
     <!-- Brand Logo Dark -->
     <a href="{{ Url('/') }}" class="logo logo-dark">
         <span class="logo-lg">
-            <img src="{{ asset('storage/img/logo-dark.png') }}" alt="logo">
+            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="logo">
         </span>
         <span class="logo-sm">
-            <img src="{{ asset('storage/img/logo-sm.png') }}" alt="small logo">
+            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="small logo">
         </span>
     </a>
     
@@ -37,195 +37,49 @@
         <!--- Sidemenu -->
         <ul class="side-nav">
 
-            <li class="side-nav-title">Navigation</li>
+            <li class="side-nav-title">Menu</li>
             <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarGoals" aria-expanded="false" aria-controls="sidebarGoals" class="side-nav-link">
-                    <i class="ri-focus-2-line"></i>
-                    <span>{{ __('Goal') }}</span>
-                    @if ($notificationGoal)
-                        <span class="badge bg-danger float-end">{{ $notificationGoal }}</span>    
-                    @else
-                        <span class="menu-arrow"></span>  
-                    @endif
-                </a>
-                <div class="collapse" id="sidebarGoals">
-                    <ul class="side-nav-second-level">
-                        <li>
-                            <a href="{{ route('goals') }}">{{ __('My Goal') }}</a>
-                        </li>
-                        @if(auth()->user()->isApprover())
-                        <li>
-                            <a href="{{ route('team-goals') }}">{{ __('Task Box') }}<span class="badge bg-danger float-end {{ $notificationGoal ? '' : 'd-none' }}">{{ $notificationGoal }}</span></a>
-                        </li>
-                        @endif
-                    </ul>
-                </div>
-            </li>
-            @if ($appraisalPeriod)
-                <li class="side-nav-item">
-                    <a data-bs-toggle="collapse" href="#sidebarAppraisal" aria-expanded="false" aria-controls="sidebarAppraisal" class="side-nav-link">
-                        <i class="ri-list-check-3"></i>
-                        <span>{{ __('Appraisal') }}</span>
-                        <span class="badge bg-danger float-end {{ $notificationAppraisal ? '' : 'd-none' }}">{{ $notificationAppraisal }}</span>    
-                        <span class="menu-arrow {{ $notificationAppraisal ? 'd-none' : '' }}"></span>  
-                    </a>
-                    <div class="collapse" id="sidebarAppraisal">
-                        <ul class="side-nav-second-level">
-                            <li>
-                                <a href="{{ route('appraisals') }}">{{ __('My Appraisal') }}</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('appraisals-task') }}">{{ __('Task Box') }}<span class="badge bg-danger float-end {{ $notificationAppraisal ? '' : 'd-none' }}">{{ $notificationAppraisal }}</span></a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                @if(auth()->user()->isCalibrator() && auth()->user()->kpiUnits())
-                <li class="side-nav-item">
-                    <a href="{{ route('rating') }}" onclick="showLoader()" class="side-nav-link">
-                        <i class="ri-star-line"></i>
-                        <span> Rating </span>
-                    </a>
-                </li>
-                @endif
-            @endif
-            @if (auth()->user()->isApprover())
-            <li class="side-nav-item">
-                <a href="{{ url('/reports') }}" class="side-nav-link">
-                    <i class="ri-file-chart-line"></i>
-                    <span>{{ __('Report') }}</span>
+                <a href="{{ url('/dashboard') }}" class="side-nav-link">
+                    <i class="ri-dashboard-3-line"></i>
+                    <span> Dashboard </span>
                 </a>
             </li>
-            @endif
             <li class="side-nav-item">
-                <a href="{{ url('/guides') }}" class="side-nav-link">
-                    <i class="ri-file-text-line"></i>
-                    <span> User Guide </span>
+                <a href="{{ url('/news') }}" class="side-nav-link">
+                    <i class="ri-file-list-2-line"></i>
+                    <span> News Update </span>
                 </a>
             </li>
-
-            @if(auth()->check())
-                @can('adminmenu')
-                <li class="side-nav-title">Admin</li>
-                @can('viewsetting')
-                <li class="side-nav-item">
-                    <a data-bs-toggle="collapse" href="#sidebarSettings" aria-expanded="false" aria-controls="sidebarSettings" class="side-nav-link">
-                        <i class="ri-user-settings-line"></i>
-                        <span> Admin Settings </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarSettings">
-                        <ul class="side-nav-second-level">
-                            @can('mastercalibration')
-                            <li>
-                                <a href="{{ route('admcalibrations') }}">Calibration</a>
-                            </li>
-                            @endcan
-                            @can('viewlayer')
-                            <li class="side-nav-item">
-                                <a data-bs-toggle="collapse" href="#sidebarLayer" aria-expanded="false" aria-controls="sidebarLayer">
-                                    <span> Layer </span>
-                                    <span class="menu-arrow"></span>
-                                </a>
-                                <div class="collapse" id="sidebarLayer">
-                                    <ul class="side-nav-third-level">
-                                        
-                                        <li>
-                                            <a href="{{ route('layer') }}">{{ __('Goal') }}</a>
-                                        </li>
-                                        @can('layerpa')
-                                        <li>
-                                            <a href="{{ route('layer-appraisal') }}">{{ __('Appraisal') }}</a>
-                                        </li>
-                                        @endcan
-                                    </ul>
-                                </div>
-                            </li>
-                            @endcan
-                            @can('masterrating')
-                            <li>
-                                <a href="{{ route('admratings') }}">Rating</a>
-                            </li>
-                            @endcan
-                            @can('masterweightage')
-                            <li>
-                                <a href="{{ route('admin-weightage') }}">Weightage</a>
-                            </li>
-                            @endcan
-                            @can('viewrole')
-                            <li>
-                                <a href="{{ route('roles') }}">Role</a>
-                            </li>
-                            @endcan
-                            @can('viewschedule')
-                            <li>
-                                <a href="{{ route('schedules') }}">Schedule</a>
-                            </li>
-                            @endcan
-                            @can('importgoals')
-                            <li>
-                                <a href="{{ route('importg') }}">Import Goals</a>
-                            </li>
-                            @endcan
-                        </ul>
-                    </div>
-                </li>
-                @endcan
-                @can('viewonbehalf')
-                <li class="side-nav-item">
-                    <a href="{{ route('onbehalf') }}" class="side-nav-link">
-                        <i class="ri-group-line"></i>
-                        <span> On Behalfs </span>
-                    </a>
-                </li>
-                @endcan
-                @can('viewreport')
-                <li class="side-nav-item">
-                    <a data-bs-toggle="collapse" href="#sidebarReports" aria-expanded="false" aria-controls="sidebarReports" class="side-nav-link">
-                        <i class="ri-file-chart-line"></i>
-                        <span> Reports </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarReports">
-                        <ul class="side-nav-second-level">
-                            <li>
-                                <a href="{{ route('admin.reports') }}" onclick="showLoader()">{{ __('Report') }}</a>
-                            </li>
-                            @can('reportpa')
-                            <li>
-                                <a href="{{ route('admin.appraisal') }}" onclick="showLoader()">{{ __('Appraisal') }}</a>
-                            </li>
-                            @endcan
-                            {{-- @can('employeepa')
-                            <li>
-                                <a href="{{ route('admemployee') }}">Employee PA</a>
-                            </li>
-                            @endcan --}}
-                        </ul>
-                    </div>
-                </li>
-                @endcan
-                @if (auth()->user()->hasRole('superadmin'))
-                    @can('viewimport')
-                    <li class="side-nav-item">
-                        <a data-bs-toggle="collapse" href="#sidebarImports" aria-expanded="false" aria-controls="sidebarImports" class="side-nav-link">
-                            <i class="ri-file-chart-line"></i>
-                            <span> Imports </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse" id="sidebarImports">
-                            <ul class="side-nav-second-level">
-                                <li>
-                                    <a href="{{ route('importRating') }}">{{ __('Imports Rating') }}</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                    @endcan
-                @endif
-                @endcan
-            @endif
-
+            <li class="side-nav-item">
+                <a href="{{ url('/events') }}" class="side-nav-link">
+                    <i class="ri-settings-5-line"></i>
+                    <span> Event Management </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
+                <a href="{{ url('/survey') }}" class="side-nav-link">
+                    <i class="ri-group-line"></i>
+                    <span> Survey/Voting </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
+                <a href="{{ url('/social') }}" class="side-nav-link">
+                    <i class="ri-earth-line"></i>
+                    <span> Social Media </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
+                <a href="{{ url('/dashboard') }}" class="side-nav-link">
+                    <i class="ri-live-line"></i>
+                    <span> LIVE </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
+                <a href="{{ url('/quotes') }}" class="side-nav-link">
+                    <i class="ri-double-quotes-l"></i>
+                    <span> Quotes/Affirmation </span>
+                </a>
+            </li>
         </ul>
         <!--- End Sidemenu -->
 

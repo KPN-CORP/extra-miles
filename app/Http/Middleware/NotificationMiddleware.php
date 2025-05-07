@@ -27,8 +27,8 @@ class NotificationMiddleware
     {
         if (Auth::check()) {
             // Share notification counts in views
-            view()->share('notificationAppraisal', $this->appService->getNotificationCountsAppraisal(Auth::user()->employee_id));
-            view()->share('notificationGoal', $this->appService->getNotificationCountsGoal(Auth::user()->employee_id));
+            // view()->share('notificationAppraisal', $this->appService->getNotificationCountsAppraisal(Auth::user()->employee_id));
+            // view()->share('notificationGoal', $this->appService->getNotificationCountsGoal(Auth::user()->employee_id));
         }
 
         return $next($request);

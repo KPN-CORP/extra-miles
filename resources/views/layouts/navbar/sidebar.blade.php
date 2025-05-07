@@ -17,20 +17,20 @@
     </div>
 
     <!-- Nav Item - Dashboard -->
-    @if (auth()->user()->hasRole('superadmin'))
+    {{-- @if (auth()->user()->hasRole('superadmin'))
         <li class="nav-item">
             <a class="nav-link" href="{{ route('home') }}">
                 <i class="fas fa-fw fa-chart-pie"></i>
             <span>Dashboard</span></a>
         </li>
-    @endif
+    @endif --}}
 
     {{-- <li class="nav-item">
         <a class="nav-link" href="{{ route('tasks') }}">
             <i class="fas fa-fw fa-tasks"></i>
             <span>Tasks</span></a>
     </li> --}}
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseGoals"
             aria-expanded="true" aria-controls="collapseGoals">
             <i class="fas fa-fw fa-flag-checkered"></i>
@@ -41,11 +41,11 @@
                 <a class="collapse-item" href="{{ route('goals') }}">{{ __('My Goal') }}</a>
                 @if(auth()->user()->isApprover())
                 <a class="collapse-item" href="{{ route('team-goals') }}">{{ __('Task Box') }}</a>
-                @endif
+                @endif --}}
                 {{-- <a class="collapse-item" href="{{ route('roles') }}">Role</a> --}}
-            </div>
+            {{-- </div>
         </div>
-    </li>
+    </li> --}}
     
     {{-- <li class="nav-item">
         <a class="nav-link" href="#">
@@ -57,14 +57,14 @@
             <i class="fas fa-fw fa-chart-bar"></i>
             <span>Calibration</span></a>
     </li> --}}
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         @if (auth()->user()->isApprover())
             <a class="nav-link" href="{{ url('/reports') }}">
                 <i class="fas fa-fw fa-file-alt"></i>
                 <span>{{ __('Report') }}</span>
             </a>
         @endif
-    </li>
+    </li> --}}
     
 
     <!-- Divider -->
@@ -85,7 +85,7 @@
             <i class="fas fa-fw fa-cog"></i>
             <span>Settings</span>
         </a>
-        <div id="collapseSettings" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+        {{-- <div id="collapseSettings" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 @can('viewschedule')
                     <a class="collapse-item" href="{{ route('schedules') }}">Schedule</a>
@@ -96,20 +96,19 @@
                 @can('viewrole')
                     <a class="collapse-item" href="{{ route('roles') }}">Role</a>
                 @endcan
-                {{-- <a class="collapse-item" href="{{ route('employees') }}">Employee</a> --}}
             </div>
-        </div>
+        </div> --}}
     </li>
     @endcan
-    @can('viewonbehalf')
+    {{-- @can('viewonbehalf')
     <li class="nav-item">
         <a class="nav-link" href="{{ url('/admin/onbehalf') }}">
             <i class="fas fa-fw fa-user-friends"></i>
             <span>On Behalf</span>
         </a>
     </li>
-    @endcan
-    @can('viewreport')
+    @endcan --}}
+    {{-- @can('viewreport')
     <li class="nav-item">
         <a class="nav-link" href="{{ url('/admin/reports') }}">
             <i class="fas fa-fw fa-file-alt"></i>
@@ -124,7 +123,7 @@
             <span>{{ __('Appraisal') }}</span>
         </a>
     </li>
-    @endcan
+    @endcan --}}
     
     
     <!-- Divider -->
