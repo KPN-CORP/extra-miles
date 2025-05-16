@@ -12,7 +12,7 @@ class DashboardController extends Controller
         $parentLink = 'Dashboard';
         $link = 'Dashboard';
 
-        return view('dashboard.index', [
+        return view('pages.admin.dashboard.index', [
             'link' => $link,
             'parentLink' => $parentLink,
         ]);

@@ -11,7 +11,7 @@ class NewsController extends Controller
         $parentLink = 'Dashboard';
         $link = 'News Update';
 
-        return view('pages.news.index', [
+        return view('pages.admin.news.index', [
             'link' => $link,
             'parentLink' => $parentLink,
         ]);

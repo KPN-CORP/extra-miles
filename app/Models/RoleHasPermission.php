@@ -13,5 +13,6 @@ class RoleHasPermission extends Model
         'role_id',
     ];
 
+    protected $connection = 'kpncorp';
     protected $table = 'role_has_permissions';
 }

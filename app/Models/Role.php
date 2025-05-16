@@ -9,6 +9,8 @@ class Role extends Model
 {
     use HasFactory;
 
+    protected $connection = 'kpncorp';
+
     public function modelHasRole()
     {
         return $this->hasMany(ModelHasRole::class, 'role_id', 'id');

@@ -9,7 +9,7 @@
                 Create
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="createDropdown">
-                <li><a class="dropdown-item" href="{{ route('events.create') }}">Survey Form</a></li>
+                <li><a class="dropdown-item" href="{{ route('admin.events.create') }}">Survey Form</a></li>
                 <li><a class="dropdown-item" href="#">Voting Form</a></li>
             </ul>
         </div>

@@ -1,10 +1,10 @@
-@extends('layouts_.vertical', ['page_title' => 'Quotes & Affirmation'])
+@extends('layouts_.vertical', ['page_title' => 'Social Media'])
 
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0"></h3>
-        <a href="{{ route('events.create') }}" class="btn btn-primary">Create Quote</a>
+        <a href="{{ route('admin.events.create') }}" class="btn btn-primary">Add Social Media</a>
     </div>
     <div class="row">
         <div class="col-md-12">
@@ -25,10 +25,9 @@
                             <thead class="thead-light">
                                 <tr class="text-center">
                                     <th>No</th>
-                                    <th>Created Date</th>
-                                    <th>Author</th>
-                                    <th>Quote</th>
-                                    <th>Status</th>
+                                    <th>Category</th>
+                                    <th>Business Unit</th>
+                                    <th>Direct Link</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -36,16 +35,24 @@
                                 {{-- Contoh data dummy --}}
                                 <tr>
                                     <td>1</td>
-                                    <td>03 April 2025</td>
-                                    <td>Admin</td>
-                                    <td>KPN Corp ...</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td> 
+                                    <td>Youtube</td>
+                                    <td>Corporation</td>
+                                    <td>https://www.youtube.com/ytkpncorp</td>
+                                    <td>  
                                         <a href="#" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
-                                        <a href="#" class="btn btn-outline-secondary btn-sm"><i class="ri-archive-line"></i></a>
+                                        <a href="#" class="btn btn-outline-danger btn-sm"><i class="ri-delete-bin-line"></i></a>
                                     </td>
                                 </tr>
-                                
+                                <tr>
+                                    <td>2</td>
+                                    <td>Youtube</td>
+                                    <td>Murni Teguh</td>
+                                    <td>https://www.youtube.com/ytmurniteguh</td>
+                                    <td>  
+                                        <a href="#" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
+                                        <a href="#" class="btn btn-outline-danger btn-sm"><i class="ri-delete-bin-line"></i></a>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

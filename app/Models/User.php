@@ -13,6 +13,9 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    protected $connection = 'kpncorp';
+    protected $table = 'users';
+    
     use HasFactory, Notifiable, HasRoles;
 
     protected $primaryKey = 'id';
