@@ -1,10 +1,10 @@
-@extends('layouts_.vertical', ['page_title' => 'News'])
+@extends('layouts_.vertical', ['page_title' => 'Quotes & Affirmation'])
 
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0"></h3>
-        <a href="{{ route('events.create') }}" class="btn btn-primary">Create News</a>
+        <a href="{{ route('admin.events.create') }}" class="btn btn-primary">Create Quote</a>
     </div>
     <div class="row">
         <div class="col-md-12">
@@ -25,10 +25,9 @@
                             <thead class="thead-light">
                                 <tr class="text-center">
                                     <th>No</th>
-                                    <th>Category</th>
-                                    <th>Post Date</th>
-                                    <th>News Title</th>
-                                    <th>Like Count</th>
+                                    <th>Created Date</th>
+                                    <th>Author</th>
+                                    <th>Quote</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -37,30 +36,16 @@
                                 {{-- Contoh data dummy --}}
                                 <tr>
                                     <td>1</td>
-                                    <td>Event/Comunity</td>
                                     <td>03 April 2025</td>
-                                    <td>KPN Corp gelar buka puasa dan berbagi kepedulian serta kebahagiaan</td>
-                                    <td>95</td>
+                                    <td>Admin</td>
+                                    <td>KPN Corp ...</td>
                                     <td><span class="badge bg-success">Active</span></td>
                                     <td> 
                                         <a href="#" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
                                         <a href="#" class="btn btn-outline-secondary btn-sm"><i class="ri-archive-line"></i></a>
-                                        <a href="#" class="btn btn-outline-danger btn-sm"><i class="ri-delete-bin-line"></i></a>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Event/Comunity</td>
-                                    <td>02 April 2025</td>
-                                    <td>Operasi pasar KPN Corp-Kemendag sediakan ribuan liter minyak</td>
-                                    <td>12</td>
-                                    <td><span class="badge bg-secondary">Archive</span></td>
-                                    <td> 
-                                        <a href="#" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
-                                        <a href="#" class="btn btn-outline-secondary btn-sm"><i class="ri-archive-line"></i></a>
-                                        <a href="#" class="btn btn-outline-danger btn-sm"><i class="ri-delete-bin-line"></i></a>
-                                    </td>
-                                </tr>
+                                
                             </tbody>
                         </table>
                     </div>

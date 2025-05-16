@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Designation extends Model
 {
     use HasFactory;
+    protected $connection = 'kpncorp';
 
     protected $fillable = [
         // Kolom-kolom lainnya,

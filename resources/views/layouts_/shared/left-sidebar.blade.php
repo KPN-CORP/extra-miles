@@ -39,43 +39,43 @@
 
             <li class="side-nav-title">Menu</li>
             <li class="side-nav-item">
-                <a href="{{ url('/dashboard') }}" class="side-nav-link">
+                <a href="{{ url('/admin/dashboard') }}" class="side-nav-link">
                     <i class="ri-dashboard-3-line"></i>
                     <span> Dashboard </span>
                 </a>
             </li>
             <li class="side-nav-item">
-                <a href="{{ url('/news') }}" class="side-nav-link">
+                <a href="{{ url('/admin/news') }}" class="side-nav-link">
                     <i class="ri-file-list-2-line"></i>
                     <span> News Update </span>
                 </a>
             </li>
             <li class="side-nav-item">
-                <a href="{{ url('/events') }}" class="side-nav-link">
+                <a href="{{ url('/admin/events') }}" class="side-nav-link">
                     <i class="ri-settings-5-line"></i>
                     <span> Event Management </span>
                 </a>
             </li>
             <li class="side-nav-item">
-                <a href="{{ url('/survey') }}" class="side-nav-link">
+                <a href="{{ url('/admin/survey') }}" class="side-nav-link">
                     <i class="ri-group-line"></i>
                     <span> Survey/Voting </span>
                 </a>
             </li>
             <li class="side-nav-item">
-                <a href="{{ url('/social') }}" class="side-nav-link">
+                <a href="{{ url('/admin/social') }}" class="side-nav-link">
                     <i class="ri-earth-line"></i>
                     <span> Social Media </span>
                 </a>
             </li>
             <li class="side-nav-item">
-                <a href="{{ url('/dashboard') }}" class="side-nav-link">
+                <a href="{{ url('/admin/dashboard') }}" class="side-nav-link">
                     <i class="ri-live-line"></i>
                     <span> LIVE </span>
                 </a>
             </li>
             <li class="side-nav-item">
-                <a href="{{ url('/quotes') }}" class="side-nav-link">
+                <a href="{{ url('/admin/quotes') }}" class="side-nav-link">
                     <i class="ri-double-quotes-l"></i>
                     <span> Quotes/Affirmation </span>
                 </a>

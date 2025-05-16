@@ -11,7 +11,7 @@ class QuotesController extends Controller
         $parentLink = 'Dashboard';
         $link = 'Quotes & Affirmation';
 
-        return view('pages.quotes.index', [
+        return view('pages.admin.quotes.index', [
             'link' => $link,
             'parentLink' => $parentLink,
         ]);

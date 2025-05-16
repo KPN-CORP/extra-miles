@@ -11,7 +11,7 @@ class SocialController extends Controller
         $parentLink = 'Dashboard';
         $link = 'Social Media';
 
-        return view('pages.social.index', [
+        return view('pages.admin.social.index', [
             'link' => $link,
             'parentLink' => $parentLink,
         ]);

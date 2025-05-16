@@ -11,7 +11,7 @@ class SurveyController extends Controller
         $parentLink = 'Dashboard';
         $link = 'Survey/Voting';
 
-        return view('pages.survey.index', [
+        return view('pages.admin.survey.index', [
             'link' => $link,
             'parentLink' => $parentLink,
         ]);

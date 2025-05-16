@@ -1,14 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AppraisalController as AdminAppraisalController;
-use App\Http\Controllers\Admin\OnBehalfController as AdminOnBehalfController;
-use App\Http\Controllers\Admin\ReportController as AdminReportController;
-use App\Http\Controllers\Admin\SendbackController as AdminSendbackController;
-use App\Http\Controllers\AdminImportController;
-use App\Http\Controllers\Appraisal360;
-use App\Http\Controllers\AppraisalTaskController;
-use App\Http\Controllers\ApprovalController;
-use App\Http\Controllers\ImportGoalsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -19,32 +10,10 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExportExcelController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\LayerController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\ScheduleController;
-use App\Http\Controllers\SendbackController;
 use App\Http\Controllers\SsoController;
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\GuideController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LanguageController;
-use App\Http\Controllers\MyAppraisalController;
-use App\Http\Controllers\MyGoalController;
-use App\Http\Controllers\RatingAdminController;
-use App\Http\Controllers\CalibrationController;
-use App\Http\Controllers\EmployeePAController;
-use App\Http\Controllers\FormAppraisalController;
-use App\Http\Controllers\FormGroupAppraisalController;
-use App\Http\Controllers\RatingController;
-use App\Http\Controllers\TeamAppraisalController;
-use App\Http\Controllers\TeamGoalController;
-use App\Http\Controllers\SearchController;
-use App\Http\Controllers\WeightageController;
-use App\Imports\ApprovalLayerAppraisalImport;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\NotificationMiddleware;
 use App\Http\Controllers\EventController;
@@ -52,6 +21,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\QuotesController;
+use App\Http\Controllers\EventParticipantController;
 
 Route::get('language/{locale}', [LanguageController::class, 'switchLanguage'])->name('language.switch');
 
@@ -88,21 +58,32 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth', 'locale', 'notification')->group(function () {
 
     Route::get('/', function () {
-        return redirect('dashboard');
+        return redirect('/admin/dashboard');
     });
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     
-    Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+    Route::get('/admin/news', [NewsController::class, 'index'])->name('admin.news.index');
 
-    Route::get('/events', [EventController::class, 'index'])->name('events.index');
-    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+    Route::get('/admin/events', [EventController::class, 'index'])->name('admin.events.index');
+    Route::get('/admin/events/create', [EventController::class, 'create'])->name('admin.events.create');
+    Route::post('/events/store', [EventController::class, 'store'])->name('events.store');
+    Route::delete('/events/{id}/archive', [EventController::class, 'softDelete'])->name('events.softDelete');
+    Route::post('/events/{id}/close', [EventController::class, 'closeRegistration'])->name('events.close');
+    Route::post('/events/{id}/toggle-status', [EventController::class, 'toggleStatus'])->name('events.close');
+    Route::get('/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
+    Route::get('/events/{encryptedId}/participants', [EventController::class, 'listParticipants'])->name('events.participants');
+    Route::post('/participants/{id}/approve', [EventParticipantController::class, 'approve'])->name('participants.approve');
+    Route::post('/participants/{id}/reject', [EventParticipantController::class, 'reject'])->name('participants.reject');
+    Route::post('/participants/{id}/reinvite', [EventParticipantController::class, 'reinvite'])->name('participants.reinvite');
+    
 
-    Route::get('/survey', [SurveyController::class, 'index'])->name('survey.index');
+    Route::get('/admin/survey', [SurveyController::class, 'index'])->name('admin.survey.index');
 
-    Route::get('/social', [SocialController::class, 'index'])->name('social.index');
+    Route::get('/admin/social', [SocialController::class, 'index'])->name('admin.social.index');
 
-    Route::get('/quotes', [QuotesController::class, 'index'])->name('quotes.index');
+    Route::get('/admin/quotes', [QuotesController::class, 'index'])->name('admin.quotes.index');
     
     // Authentication
     Route::get('verify-email', EmailVerificationPromptController::class)->name('verification.notice');

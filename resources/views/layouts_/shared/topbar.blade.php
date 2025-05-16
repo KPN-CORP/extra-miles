@@ -69,7 +69,7 @@
             <?php 
                 $lang = session('locale') ? session('locale') : env('APP_LOCALE', env('APP_FALLBACK_LOCALE'));
             ?>
-            <li class="dropdown">
+            {{-- <li class="dropdown">
                 <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     <img src="{{ asset('storage/img/flags/' . $lang . '.jpg')}}" alt="user-image" class="me-0 me-sm-1" height="12">
                     <span class="align-middle d-none d-lg-inline-block">{{ $lang == 'id' ? 'Bahasa' : 'English' }}</span> <i class="ri-arrow-down-s-line d-none d-sm-inline-block align-middle"></i>
@@ -89,7 +89,7 @@
                         <span class="align-middle">Bahasa</span>
                     </a>
                 </div>
-            </li>
+            </li> --}}
 
             <li class="dropdown">
                 <a class="nav-link dropdown-toggle arrow-none nav-user px-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
