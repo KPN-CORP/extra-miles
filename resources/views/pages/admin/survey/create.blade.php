@@ -114,7 +114,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <strong>CUSTOM REGISTRATION FORM BUILDER</strong>
+                <strong>CUSTOM REGISTRATION FORM BUILDERS</strong>
             </div>
         </div>
 
