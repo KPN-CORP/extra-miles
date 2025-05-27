@@ -22,6 +22,7 @@ use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\QuotesController;
 use App\Http\Controllers\EventParticipantController;
+use App\Livewire\ManageParticipants;
 
 Route::get('language/{locale}', [LanguageController::class, 'switchLanguage'])->name('language.switch');
 
@@ -67,19 +68,20 @@ Route::middleware('auth', 'locale', 'notification')->group(function () {
 
     Route::get('/admin/events', [EventController::class, 'index'])->name('admin.events.index');
     Route::get('/admin/events/create', [EventController::class, 'create'])->name('admin.events.create');
-    Route::post('/events/store', [EventController::class, 'store'])->name('events.store');
-    Route::delete('/events/{id}/archive', [EventController::class, 'softDelete'])->name('events.softDelete');
-    Route::post('/events/{id}/close', [EventController::class, 'closeRegistration'])->name('events.close');
-    Route::post('/events/{id}/toggle-status', [EventController::class, 'toggleStatus'])->name('events.close');
-    Route::get('/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
-    Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
-    Route::get('/events/{encryptedId}/participants', [EventController::class, 'listParticipants'])->name('events.participants');
-    Route::post('/participants/{id}/approve', [EventParticipantController::class, 'approve'])->name('participants.approve');
-    Route::post('/participants/{id}/reject', [EventParticipantController::class, 'reject'])->name('participants.reject');
-    Route::post('/participants/{id}/reinvite', [EventParticipantController::class, 'reinvite'])->name('participants.reinvite');
-    
+    Route::post('/admin/events/store', [EventController::class, 'store'])->name('events.store');
+    Route::delete('/admin/events/{id}/archive', [EventController::class, 'softDelete'])->name('events.softDelete');
+    Route::post('/admin/events/{id}/close', [EventController::class, 'closeRegistration'])->name('events.close');
+    Route::post('/admin/events/{id}/toggle-status', [EventController::class, 'toggleStatus'])->name('events.close');
+    Route::get('/admin/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
+    Route::put('/admin/events/{id}', [EventController::class, 'update'])->name('events.update');
+    Route::get('/admin/events/{encryptedId}/participants', [EventParticipantController::class, 'listParticipants'])->name('events.participants');
+    Route::post('/admin/participants/{id}/approve', [EventParticipantController::class, 'approve'])->name('participants.approve');
+    Route::post('/admin/participants/{id}/reject', [EventParticipantController::class, 'reject'])->name('participants.reject');
+    Route::get('/ticket/qr-png/{encryptedId}', [EventController::class, 'showQRPNG'])->name('event.qrpng');
+    Route::get('/participants/export/{event_id}', [EventParticipantController::class, 'export'])->name('participants.export');
 
     Route::get('/admin/survey', [SurveyController::class, 'index'])->name('admin.survey.index');
+    Route::get('/admin/survey/create', [SurveyController::class, 'create'])->name('admin.survey.create');
 
     Route::get('/admin/social', [SocialController::class, 'index'])->name('admin.social.index');
 

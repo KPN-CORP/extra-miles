@@ -6,7 +6,7 @@
         @csrf
         <div class="card bg-light shadow">
             <div class="card-header">
-                <h4 class="mb-0">Event Info</h4>
+                <h4 class="mb-0">Survey Info</h4>
             </div>
             <div class="card-body row g-3">
                 <div class="col-md-4">

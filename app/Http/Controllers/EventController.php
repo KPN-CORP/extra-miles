@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -21,13 +22,58 @@ class EventController extends Controller
         $parentLink = 'Dashboard';
         $link = 'Event Management';
 
-        $events = Event::orderBy('created_at', 'desc')->get();
+        $eventsToUpdate = Event::whereIn('status', ['Open Registration', 'Full Booked'])->whereNull('deleted_at')->get();
+        $now = Carbon::now();
+
+        foreach ($eventsToUpdate as $event) {
+            $start = Carbon::parse($event->start_date . ' ' . $event->time_start);
+            $end = Carbon::parse($event->end_date . ' ' . $event->time_end);
+
+            if ($now->greaterThanOrEqualTo($start) && $now->lessThan($end)) {
+                $event->status = 'Ongoing';
+                $event->save();
+            } elseif ($now->greaterThan($end)) {
+                $event->status = 'Closed';
+                $event->save();
+            }
+        }
+
+        $events = Event::withCount('participants')
+        ->whereIn('status', ['Open Registration', 'Full Booked', 'Draft', 'Ongoing'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $eventClosed = Event::withCount('participants')
+        ->whereIn('status', ['Closed'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $eventArchive = Event::onlyTrashed()
+        ->withCount('participants')
+        ->orderBy('created_at', 'desc')
+        ->get();
 
         return view('pages.admin.events.index', [
             'link' => $link,
             'parentLink' => $parentLink,
             'events' => $events,
+            'eventClosed' => $eventClosed,
+            'eventArchive' => $eventArchive,
         ]);
+    }
+
+    public function showQRPNG($encryptedId)
+    {
+        try {
+            $eventId = Crypt::decryptString($encryptedId);
+            $event = Event::findOrFail($eventId);
+            // $url = url($encryptedId);
+            $url = $encryptedId;
+
+            return view('pages.admin.events.qr_png', compact('url','event'));
+        } catch (\Exception $e) {
+            abort(403, 'Invalid QR request');
+        }
     }
 
     public function create()
@@ -94,7 +140,7 @@ class EventController extends Controller
             'title'            => $request->event_name,
             'description'      => $request->description,
             'image'            => $imagePath,
-            'status'           => $request->action === 'draft' ? 'Draft' : 'Ongoing',
+            'status'           => $request->action === 'draft' ? 'Draft' : 'Open Registration',
             'status_survey'    => $request->has('need_survey') ? 'T' : 'F',
             'status_voting'    => $request->has('need_voting') ? 'T' : 'F',
             'quota'            => $request->participants,
@@ -197,55 +243,6 @@ class EventController extends Controller
         $event->save();
 
         return redirect()->route('admin.events.index')->with('success', 'Event updated successfully.');
-    }
-
-    public function listParticipants($encryptedId)
-    {
-        $parentLink = 'Event Management';
-        $link = 'List Participant';
-
-        $id = Crypt::decryptString($encryptedId);
-
-        $event = Event::findOrFail($id);
-
-        $participants = EventParticipant::where('event_id', $id)
-                        ->where('status', 'Request')
-                        ->paginate(10);
-        
-        $waitinglists = EventParticipant::where('event_id', $id)
-                        ->where('status', 'Waiting List')
-                        ->paginate(10);
-        
-        $approveparticipants = EventParticipant::where('event_id', $id)
-                        ->where('status', 'Approved')
-                        ->paginate(10);
-
-        // Hitung status
-        $countRequest = EventParticipant::where('event_id', $id)->where('status', 'Request')->count();
-        $countWaitingList = EventParticipant::where('event_id', $id)->where('status', 'Waiting List')->count();
-        $countApproved = EventParticipant::where('event_id', $id)->where('status', 'Approved')->count();
-        $countConfirmation = EventParticipant::where('event_id', $id)
-            ->where('status', 'Approved')
-            ->whereNull('attending_status')
-            ->count();
-        $countConfirmed = EventParticipant::where('event_id', $id)
-            ->where('status', 'Approved')
-            ->where('attending_status', '!=','')
-            ->count();
-        $countAttending = EventParticipant::where('event_id', $id)
-            ->where('status', 'Approved')
-            ->where('attending_status', 'Attending')
-            ->count();
-        $countNotAttending = EventParticipant::where('event_id', $id)
-            ->where('status', 'Approved')
-            ->where('attending_status', 'Not Attending')
-            ->count();
-
-        return view('pages.admin.events.list-participants', compact(
-            'event', 'participants',
-            'countRequest', 'countWaitingList', 'countApproved',
-            'countConfirmation', 'countConfirmed', 'countAttending', 'countNotAttending', 'parentLink', 'link', 'waitinglists', 'approveparticipants'
-        ));
     }
 
     public function softDelete($id)
