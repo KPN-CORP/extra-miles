@@ -131,7 +131,6 @@ $(document).ready(function() {
     });
 });
 
-
 document.addEventListener("DOMContentLoaded", function () {
 
     const scheduleTable = $("#scheduleTable").DataTable({
@@ -142,16 +141,63 @@ document.addEventListener("DOMContentLoaded", function () {
             rightColumns: 1
         },
         pageLength: 50,
+        autoWidth: true,
         scrollCollapse: true,
-        scrollX: true
+        // scrollX: true
+    });
+
+    const scheduleTable1 = $("#scheduleTable1").DataTable({
+        dom: "lrtip",
+        stateSave: true,
+        fixedColumns: {
+            leftColumns: 0,
+            rightColumns: 1
+        },
+        autoWidth: true, 
+        pageLength: 50,
+        scrollCollapse: true,
+        // scrollX: true
+    });
+
+    const scheduleTable2 = $("#scheduleTable2").DataTable({
+        dom: "lrtip",
+        stateSave: true,
+        fixedColumns: {
+            leftColumns: 0,
+            rightColumns: 1
+        },
+        autoWidth: true, 
+        pageLength: 50,
+        scrollCollapse: true,
+        // scrollX: true
     });
 
     $("#customsearch").on("keyup", function () {
         scheduleTable.search($(this).val()).draw();
     });
 
-});
+    $("#customsearch1").on("keyup", function () {
+        scheduleTable1.search($(this).val()).draw();
+    });
 
+    $("#customsearch2").on("keyup", function () {
+        scheduleTable2.search($(this).val()).draw();
+    });
+
+    // Fix layout on first load
+    $.fn.dataTable
+        .tables({ visible: true, api: true })
+        .columns.adjust();
+
+    // Fix layout when switching tab
+    $('a[data-bs-toggle="tab"]').on("shown.bs.tab", function () {
+        $.fn.dataTable
+            .tables({ visible: true, api: true })
+            .columns.adjust()
+            .draw();
+    });
+
+});
 
 // Load the initial content into the Quill editor
 // var initialContent = `{!! $model->messages !!}`;

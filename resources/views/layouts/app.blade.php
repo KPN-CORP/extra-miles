@@ -8,6 +8,7 @@
     <meta name="author" content="" />
     <link rel="icon" type="image/ico" href="{{ asset('storage/img/favicon.ico') }}">
     <title>@yield('title')</title>
+    @livewireStyles
     @include('link')
   </head>
 
@@ -35,5 +36,6 @@
 
     @include('script')
     @include('sweetalert::alert')
+    @livewireScripts
 </body>
 </html>
