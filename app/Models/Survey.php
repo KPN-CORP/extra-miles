@@ -13,7 +13,7 @@ class Survey extends Model
     use SoftDeletes;
 
     protected $appends = ['encrypted_id'];
-    protected $hidden = ['id'];
+    // protected $hidden = ['id'];
 
     public function surveyParticipant()
     {

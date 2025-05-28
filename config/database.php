@@ -66,7 +66,7 @@ return [
             'driver' => 'mysql',
             'host' => env('KPNCORP_DB_HOST', '127.0.0.1'),
             'port' => env('KPNCORP_DB_PORT', '3306'),
-            'database' => env('KPNCORP_DB_DATABASE', 'kpncorp'),
+            'database' => env('KPNCORP_DB_DATABASE', 'laravel'),
             'username' => env('KPNCORP_DB_USERNAME', 'root'),
             'password' => env('KPNCORP_DB_PASSWORD', ''),
             'unix_socket' => env('KPNCORP_DB_SOCKET', ''),
