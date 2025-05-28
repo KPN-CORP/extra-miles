@@ -3,6 +3,16 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+<<<<<<< HEAD
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable;
+=======
 
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,10 +31,19 @@ class User extends Authenticatable
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'string';
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
 
     /**
      * The attributes that are mass assignable.
      *
+<<<<<<< HEAD
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+=======
      * @var array<int, string>
      */
     protected $fillable = [
@@ -34,12 +53,17 @@ class User extends Authenticatable
         'email',
         'password',
         'token',
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
+<<<<<<< HEAD
+     * @var list<string>
+=======
      * @var array<int, string>
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
      */
     protected $hidden = [
         'password',
@@ -58,6 +82,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+<<<<<<< HEAD
+=======
 
     public function sendPasswordResetNotification($token)
     {
@@ -112,4 +138,5 @@ class User extends Authenticatable
     {
         return $this->cekBUCement()->exists();
     }
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
 }

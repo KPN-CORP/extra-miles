@@ -4,10 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+<<<<<<< HEAD
+use Illuminate\Database\Eloquent\SoftDeletes;
+=======
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
 
 class EventParticipant extends Model
 {
     use HasFactory;
+<<<<<<< HEAD
+    use SoftDeletes;
+=======
 
     protected $fillable = [
         'event_id',
@@ -25,4 +32,5 @@ class EventParticipant extends Model
     {
         return $this->belongsTo(Event::class);
     }
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
 }

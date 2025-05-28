@@ -23,11 +23,27 @@ use App\Http\Controllers\SocialController;
 use App\Http\Controllers\QuotesController;
 use App\Http\Controllers\EventParticipantController;
 use App\Livewire\ManageParticipants;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('language/{locale}', [LanguageController::class, 'switchLanguage'])->name('language.switch');
 
 Route::get('dbauth', [SsoController::class, 'dbauth']);
 Route::get('sourcermb/dbauth', [SsoController::class, 'dbauthReimburse']);
+
+
+Route::get('/{any?}', function () {
+    return view('user-app');
+})->where('any', '^(?!admin).*$');
+
+Route::get('/images/{filename}', function ($filename) {
+    $path = storage_path('app/public/assets/images/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -61,8 +77,6 @@ Route::middleware('auth', 'locale', 'notification')->group(function () {
     Route::get('/', function () {
         return redirect('/admin/dashboard');
     });
-
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     
     Route::get('/admin/news', [NewsController::class, 'index'])->name('admin.news.index');
 
@@ -95,7 +109,6 @@ Route::middleware('auth', 'locale', 'notification')->group(function () {
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-    Route::get('{first}/{second}', [HomeController::class, 'secondLevel'])->name('second');
     Route::get('reset-self', [PasswordResetLinkController::class, 'selfReset'])
         ->name('password.reset.self');
 });

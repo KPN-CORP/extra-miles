@@ -4,6 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+<<<<<<< HEAD
+
+class Employee extends Model
+{
+    use HasFactory;
+
+=======
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Employee extends Model
@@ -13,6 +20,7 @@ class Employee extends Model
 
     use HasFactory;
     
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
     protected $fillable = [
         // Kolom-kolom lainnya,
         'access_menu','id','employee_id', 'fullname', 'gender', 'email', 'group_company',
@@ -20,6 +28,10 @@ class Employee extends Model
         'work_area_code', 'office_area', 'manager_l1_id', 'manager_l2_id',
         'employee_type', 'unit', 'date_of_joining', 'users_id'
     ];
+<<<<<<< HEAD
+
+    protected $table = 'employees';
+=======
     
     public function user()
     {
@@ -64,4 +76,5 @@ class Employee extends Model
     {
         return $this->hasMany(ApprovalLayerAppraisal::class, 'employee_id', 'employee_id');
     }
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
 }
