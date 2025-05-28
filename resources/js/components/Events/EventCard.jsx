@@ -1,0 +1,70 @@
+import React from "react";
+import { useApiUrl } from "../Context/ApiContext";
+import { showAlert } from "../Helper/alertHelper";
+import { useNavigate } from "react-router-dom";
+import { dateTimeHelper } from "../Helper/dateTimeHelper";
+import { getImageUrl } from "../Helper/imagePath";
+
+const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
+  const apiUrl = useApiUrl();
+  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing  } = dateTimeHelper(event); 
+  
+  const date = new Date(event.start_date);
+  const formattedDate = `${day} ${month} ${year}`;  
+  
+  const navigate = useNavigate()
+  const today = new Date();
+  // Strip time portion
+  const eventDateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());  
+  const eventDay =  eventDateOnly <= todayOnly;  
+
+  return (
+    <div className="w-full h-14 p-3 bg-white rounded-lg flex items-center gap-1">
+      <div className="flex-1 flex flex-col gap-1" onClick={() => navigate(`/event/${event.encrypted_id}`)}>
+        <div className="flex items-center gap-1">
+          <img
+            className="w-3 h-3"
+            src={getImageUrl(apiUrl, '', '', event.logo)}
+            alt={event.title}
+          />
+          <div className="text-stone-700 text-sm font-semibold">{event.title}</div>
+        </div>
+        <div className="flex items-center gap-2 pl-4 text-stone-600 text-xs font-normal">
+          <div>{formattedDate}</div>
+          <div>{`${startTime} - ${endTime}`}</div>
+          <div className="flex-1 truncate">{event.event_location}</div>
+        </div>
+      </div>
+      {event.status === 'Ongoing' && isOngoing && event.event_participant?.[0]?.attending_status === 'Attending' ? (
+        <p className="p-2 text-green-700 font-medium text-xl">
+          <i className="ri-check-double-line"></i>
+        </p>
+      ) : (
+        <button
+          onClick={() => {
+            if (eventDay || event.event_participant?.[0]?.status === 'Confirmation') {
+              onAction(event);
+            } else {
+              showAlert({
+                icon: 'info',
+                title: 'Event Not Started',
+                text: 'This event has not started yet.',
+                confirmButtonText: 'OK',
+                customClass: {
+                  popup: 'rounded-lg',
+                  confirmButton: 'bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded'
+                }
+              });
+            }
+          }}
+          className={`px-3 py-2 rounded-lg shadow-md flex items-center justify-center ${buttonClass}`}
+        >
+          {buttonText}
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default EventCard;
