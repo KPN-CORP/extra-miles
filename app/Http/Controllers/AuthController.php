@@ -16,7 +16,7 @@ class AuthController extends Controller
     }
 
     // Endpoint untuk login yang diarahkan ke auth-service
-    public function login(Request $request)
+    public function loginMobile(Request $request)
     {
         try {
             $response = $this->client->get(env('AUTH_SERVICE_URL') . '/auth-service', [
@@ -39,5 +39,15 @@ class AuthController extends Controller
                 'error' => 'Auth Service unavailable'
             ], 500);
         }
+    }
+    
+    function login() {
+        return view('pages.auth.login');
+    }
+    function auth() {
+        return redirect('login');
+    }
+    function logout() {
+        return redirect('login');
     }
 }

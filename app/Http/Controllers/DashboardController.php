@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+<<<<<<< HEAD
 use App\Models\Employee;
+=======
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+<<<<<<< HEAD
     /**
      * Display a listing of the resource.
      */
@@ -45,5 +49,17 @@ class DashboardController extends Controller
     public function destroy(string $id)
     {
         //
+=======
+    public function index()
+    {
+
+        $parentLink = 'Dashboard';
+        $link = 'Dashboard';
+
+        return view('pages.admin.dashboard.index', [
+            'link' => $link,
+            'parentLink' => $parentLink,
+        ]);
+>>>>>>> 6ad6b0c67ed9c25b2bfe98e8b37687c0300fc0ab
     }
 }

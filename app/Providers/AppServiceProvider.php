@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\URL;
+use App\Services\AppService;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
+        // You could bind services here if needed.
     }
 
     /**
@@ -21,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if (config('app.env') === 'production' || request()->isSecure()) {
-        URL::forceScheme('https');
+            URL::forceScheme('https');
         }
     }
 }
