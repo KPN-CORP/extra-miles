@@ -20,12 +20,12 @@
     "src": "node_modules/remixicon/fonts/remixicon.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BaxXbfN-.css",
+    "file": "assets/app-GiyCJrVA.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/main.jsx": {
-    "file": "assets/main-wHxp3BoW.js",
+    "file": "assets/main-Sv0WXFnE.js",
     "name": "main",
     "src": "resources/js/main.jsx",
     "isEntry": true,

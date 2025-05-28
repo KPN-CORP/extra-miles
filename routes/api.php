@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\LiveContentController;
 use App\Http\Controllers\Api\QuotesController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\SurveyVoteController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 
@@ -15,6 +16,7 @@ Route::get('auth-service', [AuthController::class, 'login']);
 Route::middleware('auth:api')->get('/verify', function (Request $request) {
     return response()->json($request->user());
 });
+
 
 Route::middleware('auth.token')->group(function () {
     Route::get('/employees', [EmployeeController::class, 'index']);
