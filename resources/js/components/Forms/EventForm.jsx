@@ -132,7 +132,7 @@ export default function EventForm() {
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
-                    navigate(`/event`);
+                    navigate(`/event`, { replace: true });
                 });
             } else {
                 showAlert({
@@ -142,7 +142,7 @@ export default function EventForm() {
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
-                    navigate(`/event`);
+                    navigate(`/event`, { replace: true });
                 });
             }
         } catch (error) {
@@ -185,7 +185,7 @@ export default function EventForm() {
                         timer: 2500,
                         showConfirmButton: false,
                     }).then(() => {
-                        navigate(`/event`);
+                        navigate(`/event`, { replace: true });
                     });
                 } else {
                     showAlert({
@@ -195,7 +195,7 @@ export default function EventForm() {
                         timer: 2500,
                         showConfirmButton: false,
                     }).then(() => {
-                        navigate(`/event`);
+                        navigate(`/event`, { replace: true });
                     });
                 }
             } catch (error) {
