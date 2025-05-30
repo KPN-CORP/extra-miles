@@ -31,7 +31,7 @@ export default () => {
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => {
-                console.log(err);
+                // console.log(err);
                 
                 // window.location.href = "https://kpncorporation.darwinbox.com/";
             });
