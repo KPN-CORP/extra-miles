@@ -53,9 +53,7 @@ const Home = () => {
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => {
-                console.log(err);
-                
-                // window.location.href = "https://kpncorporation.darwinbox.com/";
+                window.location.href = "https://kpncorporation.darwinbox.com/";
             });
           } finally {
             setLoading(false);

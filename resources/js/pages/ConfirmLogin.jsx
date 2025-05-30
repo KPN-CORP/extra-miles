@@ -13,16 +13,14 @@ function ConfirmLogin() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const token = searchParams.get('token');
-    
-    console.log(token);
-    
+    const token = searchParams.get('token');    
 
     const validateToken = async (token) => {        
       try {
         const response = await axios.get(`${apiUrl}/api/verify`, {
           headers: { Authorization: `Bearer ${token}` },
-        });                
+        });         
+               
         if (response.status === 200) {
           saveToken(token); // pakai fungsi dari context
           navigate('/');

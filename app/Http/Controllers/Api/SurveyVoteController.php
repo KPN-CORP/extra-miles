@@ -33,8 +33,9 @@ class SurveyVoteController extends Controller
                 $query->where('employee_id', $employee_id);
             }])
             ->where(function ($query) {
-                $query->whereDate('start_date', '>=', $this->today)
-                        ->orWhere('status', '!=', 'Closed');
+                $query->where('status', '!=', 'Closed')
+                      ->whereDate('start_date', '<=', $this->today)
+                      ->whereDate('end_date', '>=', $this->today);
             })
             ->get();
             
