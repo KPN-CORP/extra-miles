@@ -27,7 +27,7 @@ export default function EventCalendar() {
     const [selectedBU, setSelectedBU] = useState("All BU");
     const { token } = useAuth(); 
     const handleSwipeLeft = () => {
-    const newMonth = new Date(activeYear, activeMonth + 1, 1);
+        const newMonth = new Date(activeYear, activeMonth + 1, 1);
         setActiveMonth(newMonth.getMonth());
         setActiveYear(newMonth.getFullYear());
     };
@@ -126,6 +126,7 @@ export default function EventCalendar() {
                 <div className="calendar-container">
                     <div {...swipeHandlers}>
                         <Calendar
+                        activeStartDate={new Date(activeYear, activeMonth, 1)}
                         onChange={handleDateChange}
                         value={selectedDate}
                         view="month"
