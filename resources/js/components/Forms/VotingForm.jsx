@@ -157,7 +157,7 @@ export default function VotingForm({ participated }) {
           text: success ? 'Your response has been recorded. Thanks a bunch for your vote!' : 'Please try again later.',
           timer: 2500,
           showConfirmButton: false,
-        }).then(() => navigate(`/survey`));
+        }).then(() => navigate(`/survey`, { replace: true }));
       } catch (error) {
         console.error('Submission error:', error);
       } finally {
