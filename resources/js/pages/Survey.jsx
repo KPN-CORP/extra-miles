@@ -157,7 +157,6 @@ export default function EventCalendar() {
                                         </div>
                                         ) : (
                                         <button
-                                            onClick={() => navigate(`/${data.category}/${data.encrypted_id}`)}
                                             className="px-3 py-2 rounded-lg shadow-md flex justify-center items-center gap-2 overflow-hidden"
                                             style={{ backgroundColor: '#DEBD69' }}
                                         >
