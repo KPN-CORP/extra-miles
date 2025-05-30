@@ -13,6 +13,7 @@ import { useAuth } from "../components/context/AuthContext";
 import PageLoader from "../components/Loader/PageLoader";
 import { dateTimeHelper } from "../components/Helper/dateTimeHelper";
 import { getImageUrl } from "../components/Helper/imagePath";
+import { useSwipeable } from 'react-swipeable';
 
 export default function EventCalendar() {
 
@@ -25,7 +26,22 @@ export default function EventCalendar() {
     const [activeYear, setActiveYear] = useState(new Date().getFullYear());
     const [selectedBU, setSelectedBU] = useState("All BU");
     const { token } = useAuth(); 
-    
+    const handleSwipeLeft = () => {
+    const newMonth = new Date(activeYear, activeMonth + 1, 1);
+        setActiveMonth(newMonth.getMonth());
+        setActiveYear(newMonth.getFullYear());
+    };
+      
+    const handleSwipeRight = () => {
+        const newMonth = new Date(activeYear, activeMonth - 1, 1);
+        setActiveMonth(newMonth.getMonth());
+        setActiveYear(newMonth.getFullYear());
+    };
+      
+    const swipeHandlers = useSwipeable({
+        onSwipedLeft: handleSwipeLeft,
+        onSwipedRight: handleSwipeRight,
+    });
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -108,25 +124,26 @@ export default function EventCalendar() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Left Column: Calendar */}
                 <div className="calendar-container">
-                <Calendar
-                onChange={handleDateChange}
-                value={selectedDate}
-                view="month"
-                onActiveStartDateChange={({ activeStartDate }) => {
-                    setActiveMonth(activeStartDate.getMonth());
-                    setActiveYear(activeStartDate.getFullYear());
-                }}
-                tileContent={({ date, view }) => {
-                    const found = events.find(
-                      (e) => new Date(e.start_date).toDateString() === date.toDateString()
-                    );
-                    return found ? <span className="event-emoji">
-                        <img className="w-4 h-4" src={getImageUrl(apiUrl, '', '', found.logo)} alt={found.title} />
-                    </span> : null;
-                  }}
-                className="w-full rounded-lg shadow-md p-4"
-                />
-
+                    <div {...swipeHandlers}>
+                        <Calendar
+                        onChange={handleDateChange}
+                        value={selectedDate}
+                        view="month"
+                        onActiveStartDateChange={({ activeStartDate }) => {
+                            setActiveMonth(activeStartDate.getMonth());
+                            setActiveYear(activeStartDate.getFullYear());
+                        }}
+                        tileContent={({ date, view }) => {
+                            const found = events.find(
+                            (e) => new Date(e.start_date).toDateString() === date.toDateString()
+                            );
+                            return found ? <span className="event-emoji">
+                                <img className="w-4 h-4" src={getImageUrl(apiUrl, '', '', found.logo)} alt={found.title} />
+                            </span> : null;
+                        }}
+                        className="w-full rounded-lg shadow-md p-4"
+                        />
+                    </div>
                 </div>
 
                 {/* Right Column: Filters and Event Cards */}
