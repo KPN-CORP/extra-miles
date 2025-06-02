@@ -46,13 +46,10 @@
             <h5><span class="badge bg-info fs-4 p-1">Attending: {{ $countAttending }}</span></h5>
             <h5><span class="badge bg-dark fs-4 p-1">Not Attending: {{ $countNotAttending }} | Canceled: {{ $countCanceled }}
                 </span></h5>
-            <form action="{{ route('participants.export', $event->id) }}" method="GET" class="d-flex align-items-center">
+            <form action="{{ route('participants.export', $event->id) }}" method="GET" class="align-items-center">
                 <button type="submit" class="btn btn-success fs-4 p-1 align-middle" style="line-height: 1.2; height: 30px;">
                     <i class="ri-file-excel-2-line"></i> Export Participants
                 </button>
-                {{-- <button type="submit" class="btn btn-success px-3 py-1 fs-6" style="line-height: 1.2;">
-                    <i class="ri-file-excel-2-line me-1"></i> Export Participants
-                </button> --}}
             </form>
         </div>
 
@@ -323,58 +320,3 @@
         </div>
     </div>
 @endsection
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Set tab kembali ke active setelah reload
-        const activeTab = localStorage.getItem('activeTab');
-        if (activeTab) {
-            const triggerEl = document.querySelector(`[data-bs-target="${activeTab}"]`);
-            const tabPane = document.querySelector(`${activeTab}`);
-
-            if (triggerEl && tabPane) {
-                document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active', 'show'));
-
-                triggerEl.classList.add('active');
-                tabPane.classList.add('active', 'show');
-            }
-
-            localStorage.removeItem('activeTab');
-        }
-
-        // Saat tombol canceled diklik
-        document.querySelectorAll('.canceled-form').forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                localStorage.setItem('activeTab', '#approved');
-            });
-        });
-    });
-</script>
-
-@if (session('success'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: '{{ session('success') }}',
-                confirmButtonColor: '#ab2f2b',
-                confirmButtonText: 'OK'
-            });
-        });
-    </script>
-@endif
-
-@if (session('error'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: '{{ session('error') }}',
-                confirmButtonColor: '#ab2f2b',
-                confirmButtonText: 'OK'
-            });
-        });
-    </script>
-@endif

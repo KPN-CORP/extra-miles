@@ -25,9 +25,17 @@ use App\Http\Controllers\QuotesController;
 use App\Http\Controllers\EventParticipantController;
 use App\Livewire\ManageParticipants;
 
+
+Route::get('dbauth', [SsoController::class, 'dbauth']);
+
+Route::middleware('guest')->group(function () {
+    Route::get('register', [RegisteredUserController::class, 'create'])
+                ->name('register');
+
 Route::get('/{any?}', function () {
     return view('user-app');
 })->where('any', '^(?!admin).*$');
+
 
 Route::get('/images/{filename}', function ($filename) {
     $path = storage_path('app/public/' . $filename);
@@ -43,8 +51,10 @@ Route::prefix('admin')->group(function () {
     
     Route::middleware('auth', 'locale', 'notification')->group(function () {
 
+        // News
         Route::get('/admin/news', [NewsController::class, 'index'])->name('admin.news.index');
-    
+
+        // Event
         Route::get('/admin/events', [EventController::class, 'index'])->name('admin.events.index');
         Route::get('/admin/events/create', [EventController::class, 'create'])->name('admin.events.create');
         Route::post('/admin/events/store', [EventController::class, 'store'])->name('events.store');
@@ -58,15 +68,24 @@ Route::prefix('admin')->group(function () {
         Route::post('/admin/participants/{id}/reject', [EventParticipantController::class, 'reject'])->name('participants.reject');
         Route::get('/ticket/qr-png/{encryptedId}', [EventController::class, 'showQRPNG'])->name('event.qrpng');
         Route::get('/participants/export/{event_id}', [EventParticipantController::class, 'export'])->name('participants.export');
-    
+
+        // Survey
         Route::get('/admin/survey', [SurveyController::class, 'index'])->name('admin.survey.index');
         Route::get('/admin/survey/create', [SurveyController::class, 'create'])->name('admin.survey.create');
-    
+        Route::post('/admin/survey/store', [SurveyController::class, 'store'])->name('survey.store');
+        Route::get('/admin/survey/{id}/edit', [SurveyController::class, 'edit'])->name('survey.edit');
+        Route::put('/admin/survey/{id}', [SurveyController::class, 'update'])->name('survey.update');
+        Route::post('/admin/survey/{id}/archive', [SurveyController::class, 'archive'])->name('survey.archive');
+        Route::get('/admin/survey/{encryptedId}/participants', [SurveyController::class, 'listParticipants'])->name('survey.participants');
+
+        // Social
         Route::get('/admin/social', [SocialController::class, 'index'])->name('admin.social.index');
-    
+
+        // Quotes
         Route::get('/admin/quotes', [QuotesController::class, 'index'])->name('admin.quotes.index');
     });
     
+
     Route::fallback(function () {
         return view('errors.404');
     });

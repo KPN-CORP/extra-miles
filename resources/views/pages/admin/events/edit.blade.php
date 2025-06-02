@@ -42,10 +42,10 @@
                 <div class="col-md-12">
                     <label for="banner" class="form-label">Event Banner</label>
                     <input type="file" name="banner" id="banner" class="form-control">
-                    <small class="text-muted">Maximum file size 2MB</small><br>
+                    <small class="text-muted">Maximum file size 2MB</small>
                     @if($event->image)
                         <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#viewBannerModal">
+                        <br><button type="button" class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#viewBannerModal">
                             View Full Banner
                         </button>
 

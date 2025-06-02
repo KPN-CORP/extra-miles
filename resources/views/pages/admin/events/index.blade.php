@@ -70,11 +70,13 @@
                         <div class="tab-pane fade show active" id="open" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="card-title"></h3>
-                                <div class="input-group" style="width: 30%;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                        </div>
+                                        <input type="text" name="customsearch" id="customsearch" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                     </div>
-                                    <input type="text" name="customsearch" id="customsearch" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -188,11 +190,13 @@
                         <div class="tab-pane fade" id="closed" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="card-title"></h3>
-                                <div class="input-group" style="width: 30%;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                        </div>
+                                        <input type="text" name="customsearch1" id="customsearch1" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                     </div>
-                                    <input type="text" name="customsearch1" id="customsearch1" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -257,11 +261,13 @@
                         <div class="tab-pane fade" id="archive" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="card-title"></h3>
-                                <div class="input-group" style="width: 30%;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                        </div>
+                                        <input type="text" name="customsearch2" id="customsearch2" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                     </div>
-                                    <input type="text" name="customsearch2" id="customsearch2" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -350,120 +356,3 @@
     </div>
 </div>
 @endsection
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    // script QR Code
-    function showQRModal(token) {
-        document.getElementById("qrcode").innerHTML = "";
-
-        const dummyURL = `https://example.com/ticket/${token}`;
-        
-        new QRCode(document.getElementById("qrcode"), {
-            text: dummyURL,
-            width: 300,
-            height: 300,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-
-        const linkEl = document.getElementById("dummyLink");
-        linkEl.href = dummyURL;
-        linkEl.textContent = dummyURL;
-
-        const modal = new bootstrap.Modal(document.getElementById('qrModal'));
-        modal.show();
-    }
-
-    // // script Close Registration
-    // document.addEventListener("DOMContentLoaded", function () {
-    //     document.querySelectorAll(".btn-close-reg").forEach(function (btn) {
-    //         btn.addEventListener("click", function () {
-    //             const eventId = this.getAttribute("data-id");
-
-    //             Swal.fire({
-    //                 title: 'Are you sure?',
-    //                 text: "This will close registration and set the status to 'Full Booked'.",
-    //                 icon: 'warning',
-    //                 showCancelButton: true,
-    //                 confirmButtonColor: '#ab2f2b',
-    //                 cancelButtonColor: '#aaa',
-    //                 confirmButtonText: 'Yes, close it!'
-    //             }).then((result) => {
-    //                 if (result.isConfirmed) {
-    //                     document.getElementById(`close-form-${eventId}`).submit();
-    //                 }
-    //             });
-    //         });
-    //     });
-    // });
-
-    // script Archive Event
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".btn-archive").forEach(function (button) {
-            button.addEventListener("click", function () {
-                const eventId = this.getAttribute("data-id");
-    
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Event will be archived.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ab2f2b',
-                    cancelButtonColor: '#aaa',
-                    confirmButtonText: 'Yes, archive it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById(`delete-form-${eventId}`).submit();
-                    }
-                });
-            });
-        });
-
-        document.querySelectorAll(".btn-close-reg").forEach(function (btn) {
-            btn.addEventListener("click", function () {
-                const id = this.dataset.id;
-                const action = this.dataset.action;
-                const message = action === 'close' 
-                    ? 'Close registration for this event?' 
-                    : 'Reopen registration for this event?';
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: message,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ab2f2b',
-                    cancelButtonColor: '#aaa',
-                    confirmButtonText: 'Yes, continue'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById(`close-form-${id}`).submit();
-                    }
-                });
-            });
-        });
-
-        function updateDateTime() {
-            const now = new Date();
-
-            // Format time
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            // Update DOM elements
-            const currentTimeEl = document.getElementById('currentTime');
-            if (currentTimeEl) {
-                currentTimeEl.textContent = `${hours}:${minutes}:${seconds}`;
-            }
-        }
-
-        // Update immediately and then every second
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-    });
-
-</script>
