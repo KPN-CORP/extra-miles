@@ -1,7 +1,9 @@
 // App.jsx
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { ApiProvider } from './components/Context/ApiContext';
+import { AnimatePresence } from "framer-motion";
+import { NavigationProvider } from './components/Context/NavigationProvider'; // sesuaikan path
 
 // Pages
 import Home from './pages/Home';
@@ -13,6 +15,25 @@ import Survey from './pages/Survey';
 import SurveyDetails from './pages/SurveyDetails';
 import VoteDetails from './pages/VoteDetails';
 import { AuthProvider } from './components/context/AuthContext';
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/login-success" element={<ConfirmLogin />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/event" element={<Event />} />
+        <Route path="/event/:id" element={<EventDetails />} />
+        <Route path="/event-registration/:id" element={<EventRegistration />} />
+        <Route path="/survey" element={<Survey />} />
+        <Route path="/survey/:id" element={<SurveyDetails />} />
+        <Route path="/vote/:id" element={<VoteDetails />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 const AppContent = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 450);
@@ -54,16 +75,9 @@ const AppContent = () => {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/login-success" element={<ConfirmLogin />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/event" element={<Event />} />
-        <Route path="/event/:id" element={<EventDetails />} />
-        <Route path="/event-registration/:id" element={<EventRegistration />} />
-        <Route path="/survey" element={<Survey />} />
-        <Route path="/survey/:id" element={<SurveyDetails />} />
-        <Route path="/vote/:id" element={<VoteDetails />} />
-      </Routes>
+      <NavigationProvider>
+        <AnimatedRoutes />
+      </NavigationProvider>
     </Router>
   );
 };

@@ -8,8 +8,10 @@ export const showAlert = (options) => {
     const defaultOptions = {
       icon: 'info',
       confirmButtonText: 'OK',
+      reverseButtons: true,
       customClass: {
-        confirmButton: 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded'
+        confirmButton: 'bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded',
+        cancelButton: 'bg-stone-500 hover:bg-stone-600 text-white px-4 py-2 rounded'
       }
     };
   

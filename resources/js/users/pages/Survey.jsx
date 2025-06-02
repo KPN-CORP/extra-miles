@@ -4,13 +4,26 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import 'react-calendar/dist/Calendar.css';
-import '../../css/calendar-custom.css';
+import '../../../css/calendar-custom.css';
 import { useApiUrl } from "../components/Context/ApiContext";
 import { showAlert } from "../components/Helper/alertHelper";
 import { useAuth } from "../components/context/AuthContext";
-import PageLoader from "../components/Loader/PageLoader";
 import { dateTimeHelper } from "../components/Helper/dateTimeHelper";
 import { getImageUrl } from "../components/Helper/imagePath";
+import SurveyLoader from "../components/Loader/SurveyLoader";
+import { motion } from "framer-motion";
+
+const pageVariants = {
+    initial: { opacity: 0, x: 0 },     // Masuk dari kanan
+    animate: { opacity: 1, x: 0 },       // Diam di tengah
+    exit: { opacity: 0, x: 0 },       // Keluar ke kiri
+};
+
+const pageVariants2 = {
+    initial: { opacity: 0, y: 100 },     // Masuk dari kanan
+    animate: { opacity: 1, y: 0 },       // Diam di tengah
+    exit: { opacity: 0, y: 100 },       // Keluar ke kiri
+};
 
 export default function EventCalendar() {
 
@@ -64,11 +77,7 @@ export default function EventCalendar() {
         } else {
           setSelectedDate(date); // select new
         }
-      };
-
-    if (loading) {
-        return <PageLoader />;
-      }      
+      };    
 
     if (!datas) {
         // No event found after loading
@@ -86,9 +95,19 @@ export default function EventCalendar() {
     }  
   
     return (
-        <>
         <div className="w-full min-h-screen flex flex-col bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto">
-            <div className="p-5">
+        {loading ? (
+            <SurveyLoader />
+          ) : (
+            <>
+            <motion.div
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="p-5"
+            >
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex-1">
                         <button
@@ -114,8 +133,15 @@ export default function EventCalendar() {
                         />
                     </div>
                 </div>
-            </div>
-            <div className="flex-1 w-full bg-red-700 rounded-t-3xl p-5 overflow-auto">
+            </motion.div>
+            <motion.div
+            variants={pageVariants2}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="flex-1 w-full bg-red-700 rounded-t-3xl p-5 overflow-auto"
+            >
                 <div className="flex flex-col justify-start items-start gap-3 w-full">
                 {datas.length === 0 ? (
                     <div className="w-full justify-center text-center text-white font-medium py-4">
@@ -129,7 +155,7 @@ export default function EventCalendar() {
                             return (
                                 <div onClick={() => navigate(`/${data.category}/${data.encrypted_id}`, {
                                     state: { participated }
-                                  })} key={data.encrypted_id} className={`w-full px-3 py-2 bg-white rounded-xl shadow-md flex justify-start items-center gap-3 overflow-hidden ${daysUntil === 'Ended' ? 'hidden' : ''}`}>
+                                })} key={data.encrypted_id} className={`w-full px-3 py-2 bg-white rounded-xl shadow-md flex justify-start items-center gap-3 overflow-hidden ${daysUntil === 'Ended' ? 'hidden' : ''}`}>
                                     <div className="relative overflow-hidden">
                                     <img
                                         className="w-10 h-12 object-cover"
@@ -152,8 +178,8 @@ export default function EventCalendar() {
                                         </div>
                                     </div>
                                     {participated ? (
-                                        <div className="px-2 py-1 rounded-full shadow-md flex justify-center items-center gap-2 overflow-hidden bg-green-600">
-                                            <i className="ri-check-line text-white text-xl"></i>
+                                        <div className="px-2 py-1 rounded-full shadow-md flex justify-center items-center gap-2 overflow-hidden bg-white ring-1 ring-green-600">
+                                            <i className="ri-check-double-line text-xl text-green-600"></i>
                                         </div>
                                         ) : (
                                         <button
@@ -168,8 +194,10 @@ export default function EventCalendar() {
                         })
                     )}
                 </div>
-            </div>
+            </motion.div>
+            </>
+          )
+        }
         </div>
-        </>
     );
 }

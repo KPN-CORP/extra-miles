@@ -137,11 +137,25 @@ export default function VotingForm({ participated }) {
   
     const onSubmit = async (values, { setSubmitting }) => {
       try {
+        const result = await showAlert({
+          icon: 'question',
+          title: 'Are you sure?',
+          text: 'Do you want to submit your vote now?',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, submit',
+          cancelButtonText: 'Cancel',
+        });
+    
+        if (!result.isConfirmed) {
+          setSubmitting(false);
+          return;
+        }
+    
         const payload = {
           surveyId: id,
           formData: values,
         };
-  
+    
         const response = await axios.post(`${apiUrl}/api/survey`, payload, {
           headers: {
             'Content-Type': 'application/json',
@@ -149,12 +163,14 @@ export default function VotingForm({ participated }) {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+    
         const success = response.status === 201;
         showAlert({
           icon: success ? 'success' : 'error',
           title: success ? 'Success!' : 'Something went wrong',
-          text: success ? 'Your response has been recorded. Thanks a bunch for your vote!' : 'Please try again later.',
+          text: success
+            ? 'Your response has been recorded. Thanks a bunch for your vote!'
+            : 'Please try again later.',
           timer: 2500,
           showConfirmButton: false,
         }).then(() => navigate(`/survey`, { replace: true }));
@@ -163,7 +179,7 @@ export default function VotingForm({ participated }) {
       } finally {
         setSubmitting(false);
       }
-    };
+    };    
   
     if (loading) {
       return <PulseLoader className='w-full justify-center text-center' margin={2} size={8} color="#FFF" speedMultiplier={0.75} />;
@@ -179,8 +195,23 @@ export default function VotingForm({ participated }) {
           onSubmit={onSubmit}
           enableReinitialize
         >
-          {({ values, handleChange, handleBlur, isSubmitting }) => (
-            <Form>
+          {({ values, handleChange, handleBlur, isSubmitting, validateForm, isValid }) => (
+            <Form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const errors = await validateForm();
+                if (Object.keys(errors).length > 0) {
+                  showAlert({
+                    icon: 'warning',
+                    title: 'No vote detected',
+                    text: 'Please make your selection before submitting the form.',
+                  });
+                  return;
+                }
+                // submit jika valid
+                onSubmit(values, { setSubmitting: () => {} });
+              }}
+            >
               {formFields.map((field, index) => (
                 <div key={index}>
                   {field.type === 'checkbox' && field.options && !participated ? (
@@ -254,7 +285,7 @@ export default function VotingForm({ participated }) {
                     <ErrorMessage
                       name={field.name}
                       render={() => (
-                        <div className="w-full bg-red-100 rounded-xl shadow-lg flex items-center gap-2 mb-4 p-2 px-3 text-red-700 font-medium text-sm">
+                        <div className="w-full bg-red-100 rounded-xl shadow-lg flex items-center gap-2 mb-4 p-2 px-3 text-white font-medium text-sm">
                           <i className="ri-error-warning-line text-lg"></i>
                           {`Kamu belum pilih ${field.label}`}
                         </div>
