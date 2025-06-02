@@ -110,7 +110,7 @@ export default function EventDetails() {
             <div className="flex-1" /> {/* Spacer to balance layout */}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <img className="w-full object-cover rounded-lg" src={getImageUrl(apiUrl, 'events', '', event.image)} />
+            <img className="w-full object-cover rounded-lg" src={getImageUrl(apiUrl, event.image)} />
             <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
                 <div className="self-stretch justify-start text-red-700 text-lg font-semibold">{event.title}</div>
                 <div className="flex gap-2">

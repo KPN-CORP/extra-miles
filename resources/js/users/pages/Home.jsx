@@ -82,11 +82,11 @@ const Home = () => {
                 <div className="fixed bottom-0 right-0 w-44 h-40 overflow-hidden">
                     <img
                     className="w-full h-full object-cover"
-                    src={getImageUrl(apiUrl, '', '', 'Element Extra Mile 1.png')}
+                    src={getImageUrl(apiUrl, 'assets/images/Element Extra Mile 1.png')}
                     alt="attribute"
                     />
                 </div>
-                <img className={`w-full h-36 left-0 top-0 absolute`} src={getImageUrl(apiUrl, '', '', 'img-banner.png')} />
+                <img className={`w-full h-36 left-0 top-0 absolute`} src={getImageUrl(apiUrl, 'assets/images/img-banner.png')} />
                 <div className="w-full px-5 py-4 left-0 top-[150px] absolute rounded-tl-[30px] rounded-tr-[30px flex-col justify-start items-start gap-6 overflow-auto">
                     <div className="flex flex-col gap-2 mb-4">
                     {/* Employee Section */}

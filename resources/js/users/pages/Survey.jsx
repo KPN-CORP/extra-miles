@@ -128,7 +128,7 @@ export default function EventCalendar() {
                     <div className="w-1/3 relative rounded-lg overflow-hidden">
                     <img
                         className="w-full h-full object-cover"
-                        src={getImageUrl(apiUrl, 'surveys', '', 'banner-survey-img.png')}
+                        src={getImageUrl(apiUrl, 'assets/images/surveys/banner-survey-img.png')}
                         alt="Banner"
                         />
                     </div>
@@ -159,7 +159,7 @@ export default function EventCalendar() {
                                     <div className="relative overflow-hidden">
                                     <img
                                         className="w-10 h-12 object-cover"
-                                        src={getImageUrl(apiUrl, 'surveys', data.category, data.icon)}
+                                        src={getImageUrl(apiUrl, data.icon)}
                                         alt="Survey"
                                         />
                                     </div>

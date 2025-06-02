@@ -1,13 +1,5 @@
-export function getImageUrl(apiUrl, category, sub, image) {
-    let path = 'storage/assets/images';
-
-    if (category?.trim()) {
-        path += `/${category.trim()}`;
-    }
-
-    if (sub?.trim()) {
-        path += `/${sub.trim()}`;
-    }
+export function getImageUrl(apiUrl, image) {
+    let path = 'storage';
 
     return `${apiUrl}/${path}/${image}`;
 }
