@@ -3,6 +3,7 @@
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
 @if(Session::has('toast'))
 <script>
@@ -168,3 +169,40 @@
         });
     </script>
 @endif
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const startInput = document.getElementById('start_date');
+      const endInput = document.getElementById('end_date');
+  
+      startInput.addEventListener('change', function () {
+        endInput.min = this.value;
+      });
+  
+      endInput.addEventListener('change', function () {
+        if (this.value < startInput.value) {
+          alert("End Date tidak boleh kurang dari Start Date!");
+          this.value = '';
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        ClassicEditor
+            .create(document.querySelector('#description'), {
+                toolbar: [
+                    'heading',
+                    '|',
+                    'bold', 'italic', 'underline', 'strikethrough',
+                    '|',
+                    'bulletedList', 'numberedList',
+                    '|',
+                    'undo', 'redo'
+                ],
+                removePlugins: ['Image', 'ImageToolbar', 'EasyImage', 'ImageUpload', 'MediaEmbed', 'CKFinder']
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+</script>

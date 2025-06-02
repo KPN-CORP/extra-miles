@@ -27,7 +27,6 @@ use App\Livewire\ManageParticipants;
 Route::get('language/{locale}', [LanguageController::class, 'switchLanguage'])->name('language.switch');
 
 Route::get('dbauth', [SsoController::class, 'dbauth']);
-Route::get('sourcermb/dbauth', [SsoController::class, 'dbauthReimburse']);
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -64,8 +63,10 @@ Route::middleware('auth', 'locale', 'notification')->group(function () {
 
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     
+    // News
     Route::get('/admin/news', [NewsController::class, 'index'])->name('admin.news.index');
 
+    // Event
     Route::get('/admin/events', [EventController::class, 'index'])->name('admin.events.index');
     Route::get('/admin/events/create', [EventController::class, 'create'])->name('admin.events.create');
     Route::post('/admin/events/store', [EventController::class, 'store'])->name('events.store');
@@ -80,11 +81,19 @@ Route::middleware('auth', 'locale', 'notification')->group(function () {
     Route::get('/ticket/qr-png/{encryptedId}', [EventController::class, 'showQRPNG'])->name('event.qrpng');
     Route::get('/participants/export/{event_id}', [EventParticipantController::class, 'export'])->name('participants.export');
 
+    // Survey
     Route::get('/admin/survey', [SurveyController::class, 'index'])->name('admin.survey.index');
     Route::get('/admin/survey/create', [SurveyController::class, 'create'])->name('admin.survey.create');
+    Route::post('/admin/survey/store', [SurveyController::class, 'store'])->name('survey.store');
+    Route::get('/admin/survey/{id}/edit', [SurveyController::class, 'edit'])->name('survey.edit');
+    Route::put('/admin/survey/{id}', [SurveyController::class, 'update'])->name('survey.update');
+    Route::post('/admin/survey/{id}/archive', [SurveyController::class, 'archive'])->name('survey.archive');
+    Route::get('/admin/survey/{encryptedId}/participants', [SurveyController::class, 'listParticipants'])->name('survey.participants');
 
+    // Social
     Route::get('/admin/social', [SocialController::class, 'index'])->name('admin.social.index');
 
+    // Quotes
     Route::get('/admin/quotes', [QuotesController::class, 'index'])->name('admin.quotes.index');
     
     // Authentication

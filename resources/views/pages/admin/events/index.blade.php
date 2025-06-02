@@ -70,11 +70,13 @@
                         <div class="tab-pane fade show active" id="open" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="card-title"></h3>
-                                <div class="input-group" style="width: 30%;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                        </div>
+                                        <input type="text" name="customsearch" id="customsearch" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                     </div>
-                                    <input type="text" name="customsearch" id="customsearch" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -188,11 +190,13 @@
                         <div class="tab-pane fade" id="closed" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="card-title"></h3>
-                                <div class="input-group" style="width: 30%;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                        </div>
+                                        <input type="text" name="customsearch1" id="customsearch1" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                     </div>
-                                    <input type="text" name="customsearch1" id="customsearch1" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -257,11 +261,13 @@
                         <div class="tab-pane fade" id="archive" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="card-title"></h3>
-                                <div class="input-group" style="width: 30%;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
+                                        </div>
+                                        <input type="text" name="customsearch2" id="customsearch2" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                     </div>
-                                    <input type="text" name="customsearch2" id="customsearch2" class="form-control w-border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
                                 </div>
                             </div>
                             <div class="table-responsive">
