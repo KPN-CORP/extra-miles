@@ -130,7 +130,7 @@ export default function VoteList() {
                         <>
                             {loadingBanner && <BannerLoader className='w-full object-fill rounded-3xl' />}
                             <img
-                            src={getImageUrl(apiUrl, 'surveys', data.category, data.banner)}
+                            src={getImageUrl(apiUrl, data.banner)}
                             alt="Banner"
                             onLoad={handleImageLoad}
                             onError={handleImageLoad}

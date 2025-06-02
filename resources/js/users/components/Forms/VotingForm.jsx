@@ -255,7 +255,7 @@ export default function VotingForm({ participated }) {
                             className="w-full p-4 bg-white rounded-xl ring-1 ring-inset ring-red-700 shadow-lg flex items-center gap-3 overflow-hidden"
                           >
                             <img
-                              src={getImageUrl(apiUrl, 'surveys', 'vote', 'candidate-img.jpg')}
+                              src={getImageUrl(apiUrl, 'assets/images/surveys/vote/candidate-img.jpg')}
                               alt="Profile"
                               className="w-12 h-12 rounded-full"
                             />

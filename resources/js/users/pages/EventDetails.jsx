@@ -140,7 +140,7 @@ export default function EventDetails() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <img
-                  src={getImageUrl(apiUrl, 'events', '', event.image)}
+                  src={getImageUrl(apiUrl, event.image)}
                   alt={event.title}
                   className="w-full object-fill rounded-lg"
               />

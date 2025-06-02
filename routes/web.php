@@ -30,7 +30,7 @@ Route::get('/{any?}', function () {
 })->where('any', '^(?!admin).*$');
 
 Route::get('/images/{filename}', function ($filename) {
-    $path = storage_path('app/public/assets/images/' . $filename);
+    $path = storage_path('app/public/' . $filename);
 
     if (!file_exists($path)) {
         abort(404);

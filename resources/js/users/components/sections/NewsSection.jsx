@@ -12,19 +12,19 @@ export default () => {
       id: 1,
       date: "Rabu, 03 April 2025",
       title: "KPN Corp Gelar Buka Puasa dan Berbagi Kepedulian serta Kebahagiaan",
-      image: "News-img-1.png",
+      image: "assets/images/news/News-img-1.png",
     },
     {
       id: 2,
       date: "Selasa, 02 April 2025",
       title: "Operasi Pasar KPN Corp-Kemendag Sediakan Ribuan Liter Minyak Goreng",
-      image: "News-img-2.png",
+      image: "assets/images/news/News-img-2.png",
     },
     {
       id: 3,
       date: "Senin, 27 Maret 2025",
       title: "Jembatan Penghubung Mimpi",
-      image: "News-img-3.png",
+      image: "assets/images/news/News-img-3.png",
     },
     // Add more cards as needed
   ];
@@ -61,7 +61,7 @@ export default () => {
                     <img
                       className={`w-full h-full object-cover transition-opacity duration-300 ${
                         isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                      src={getImageUrl(apiUrl, '', '', card.image)}
+                      src={getImageUrl(apiUrl, card.image)}
                       alt={card.title}
                       loading="lazy"
                       onLoad={() => setIsImageLoaded(true)} // Trigger when image loads

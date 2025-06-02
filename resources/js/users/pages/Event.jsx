@@ -155,7 +155,7 @@ export default function EventCalendar() {
                                 (e) => new Date(e.start_date).toDateString() === date.toDateString()
                                 );
                                 return found ? <span className="event-emoji">
-                                    <img className="w-4 h-4" src={getImageUrl(apiUrl, '', '', found.logo)} alt={found.title} />
+                                    <img className="w-4 h-4" src={getImageUrl(apiUrl, found.logo)} alt={found.title} />
                                 </span> : null;
                             }}
                             className="w-full rounded-lg shadow-md p-4"
@@ -256,7 +256,7 @@ export default function EventCalendar() {
                                             </div>
                                         </div>
                                         <img
-                                            src={getImageUrl(apiUrl, 'events', '', event.image)}
+                                            src={getImageUrl(apiUrl, event.image)}
                                             alt="Event Thumbnail"
                                             className="object-cover w-20"
                                         />

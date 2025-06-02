@@ -25,7 +25,7 @@ const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
         <div className="flex items-center gap-1">
           <img
             className="w-3 h-3"
-            src={getImageUrl(apiUrl, '', '', event.logo)}
+            src={getImageUrl(apiUrl, event.logo)}
             alt={event.title}
           />
           <div className="text-stone-700 text-sm font-semibold">{event.title}</div>
