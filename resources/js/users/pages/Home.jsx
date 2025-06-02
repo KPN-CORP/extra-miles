@@ -4,9 +4,9 @@ import { useApiUrl } from "../components/Context/ApiContext"; // Assuming you ha
 import NewsSection from '../components/sections/NewsSection'; // Assuming you have a NewsCard component
 import MenuSection from '../components/sections/MenuSection'; // Assuming you have a NewsCard component
 import axios from 'axios';
-import ActivitySection from '../components/Sections/ActivitySection';
+import ActivitySection from '../components/sections/ActivitySection';
 import QuoteSection from '../components/sections/QuoteSection';
-import AssetSection from '../components/Sections/AssetSection';
+import AssetSection from '../components/sections/AssetSection';
 import { showAlert } from '../components/Helper/alertHelper';
 import { useAuth } from '../components/context/AuthContext';
 import PageLoader from '../components/Loader/PageLoader';

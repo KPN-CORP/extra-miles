@@ -20,14 +20,14 @@
     "src": "node_modules/remixicon/fonts/remixicon.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-GiyCJrVA.css",
+    "file": "assets/app-DO0s92C7.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
-  "resources/js/main.jsx": {
-    "file": "assets/main-BQ-VpvCf.js",
+  "resources/js/users/main.jsx": {
+    "file": "assets/main-24yWg_t9.js",
     "name": "main",
-    "src": "resources/js/main.jsx",
+    "src": "resources/js/users/main.jsx",
     "isEntry": true,
     "css": [
       "assets/main-CH7yEnXz.css"
