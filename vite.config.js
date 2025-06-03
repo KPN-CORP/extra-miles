@@ -11,6 +11,7 @@ export default defineConfig({
                 "resources/js/users/main.jsx",
                 "resources/scss/app.scss",
                 "resources/scss/icons.scss",
+                "resources/js/app.js",
             ],
             refresh: true,
         }),

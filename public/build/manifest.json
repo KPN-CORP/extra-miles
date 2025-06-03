@@ -1,4 +1,8 @@
 {
+  "_cloneDeep-DzRP12Gi.js": {
+    "file": "assets/cloneDeep-DzRP12Gi.js",
+    "name": "cloneDeep"
+  },
   "node_modules/remixicon/fonts/remixicon.eot": {
     "file": "assets/remixicon-BVJ9S1ev.eot",
     "src": "node_modules/remixicon/fonts/remixicon.eot"
@@ -56,11 +60,26 @@
     "file": "assets/remixicon-BBTkVcFJ.woff2",
     "src": "resources/fonts/remixicon.woff2"
   },
+  "resources/js/app.js": {
+    "file": "assets/app-PMb8QTHB.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_cloneDeep-DzRP12Gi.js"
+    ],
+    "css": [
+      "assets/app-DVNhP-d0.css"
+    ]
+  },
   "resources/js/users/main.jsx": {
-    "file": "assets/main-BMGVgUlH.js",
+    "file": "assets/main-3NX4UbK6.js",
     "name": "main",
     "src": "resources/js/users/main.jsx",
     "isEntry": true,
+    "imports": [
+      "_cloneDeep-DzRP12Gi.js"
+    ],
     "css": [
       "assets/main-CH7yEnXz.css"
     ],
