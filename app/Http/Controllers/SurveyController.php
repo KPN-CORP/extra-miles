@@ -33,18 +33,18 @@ class SurveyController extends Controller
             }
         }
 
-        $surveyList = survey::withCount('participants')
+        $surveyList = survey::withCount('surveyParticipant')
         ->whereIn('status', ['Ongoing', 'Draft'])
         ->orderBy('created_at', 'desc')
         ->get();
 
-        $surveyClosed = survey::withCount('participants')
+        $surveyClosed = survey::withCount('surveyParticipant')
         ->whereIn('status', ['Closed'])
         ->orderBy('created_at', 'desc')
         ->get();
 
         $surveyArchive = survey::onlyTrashed()
-        ->withCount('participants')
+        ->withCount('surveyParticipant')
         ->orderBy('created_at', 'desc')
         ->get();
 
