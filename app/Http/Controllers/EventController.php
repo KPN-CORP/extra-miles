@@ -128,7 +128,7 @@ class EventController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('banner')) {
-            $imagePath = $request->file('banner')->store('event_banners', 'public');
+            $imagePath = $request->file('banner')->store('assets/images/events', 'public');
         }
 
         Event::create([
@@ -231,7 +231,7 @@ class EventController extends Controller
 
         // Upload banner jika ada
         if ($request->hasFile('banner')) {
-            $path = $request->file('banner')->store('event_banners', 'public');
+            $path = $request->file('banner')->store('assets/images/events', 'public');
             $event->image = $path;
         }
 

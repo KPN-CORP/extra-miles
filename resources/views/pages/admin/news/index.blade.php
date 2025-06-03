@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0"></h3>
-        <a href="{{ route('admin.events.create') }}" class="btn btn-primary">Create News</a>
+        <a href="#" class="btn btn-primary">Create News</a>
     </div>
     <div class="row">
         <div class="col-md-12">
