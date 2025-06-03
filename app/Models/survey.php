@@ -5,22 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Crypt;
 
-class survey extends Model
+class Survey extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'surveys';
+    protected $appends = ['encrypted_id'];
+    // protected $hidden = ['id'];
 
-    protected $fillable = [
-        'category', 'start_date', 'time_start', 'end_date', 'time_end',
-        'title', 'description', 'banner', 'icon', 'status', 'quota', 'related', 'quota', 'form_id','event_id',
-        'businessUnit', 'unit', 'jobLevel', 'location', 'created_by', 'deleted_at'
-    ];
-
-    public function participants()
+    public function surveyParticipant()
     {
-        return $this->hasMany(survey_participant::class);
+        return $this->hasMany(SurveyParticipant::class, 'survey_id', 'id');
+    }
+
+    public function getEncryptedIdAttribute()
+    {
+        return Crypt::encryptString($this->id);
     }
 }

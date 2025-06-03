@@ -12,12 +12,7 @@ class SsoController extends Controller
 {
     public function dbauth(Request $request)
     {
-        return $this->handleDbauth($request, route('goals', absolute: false), 'kpnpm');
-    }
-
-    public function dbauthReimburse(Request $request)
-    {
-        return $this->handleDbauth($request, route('reimbursements', absolute: false), 'kpnreimburse');
+        return $this->handleDbauth($request, route('admin.dashboard', absolute: false), 'kpnem');
     }
 
     private function handleDbauth(Request $request, $redirectRoute, $sessionValue)
