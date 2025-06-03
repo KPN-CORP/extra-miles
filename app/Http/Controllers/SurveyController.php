@@ -79,7 +79,7 @@ class SurveyController extends Controller
         
         $grades = Grade::select('group_name')
             ->distinct()
-            ->orderBy('id')
+            ->orderBy('group_name')
             ->get();
 
         $events = Event::whereNotIn('status', ['Draft'])
@@ -169,7 +169,7 @@ class SurveyController extends Controller
         
         $grades = Grade::select('group_name')
             ->distinct()
-            ->orderBy('id')
+            ->orderBy('group_name')
             ->get();
 
         $events = Event::whereNotIn('status', ['Draft'])
@@ -274,7 +274,7 @@ class SurveyController extends Controller
         
         $grades = Grade::select('group_name')
             ->distinct()
-            ->orderBy('id')
+            ->orderBy('group_name')
             ->get();
 
         $events = Event::whereNotIn('status', ['Draft'])

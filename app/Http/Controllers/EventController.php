@@ -97,7 +97,7 @@ class EventController extends Controller
         
         $grades = Grade::select('group_name')
             ->distinct()
-            ->orderBy('id')
+            ->orderBy('group_name')
             ->get();
 
         return view('pages.admin.events.create', [
@@ -183,7 +183,7 @@ class EventController extends Controller
         
         $grades = Grade::select('group_name')
             ->distinct()
-            ->orderBy('id')
+            ->orderBy('group_name')
             ->get();
 
         return view('pages.admin.events.edit', compact('link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations'));
