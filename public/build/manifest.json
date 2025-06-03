@@ -72,6 +72,18 @@
       "assets/app-DVNhP-d0.css"
     ]
   },
+  "resources/js/head.js": {
+    "file": "assets/head-DoQpomps.js",
+    "name": "head",
+    "src": "resources/js/head.js",
+    "isEntry": true
+  },
+  "resources/js/layout.js": {
+    "file": "assets/layout-De5pXFvi.js",
+    "name": "layout",
+    "src": "resources/js/layout.js",
+    "isEntry": true
+  },
   "resources/js/users/main.jsx": {
     "file": "assets/main-3NX4UbK6.js",
     "name": "main",
