@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import 'react-calendar/dist/Calendar.css';
 import '../../../css/calendar-custom.css';
-import { useApiUrl } from "../components/Context/ApiContext";
+import { useApiUrl } from "../components/context/ApiContext";
 import { showAlert } from "../components/Helper/alertHelper";
 import { useAuth } from "../components/context/AuthContext";
 import { dateTimeHelper } from "../components/Helper/dateTimeHelper";
@@ -25,7 +25,7 @@ const pageVariants2 = {
     exit: { opacity: 0, y: 100 },       // Keluar ke kiri
 };
 
-export default function EventCalendar() {
+export default function Survey() {
 
     const navigate = useNavigate()
     const [datas, setData] = useState([]);

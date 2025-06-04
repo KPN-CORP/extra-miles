@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import 'react-calendar/dist/Calendar.css';
 import '../../../css/calendar-custom.css';
-import { useApiUrl } from "../components/Context/ApiContext";
+import { useApiUrl } from "../components/context/ApiContext";
 import { showAlert } from "../components/Helper/alertHelper";
 import { useAuth } from "../components/context/AuthContext";
 import { getImageUrl } from "../components/Helper/imagePath";

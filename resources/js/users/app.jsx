@@ -1,7 +1,7 @@
 // App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { ApiProvider } from './components/Context/ApiContext';
+import { ApiProvider } from './components/context/ApiContext';
 import { AnimatePresence } from "framer-motion";
 import { NavigationProvider } from './components/Context/NavigationProvider'; // sesuaikan path
 
@@ -15,6 +15,8 @@ import Survey from './pages/Survey';
 import SurveyDetails from './pages/SurveyDetails';
 import VoteDetails from './pages/VoteDetails';
 import { AuthProvider } from './components/context/AuthContext';
+import News from './pages/News';
+import NewsDetails from './pages/NewsDetails';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -30,6 +32,8 @@ const AnimatedRoutes = () => {
         <Route path="/survey" element={<Survey />} />
         <Route path="/survey/:id" element={<SurveyDetails />} />
         <Route path="/vote/:id" element={<VoteDetails />} />
+        <Route path="/news" element={<News />} />
+        <Route path="/news/:id" element={<NewsDetails />} />
       </Routes>
     </AnimatePresence>
   );
@@ -83,11 +87,11 @@ const AppContent = () => {
 };
 
 const AppWrapper = () => (
-  <AuthProvider>
     <ApiProvider>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ApiProvider>
-  </AuthProvider>
 );
 
 export default AppWrapper;

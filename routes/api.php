@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\LiveContentController;
+use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\QuotesController;
 use App\Http\Controllers\Api\SurveyVoteController;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ Route::middleware('auth:api')->get('/verify', function (Request $request) {
 
 
 Route::middleware('auth.token')->group(function () {
-    Route::get('/employees', [EmployeeController::class, 'index']);
+    Route::get('/profile', [EmployeeController::class, 'profile']);
     Route::get('/events', [EventController::class, 'getEvents']);
     Route::get('/my-event', [EventController::class, 'myEvents']);
     Route::get('/events/{id}', [EventController::class, 'getEventDetails']);
@@ -33,6 +34,9 @@ Route::middleware('auth.token')->group(function () {
     Route::get('/survey-form/{id}', [SurveyVoteController::class, 'getSurveyForm']);
     Route::post('/survey', [SurveyVoteController::class, 'store']);
     Route::get('/voting-result/{id}', [SurveyVoteController::class, 'getVotingResult']);
+    Route::get('/news', [NewsController::class, 'getNews']);
+    Route::get('/news/{id}', [NewsController::class, 'getNewsDetails']);
+    Route::post('/news/{id}/like', [NewsController::class, 'handleLike']);
     Route::get('/quotes', [QuotesController::class, 'getQuotes']);
     Route::get('/live-content', [LiveContentController::class, 'getLiveContent']);
 });

@@ -40,6 +40,7 @@ class EventController extends Controller
           $query->whereDate('start_date', '>=', $this->today)
                 ->orWhere('status', '!=', 'Closed');
       })
+      ->orderBy('start_date', 'asc')
       ->get();
 
       return response()->json($events);

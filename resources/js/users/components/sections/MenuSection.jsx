@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
-import { useApiUrl } from "../Context/ApiContext";
+import { useApiUrl } from "../context/ApiContext";
 import LiveContent from "../../pages/LiveContent";
 import { useAuth } from "../context/AuthContext";
 import { showAlert } from "../Helper/alertHelper";
@@ -72,7 +72,7 @@ export default () => {
   };
 
 return (
-    <div className="self-stretch flex flex-col justify-start items-start gap-3 mb-4">
+    <div className="self-stretch flex flex-col justify-start items-start gap-3">
         <div className="self-stretch inline-flex justify-center items-start gap-3">
           <button onClick={() => navigate("/event")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-xs font-semibold">
             🎉 Upcoming Events

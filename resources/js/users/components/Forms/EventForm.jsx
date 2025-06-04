@@ -2,7 +2,7 @@ import React from 'react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { PulseLoader } from 'react-spinners';
-import { useApiUrl } from '../Context/ApiContext';
+import { useApiUrl } from '../context/ApiContext';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom'; // Import useParams to get id from endpoint
 import { showAlert } from '../Helper/alertHelper';
@@ -154,7 +154,11 @@ export default function EventForm() {
     };
 
     if (loading) {
-        return <PulseLoader cssOverride={{}} margin={2} size={8} color="#B91C1C" speedMultiplier={0.75} />;
+        return (
+            <div className="w-full inline-flex justify-center items-center overflow-hidden">
+                <PulseLoader cssOverride={{}} margin={2} size={8} color="#B91C1C" speedMultiplier={0.75} />
+            </div>
+        )
     }
 
     if (showRegistrationButton) {
@@ -220,7 +224,7 @@ export default function EventForm() {
                     {isSubmitting ? (
                         <PulseLoader size={8} color="#fff" margin={2} speedMultiplier={0.75} />
                     ) : (
-                        'Register'
+                        'Submit'
                     )}
                 </button>
             </div>
@@ -307,89 +311,4 @@ export default function EventForm() {
             </Formik>
         </div>
     );
-    // return (
-    //     <div style={{ width: '100%', marginBottom: '2rem' }}>
-    //         <Formik
-    //             initialValues={initialValues}
-    //             validationSchema={validationSchema}
-    //             onSubmit={onSubmit}
-    //             enableReinitialize
-    //         >
-    //             {({ values, handleChange, handleBlur, isSubmitting, touched, errors }) => (
-    //                 <Form>
-    //                     {formFields.map((field) => (
-    //                         <div key={field.name} className="mb-4">
-    //                             <label className="block text-gray-700 mb-2" htmlFor={field.name}>
-    //                                 {field.label}
-    //                             </label>
-
-    //                             {field.type === 'checkbox' ? (
-    //                                 <label className="flex items-center">
-    //                                     <input
-    //                                         id={field.name}
-    //                                         name={field.name}
-    //                                         type="checkbox"
-    //                                         checked={values[field.name]}
-    //                                         onChange={handleChange}
-    //                                         onBlur={handleBlur}
-    //                                         className="mr-2"
-    //                                     />
-    //                                     I agree
-    //                                 </label>
-    //                             ) : field.type === 'select' ? (
-    //                                 <select
-    //                                     id={field.name}
-    //                                     name={field.name}
-    //                                     value={values[field.name]}
-    //                                     onChange={handleChange}
-    //                                     onBlur={handleBlur}
-    //                                     className="w-full border rounded p-2"
-    //                                 >
-    //                                     <option value="" label="Select an option" />
-    //                                     {field.options.map((option, index) => (
-    //                                         <option key={index} value={option} label={option}>
-    //                                             {option}
-    //                                         </option>
-    //                                     ))}
-    //                                 </select>
-    //                             ) : field.type === 'textarea' ? (
-    //                                 <textarea
-    //                                     id={field.name}
-    //                                     name={field.name}
-    //                                     type={field.type}
-    //                                     value={values[field.name]}
-    //                                     onChange={handleChange}
-    //                                     onBlur={handleBlur}
-    //                                     className="w-full border rounded p-2"
-    //                                 />
-    //                             ) : (
-    //                                 <input
-    //                                     id={field.name}
-    //                                     name={field.name}
-    //                                     type={field.type}
-    //                                     value={values[field.name]}
-    //                                     onChange={handleChange}
-    //                                     onBlur={handleBlur}
-    //                                     className="w-full border rounded p-2"
-    //                                 />
-    //                             )}
-
-    //                             {touched[field.name] && errors[field.name] && (
-    //                                 <p className="text-red-500 text-sm mt-1">{errors[field.name]}</p>
-    //                             )}
-    //                         </div>
-    //                     ))}
-
-    //                     <button
-    //                         type="submit"
-    //                         disabled={isSubmitting}
-    //                         className="w-full px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center overflow-hidden text-white text-sm font-semibold"
-    //                     >
-    //                         Register
-    //                     </button>
-    //                 </Form>
-    //             )}
-    //         </Formik>
-    //     </div>
-    // );
 }
