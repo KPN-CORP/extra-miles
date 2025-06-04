@@ -1,4 +1,8 @@
 {
+  "_cloneDeep-DzRP12Gi.js": {
+    "file": "assets/cloneDeep-DzRP12Gi.js",
+    "name": "cloneDeep"
+  },
   "node_modules/remixicon/fonts/remixicon.eot": {
     "file": "assets/remixicon-BVJ9S1ev.eot",
     "src": "node_modules/remixicon/fonts/remixicon.eot"
@@ -19,16 +23,75 @@
     "file": "assets/remixicon-BVvFtaex.woff2",
     "src": "node_modules/remixicon/fonts/remixicon.woff2"
   },
+  "public/images/bg-auth.jpg": {
+    "file": "assets/bg-auth-CZRtsHoG.jpg",
+    "src": "public/images/bg-auth.jpg"
+  },
   "resources/css/app.css": {
     "file": "assets/app-33NlKcyb.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
+  "resources/fonts/bootstrap-icons.woff": {
+    "file": "assets/bootstrap-icons-D8ioIzQS.woff",
+    "src": "resources/fonts/bootstrap-icons.woff"
+  },
+  "resources/fonts/bootstrap-icons.woff2": {
+    "file": "assets/bootstrap-icons-Drp84nVS.woff2",
+    "src": "resources/fonts/bootstrap-icons.woff2"
+  },
+  "resources/fonts/remixicon.eot": {
+    "file": "assets/remixicon-CsbJS0Nd.eot",
+    "src": "resources/fonts/remixicon.eot"
+  },
+  "resources/fonts/remixicon.svg": {
+    "file": "assets/remixicon-DV9onB9s.svg",
+    "src": "resources/fonts/remixicon.svg"
+  },
+  "resources/fonts/remixicon.ttf": {
+    "file": "assets/remixicon-DdzasgUs.ttf",
+    "src": "resources/fonts/remixicon.ttf"
+  },
+  "resources/fonts/remixicon.woff": {
+    "file": "assets/remixicon-2iUEOVAH.woff",
+    "src": "resources/fonts/remixicon.woff"
+  },
+  "resources/fonts/remixicon.woff2": {
+    "file": "assets/remixicon-BBTkVcFJ.woff2",
+    "src": "resources/fonts/remixicon.woff2"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-PMb8QTHB.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_cloneDeep-DzRP12Gi.js"
+    ],
+    "css": [
+      "assets/app-DVNhP-d0.css"
+    ]
+  },
+  "resources/js/head.js": {
+    "file": "assets/head-DoQpomps.js",
+    "name": "head",
+    "src": "resources/js/head.js",
+    "isEntry": true
+  },
+  "resources/js/layout.js": {
+    "file": "assets/layout-De5pXFvi.js",
+    "name": "layout",
+    "src": "resources/js/layout.js",
+    "isEntry": true
+  },
   "resources/js/users/main.jsx": {
-    "file": "assets/main-BQgpgdnj.js",
+    "file": "assets/main-KURACV1g.js",
     "name": "main",
     "src": "resources/js/users/main.jsx",
     "isEntry": true,
+    "imports": [
+      "_cloneDeep-DzRP12Gi.js"
+    ],
     "css": [
       "assets/main-C4775MlY.css"
     ],
@@ -39,5 +102,15 @@
       "assets/remixicon-CfJD46dY.ttf",
       "assets/remixicon-C2wQ2gtc.svg"
     ]
+  },
+  "resources/scss/app.scss": {
+    "file": "assets/app-CmS6PbuO.css",
+    "src": "resources/scss/app.scss",
+    "isEntry": true
+  },
+  "resources/scss/icons.scss": {
+    "file": "assets/icons-C3ys2IxD.css",
+    "src": "resources/scss/icons.scss",
+    "isEntry": true
   }
 }

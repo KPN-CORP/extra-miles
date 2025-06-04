@@ -97,7 +97,7 @@ class EventController extends Controller
         
         $grades = Grade::select('group_name')
             ->distinct()
-            ->orderBy('id')
+            ->orderBy('group_name')
             ->get();
 
         return view('pages.admin.events.create', [
@@ -128,7 +128,7 @@ class EventController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('banner')) {
-            $imagePath = $request->file('banner')->store('event_banners', 'public');
+            $imagePath = $request->file('banner')->store('assets/images/events', 'public');
         }
 
         Event::create([
@@ -137,7 +137,8 @@ class EventController extends Controller
             'time_start'       => $timeStart,
             'end_date'         => $endDate,
             'time_end'         => $timeEnd,
-            'title'            => $request->event_name,
+            'title'            => $request->event_name, 
+            'event_location'   => $request->event_location,
             'description'      => $request->description,
             'image'            => $imagePath,
             'status'           => $request->action === 'draft' ? 'Draft' : 'Open Registration',
@@ -183,7 +184,7 @@ class EventController extends Controller
         
         $grades = Grade::select('group_name')
             ->distinct()
-            ->orderBy('id')
+            ->orderBy('group_name')
             ->get();
 
         return view('pages.admin.events.edit', compact('link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations'));
@@ -231,7 +232,7 @@ class EventController extends Controller
 
         // Upload banner jika ada
         if ($request->hasFile('banner')) {
-            $path = $request->file('banner')->store('event_banners', 'public');
+            $path = $request->file('banner')->store('assets/images/events', 'public');
             $event->image = $path;
         }
 

@@ -9,6 +9,11 @@ export default defineConfig({
             input: [
                 "resources/css/app.css", 
                 "resources/js/users/main.jsx",
+                "resources/scss/app.scss",
+                "resources/scss/icons.scss",
+                "resources/js/app.js",
+                "resources/js/head.js",
+                "resources/js/layout.js",
             ],
             refresh: true,
         }),

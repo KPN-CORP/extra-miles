@@ -1,10 +1,45 @@
 @extends('layouts_.vertical', ['page_title' => 'News'])
 
+@section('css')
+    <style>
+        .nav-tabs .nav-link.active {
+            background-color: #ab2f2b !important;
+            /* Bootstrap primary color */
+            color: white !important;
+            font-weight: bold;
+            border-radius: 0.375rem;
+        }
+
+        .nav-tabs .nav-link {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .table thead th {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .table thead {
+            display: table-header-group;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            overflow-y: visible;
+        }
+        
+        table.dataTable tbody tr>.dtfc-fixed-left, table.dataTable tbody tr>.dtfc-fixed-right {
+            z-index: 3;
+            background-color: white !important;
+        }
+    </style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0"></h3>
-        <a href="{{ route('admin.events.create') }}" class="btn btn-primary">Create News</a>
+        <a href="#" class="btn btn-primary">Create News</a>
     </div>
     <div class="row">
         <div class="col-md-12">
@@ -22,7 +57,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover table-sm dt-responsive nowrap mt-2" id="scheduleTable" width="100%"
                                 cellspacing="0">
-                            <thead class="thead-light">
+                            <thead class="table-light">
                                 <tr class="text-center">
                                     <th>No</th>
                                     <th>Category</th>

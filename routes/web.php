@@ -25,9 +25,18 @@ use App\Http\Controllers\QuotesController;
 use App\Http\Controllers\EventParticipantController;
 use App\Livewire\ManageParticipants;
 
+
+Route::get('dbauth', [SsoController::class, 'dbauth']);
+
+Route::middleware('guest')->group(function () {
+    Route::get('register', [RegisteredUserController::class, 'create'])
+                ->name('register');
+});
+
 Route::get('/{any?}', function () {
     return view('user-app');
 })->where('any', '^(?!admin).*$');
+
 
 Route::get('/images/{filename}', function ($filename) {
     $path = storage_path('app/public/' . $filename);
@@ -43,30 +52,47 @@ Route::prefix('admin')->group(function () {
     
     Route::middleware('auth', 'locale', 'notification')->group(function () {
 
-        Route::get('/admin/news', [NewsController::class, 'index'])->name('admin.news.index');
-    
-        Route::get('/admin/events', [EventController::class, 'index'])->name('admin.events.index');
-        Route::get('/admin/events/create', [EventController::class, 'create'])->name('admin.events.create');
-        Route::post('/admin/events/store', [EventController::class, 'store'])->name('events.store');
-        Route::delete('/admin/events/{id}/archive', [EventController::class, 'softDelete'])->name('events.softDelete');
-        Route::post('/admin/events/{id}/close', [EventController::class, 'closeRegistration'])->name('events.close');
-        Route::post('/admin/events/{id}/toggle-status', [EventController::class, 'toggleStatus'])->name('events.close');
-        Route::get('/admin/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
-        Route::put('/admin/events/{id}', [EventController::class, 'update'])->name('events.update');
-        Route::get('/admin/events/{encryptedId}/participants', [EventParticipantController::class, 'listParticipants'])->name('events.participants');
-        Route::post('/admin/participants/{id}/approve', [EventParticipantController::class, 'approve'])->name('participants.approve');
-        Route::post('/admin/participants/{id}/reject', [EventParticipantController::class, 'reject'])->name('participants.reject');
+        // News
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+        
+        // News
+        Route::get('/news', [NewsController::class, 'index'])->name('admin.news.index');
+
+        // Event
+        Route::get('/events', [EventController::class, 'index'])->name('admin.events.index');
+        Route::get('/events/create', [EventController::class, 'create'])->name('admin.events.create');
+        Route::post('/events/store', [EventController::class, 'store'])->name('events.store');
+        Route::delete('/events/{id}/archive', [EventController::class, 'softDelete'])->name('events.softDelete');
+        Route::post('/events/{id}/close', [EventController::class, 'closeRegistration'])->name('events.close');
+        Route::post('/events/{id}/toggle-status', [EventController::class, 'toggleStatus'])->name('events.close');
+        Route::get('/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
+        Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
+        Route::get('/events/{encryptedId}/participants', [EventParticipantController::class, 'listParticipants'])->name('events.participants');
+        Route::post('/participants/{id}/approve', [EventParticipantController::class, 'approve'])->name('participants.approve');
+        Route::post('/participants/{id}/reject', [EventParticipantController::class, 'reject'])->name('participants.reject');
         Route::get('/ticket/qr-png/{encryptedId}', [EventController::class, 'showQRPNG'])->name('event.qrpng');
         Route::get('/participants/export/{event_id}', [EventParticipantController::class, 'export'])->name('participants.export');
-    
-        Route::get('/admin/survey', [SurveyController::class, 'index'])->name('admin.survey.index');
-        Route::get('/admin/survey/create', [SurveyController::class, 'create'])->name('admin.survey.create');
-    
-        Route::get('/admin/social', [SocialController::class, 'index'])->name('admin.social.index');
-    
-        Route::get('/admin/quotes', [QuotesController::class, 'index'])->name('admin.quotes.index');
+
+        // Survey
+        Route::get('/survey', [SurveyController::class, 'index'])->name('admin.survey.index');
+        Route::get('/survey/create', [SurveyController::class, 'create'])->name('admin.survey.create');
+        Route::post('/survey/store', [SurveyController::class, 'store'])->name('survey.store');
+        Route::get('/survey/{id}/edit', [SurveyController::class, 'edit'])->name('survey.edit');
+        Route::put('/survey/{id}', [SurveyController::class, 'update'])->name('survey.update');
+        Route::post('/survey/{id}/archive', [SurveyController::class, 'archive'])->name('survey.archive');
+        Route::get('/survey/{encryptedId}/participants', [SurveyController::class, 'listParticipants'])->name('survey.participants');
+
+        // Social
+        Route::get('/social', [SocialController::class, 'index'])->name('admin.social.index');
+
+        // Quotes
+        Route::get('/quotes', [QuotesController::class, 'index'])->name('admin.quotes.index');
+
+        Route::get('{first}/{second}', [HomeController::class, 'secondLevel'])->name('second');
+        Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     });
     
+
     Route::fallback(function () {
         return view('errors.404');
     });

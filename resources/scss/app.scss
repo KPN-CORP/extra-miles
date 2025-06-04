@@ -13,15 +13,17 @@ File: Main Css File
 @import url("https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap");
 //Core files
 
-@import "./node_modules/bootstrap/scss/functions";
-@import "./node_modules/bootstrap/scss/variables";
+// @import "./node_modules/bootstrap/scss/functions";
+// @import "./node_modules/bootstrap/scss/variables";
+@import '../../node_modules/bootstrap/scss/functions';
+@import '../../node_modules/bootstrap/scss/variables';
 
 @import "config/variables";
 @import "config/variables-custom";
 @import "config/variables-dark";
 @import "config/theme-mode"; // Lght/Dark Mode
 @import "custom/components/utilities";
-@import "./node_modules/bootstrap/scss/bootstrap";
+@import "../../node_modules/bootstrap/scss/bootstrap";
 
 // Structure
 @import "custom/structure/sidenav";
