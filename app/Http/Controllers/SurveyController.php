@@ -115,7 +115,7 @@ class SurveyController extends Controller
         $type = $request->input('type');
 
         if ($request->hasFile('banner')) {
-            $folder = $request->survey_type === 'vote' ? 'assets/surveys/voting' : 'assets/surveys/survey';
+            $folder = $request->survey_type === 'vote' ? 'assets/images/surveys/voting' : 'assets/images/surveys/survey';
             $imagePath = $request->file('banner')->store($folder, 'public');
         }
 
@@ -221,7 +221,7 @@ class SurveyController extends Controller
 
         // Upload banner jika ada
         if ($request->hasFile('banner')) {
-            $folder = $request->survey_type === 'vote' ? 'assets/surveys/voting' : 'assets/surveys/survey';
+            $folder = $request->survey_type === 'vote' ? 'assets/images/surveys/voting' : 'assets/images/surveys/survey';
             $imagePath = $request->file('banner')->store($folder, 'public');
             $survey->banner = $imagePath;
         }

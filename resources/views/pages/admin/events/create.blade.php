@@ -30,6 +30,10 @@
                     <input type="text" class="form-control" name="event_name" id="event_name" required>
                 </div>
                 <div class="col-md-12">
+                    <label for="event_name" class="form-label">Event Location</label>
+                    <input type="text" class="form-control" name="event_location" id="event_location" required>
+                </div>
+                <div class="col-md-12">
                     <label for="description" class="form-label">Description</label>
                     <textarea name="description" class="form-control" rows="4" style="height:50px" id="description"></textarea>
                 </div>

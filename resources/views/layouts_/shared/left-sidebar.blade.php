@@ -7,7 +7,7 @@
             <img src="{{ asset('storage/img/extra_mile.png') }}" alt="logo">
         </span>
         <span class="logo-sm">
-            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="small logo">
+            <img src="{{ asset('storage/img/logo-sm_ori.png') }}" alt="small logo">
         </span>
     </a>
 
@@ -17,7 +17,7 @@
             <img src="{{ asset('storage/img/extra_mile.png') }}" alt="logo">
         </span>
         <span class="logo-sm">
-            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="small logo">
+            <img src="{{ asset('storage/img/logo-sm_ori.png') }}" alt="small logo">
         </span>
     </a>
     
