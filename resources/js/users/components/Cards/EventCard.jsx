@@ -1,5 +1,5 @@
 import React from "react";
-import { useApiUrl } from "../Context/ApiContext";
+import { useApiUrl } from "../context/ApiContext";
 import { showAlert } from "../Helper/alertHelper";
 import { useNavigate } from "react-router-dom";
 import { dateTimeHelper } from "../Helper/dateTimeHelper";
@@ -7,7 +7,7 @@ import { getImageUrl } from "../Helper/imagePath";
 
 const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
   const apiUrl = useApiUrl();
-  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing  } = dateTimeHelper(event); 
+  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing, closedRegistration } = dateTimeHelper(event); 
   
   const date = new Date(event.start_date);
   const formattedDate = `${day} ${month} ${year}`;  

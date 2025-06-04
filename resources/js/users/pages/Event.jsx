@@ -6,7 +6,7 @@ import axios from 'axios';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../../../css/calendar-custom.css';
-import { useApiUrl } from "../components/Context/ApiContext";
+import { useApiUrl } from "../components/context/ApiContext";
 import { BarLoader, PuffLoader, SyncLoader } from "react-spinners";
 import { showAlert } from "../components/Helper/alertHelper";
 import { useAuth } from "../components/context/AuthContext";
@@ -23,7 +23,7 @@ const pageVariants = {
     exit: { opacity: 0, x: 0 },       // Keluar ke kiri
 };
 
-export default function EventCalendar() {
+export default function Event() {
 
     const navigate = useNavigate()
     const [events, setEvent] = useState([]);
@@ -101,12 +101,11 @@ export default function EventCalendar() {
         const matchDate =
             !selectedDate || eventDate.toDateString() === selectedDate.toDateString();
         
-        const matchMonth =
+        const matchYear =
             selectedDate !== null ? true : // only apply month filter if date is unselected
-            eventDate.getMonth() === activeMonth &&
             eventDate.getFullYear() === activeYear;
         
-        return matchBU && matchDate && matchMonth;
+        return matchBU && matchDate && matchYear;
     });    
   
     return (
@@ -182,10 +181,10 @@ export default function EventCalendar() {
                     <div className="space-y-3">
                         {filteredEvents.map((event, index) => {      
                             const registeredStatus = event.event_participant?.[0]?.status || null;   
-                            const { month, startTime, endTime, eventStatus, isClosed, isOngoing  } = dateTimeHelper(event);   
+                            const { month, startTime, endTime, eventStatus, isClosed, isOngoing, closedRegistration  } = dateTimeHelper(event);   
                             
                             const getStatusColors = (status) => {
-                                if (isClosed) {
+                                if (isClosed || closedRegistration) {
                                     return { text: "text-black", bg: "bg-gray-100" };
                                 } else if (isOngoing) {
                                     return { text: "text-white", bg: "bg-blue-500" };
@@ -217,7 +216,7 @@ export default function EventCalendar() {
                             };
                             const statusColors = getStatusColors(event.status);
                             return (
-                                <div onClick={() => navigate(`/event/${event.encrypted_id}`)} key={index} className="w-full bg-white rounded-lg shadow-md inline-flex justify-start items-center overflow-hidden cursor-pointer">
+                                <div onClick={() => navigate(`/event/${event.encrypted_id}`)} key={index} className="w-full min-h-20 bg-white rounded-lg shadow-md inline-flex justify-start items-center overflow-hidden cursor-pointer">
                                     <div className="flex-1 ps-2 flex justify-start items-center gap-3 overflow-hidden">
                                         <div className="w-16 px-2.5 py-2 bg-stone-400 rounded-lg inline-flex flex-col justify-center items-center">
                                             <div className="self-stretch text-center justify-start text-white text-base font-medium ">{event.start_date.split("-")[2]}<br/>{month}</div>
@@ -227,7 +226,7 @@ export default function EventCalendar() {
                                         <div className="w-24 flex-1">
                                             <div data-color="primary" data-size="H6" data-type="normal" className="bg-white/0 inline-flex flex-col justify-center items-center">
                                                 <div className={`px-2 py-1 ${statusColors.bg} rounded inline-flex justify-center items-center overflow-hidden`}>
-                                                    <div className={`text-center justify-center ${statusColors.text} text-[10px] font-medium  leading-[10px]`}>{isClosed || isOngoing ? eventStatus : (registeredStatus ?? event.status) }
+                                                    <div className={`text-center justify-center ${statusColors.text} text-[10px] font-medium  leading-[10px]`}>{isClosed || isOngoing || closedRegistration ? eventStatus : (registeredStatus ?? event.status) }
                                                     </div>
                                                     {(event.status === "Ongoing" && isOngoing) && (
                                                         <div className="ms-1">
@@ -258,7 +257,7 @@ export default function EventCalendar() {
                                         <img
                                             src={getImageUrl(apiUrl, event.image)}
                                             alt="Event Thumbnail"
-                                            className="object-cover w-20"
+                                            className="object-cover w-20 min-h-20"
                                         />
                                     </div>
                                 </div>

@@ -20,17 +20,17 @@
     "src": "node_modules/remixicon/fonts/remixicon.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DO0s92C7.css",
+    "file": "assets/app-33NlKcyb.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/users/main.jsx": {
-    "file": "assets/main-C6lWbET-.js",
+    "file": "assets/main-BQgpgdnj.js",
     "name": "main",
     "src": "resources/js/users/main.jsx",
     "isEntry": true,
     "css": [
-      "assets/main-CH7yEnXz.css"
+      "assets/main-C4775MlY.css"
     ],
     "assets": [
       "assets/remixicon-BVJ9S1ev.eot",

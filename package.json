@@ -69,6 +69,7 @@
         "fullcalendar": "^5.10.2",
         "gmaps": "^0.4.25",
         "handlebars": "^4.7.7",
+        "html-react-parser": "^5.2.5",
         "ion-rangeslider": "^2.3.1",
         "jquery": "^3.7.1",
         "jquery-datatables-checkboxes": "^1.2.12",

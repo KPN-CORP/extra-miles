@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useApiUrl } from '../components/Context/ApiContext';
+import { useApiUrl } from '../components/context/ApiContext';
 import { useAuth } from '../components/context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import PageLoader from '../components/Loader/PageLoader';
@@ -9,6 +9,7 @@ import EventLoader from '../components/Loader/EventLoader';
 import { PuffLoader } from 'react-spinners';
 import { dateTimeHelper } from '../components/Helper/dateTimeHelper';
 import { getImageUrl } from '../components/Helper/imagePath';
+import parse from "html-react-parser";
 
 export default function EventDetails() {
   const { id } = useParams();
@@ -93,11 +94,11 @@ export default function EventDetails() {
     );
   }
 
-  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing } = dateTimeHelper(event);
+  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing, closedRegistration } = dateTimeHelper(event);
   const formattedDate = `${day} ${month} ${year}`;
 
   const getStatusColor = () => {
-    if (isClosed) return { text: 'text-black', bg: 'bg-gray-100' };
+    if (isClosed || closedRegistration) return { text: 'text-black', bg: 'bg-gray-100' };
     if (isOngoing) return { text: 'text-white', bg: 'bg-blue-500' };
     const status = eventParticipant?.status || event.status;
     switch (status) {
@@ -148,7 +149,7 @@ export default function EventDetails() {
                   <div className="self-stretch inline-flex justify-start items-center gap-4">
                     <div data-color="primary" data-size="H6" data-type="normal" className="bg-white/0 inline-flex flex-col justify-center items-center">
                       <div className={`px-2 py-1 ${statusColor.bg} rounded inline-flex justify-center items-center overflow-hidden`}>
-                        <div className={`text-center justify-center ${statusColor.text} text-[10px] font-medium  leading-[10px]`}>{isClosed || isOngoing ? eventStatus : (eventParticipant?.status ?? event.status) }
+                        <div className={`text-center justify-center ${statusColor.text} text-[10px] font-medium  leading-[10px]`}>{isClosed || isOngoing || closedRegistration ? eventStatus : (eventParticipant?.status ?? event.status) }
                         </div>
                         {(event.status === "Ongoing" || isOngoing) && (
                             <div className="ms-1">
@@ -199,20 +200,20 @@ export default function EventDetails() {
                   </div>
               </div>
               {event.event_participant?.[0]?.status !== 'Confirmation' && (
-              <div className='mb-2'>
-                  <p className="text-stone-700">{event.description}</p>
-              </div>
+                <div className="prose prose-sm leading-relaxed text-stone-800 max-w-none [&>p]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1 mb-2">
+                  {parse(event.description)}
+                </div>
               )}
-              {!hasRegistered && event.status === "Open Registration" && (
-                  <button
-                    onClick={() => navigate(`/event-registration/${event.encrypted_id}`)}
-                    className="self-stretch px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center gap-2 overflow-hidden"
-                    type="button" // optional but good practice
-                  >
-                    <div className="justify-start text-white text-sm font-semibold leading-tight">
-                      Register Now!
-                    </div>
-                  </button>
+              {(!hasRegistered && !closedRegistration && !isOngoing && event.status === "Open Registration") && (
+                <button
+                  onClick={() => navigate(`/event-registration/${event.encrypted_id}`)}
+                  className="self-stretch px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center gap-2 overflow-hidden"
+                  type="button"
+                >
+                  <div className="justify-start text-white text-sm font-semibold leading-tight">
+                    Register Now!
+                  </div>
+                </button>
               )}
               {hasRegistered && event.event_participant?.[0]?.status === 'Confirmation' && (
                 <>

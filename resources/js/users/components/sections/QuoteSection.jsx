@@ -49,7 +49,7 @@ export default () => {
   }  
 
   return (
-    <div className="w-60 flex flex-col justify-start items-start gap-1 mb-4">
+    <div className="w-60 flex flex-col justify-start items-start gap-1">
         <div className="self-stretch justify-start text-stone-800 text-sm leading-none">“{datas.quotes}”</div>
         <div className="justify-start text-stone-500 text-sm font-normal leading-none italic">- {datas.author}</div>
     </div>

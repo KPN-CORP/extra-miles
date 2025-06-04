@@ -1,17 +1,22 @@
 export function dateTimeHelper(event) {
     const startDate = new Date(event.start_date);
+    const deadline = new Date(event.regist_deadline);
     const endDate = new Date(event.end_date);
     const today = new Date();
 
     // Normalize time to midnight for accurate date-only comparison
     startDate.setHours(0, 0, 0, 0);
+    deadline.setHours(0, 0, 0, 0);
     endDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
+    
 
     // Determine event status
-    const isClosed = startDate < today && endDate < today;
+    const isClosed = today > endDate;
     const isOngoing = startDate <= today && today <= endDate;
-    const eventStatus = isOngoing ? 'Ongoing' : 'Closed';
+    const closedRegistration = today > deadline && today < startDate ;
+
+    const eventStatus = isOngoing ? 'Ongoing' : ( closedRegistration ? 'Closed Registration' : 'Closed');
 
     // Format month (e.g., "May")
     const month = startDate.toLocaleString('en-US', { month: 'short' });
@@ -66,5 +71,6 @@ export function dateTimeHelper(event) {
         startDate,
         endDate,
         daysUntil,
+        closedRegistration,
     };
 }
