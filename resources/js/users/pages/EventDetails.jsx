@@ -215,7 +215,7 @@ export default function EventDetails() {
                   </div>
                 </button>
               )}
-              {hasRegistered && event.event_participant?.[0]?.status === 'Confirmation' && (
+              {hasRegistered && !closedRegistration && event.event_participant?.[0]?.status === 'Confirmation' && (
                 <>
                 <div className=''>
                   <p className="text-stone-700 font-medium">{`We’d love to have you at ${event.title}. Are you free to join?`}</p>
