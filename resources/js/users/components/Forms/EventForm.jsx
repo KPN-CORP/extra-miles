@@ -122,9 +122,11 @@ export default function EventForm() {
 
                     // Set initial values
                     const initialValues = {};
-                    formSchema.fields.forEach(field => {
-                        initialValues[field.name] = field.type === 'checkbox' ? false : '';
-                    });
+                    if (Array.isArray(formSchema?.fields)) {
+                        formSchema.fields.forEach(field => {
+                            initialValues[field.name] = field.type === 'checkbox' ? false : '';
+                        });
+                    }
 
                     const cleanNumber = (user?.whatsapp_number ?? user?.personal_mobile_number ?? '').replace(/'/g, '');
 
