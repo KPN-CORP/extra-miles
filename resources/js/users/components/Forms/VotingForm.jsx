@@ -58,7 +58,7 @@ export function generateValidationSchema(fields) {
     return Yup.object().shape(shape);
 }
 
-export default function VotingForm({ participated }) {  
+export default function VotingForm({ participated, eventEnded }) {  
     const [formFields, setFormFields] = useState([]);
     const [initialValues, setInitialValues] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -135,7 +135,18 @@ export default function VotingForm({ participated }) {
   
     const validationSchema = formFields.length > 0 ? generateValidationSchema(formFields) : null;
   
-    const onSubmit = async (values, { setSubmitting }) => {
+    const onSubmit = async (values, { setSubmitting }, e) => {
+      e.preventDefault();
+      if (eventEnded) {
+        showAlert({
+          icon: 'warning',
+          title: 'Voting Closed',
+          text: 'Voting time has ended. You can no longer vote.',
+          timer: 2500,
+          showConfirmButton: false,
+        });
+        return;
+      }
       try {
         const result = await showAlert({
           icon: 'question',

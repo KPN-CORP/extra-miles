@@ -71,7 +71,9 @@ export default function Event() {
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
-                    window.location.href = "https://kpncorporation.darwinbox.com/";
+                    console.log(err);
+                    
+                    // window.location.href = "https://kpncorporation.darwinbox.com/";
                 });
             } finally {
                 setLoading(false);

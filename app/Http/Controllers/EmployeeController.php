@@ -20,7 +20,7 @@ class EmployeeController extends Controller
             $employee_id = $payload->get('employee_id');
             Log::info('Token payload employee_id: ' . $employee_id);
 
-            $employee = Employee::select('employee_id', 'fullname', 'gender', 'email', 'group_company', 'designation_name', 'job_level', 'company_name', 'office_area', 'employee_type', 'unit', 'personal_mobile_number', 'religion', 'marital_status')->where('employee_id', $employee_id)->first();
+            $employee = Employee::select('employee_id', 'fullname', 'gender', 'email', 'group_company', 'designation_name', 'job_level', 'company_name', 'office_area', 'employee_type', 'unit', 'personal_mobile_number', 'religion', 'marital_status', 'whatsapp_number')->where('employee_id', $employee_id)->first();
 
             if (!$employee) {
                 return response()->json(['error' => 'Employee not found'], 404);

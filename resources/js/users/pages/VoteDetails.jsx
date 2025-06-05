@@ -11,6 +11,7 @@ import VotingForm from '../components/Forms/VotingForm';
 import BannerLoader from "../components/Loader/BannerLoader";
 import { motion } from "framer-motion";
 import SurveyLoader from "../components/Loader/SurveyLoader";
+import CountdownTimer from "../components/Helper/countdownTImer";
 
 const pageVariants = {
     initial: { opacity: 0, x: 0 },     // Masuk dari kanan
@@ -30,38 +31,7 @@ export default function VoteList() {
     const [loadingBanner, setLoadingBanner] = useState(true);
     const location = useLocation();
     const participated = location.state?.participated ?? false;
-
-    const [selectedItem, setSelectedItem] = useState(null);
-
-    const handleChange = (index) => {
-        setSelectedItem(index);
-    };
-
-    const handleVoting = async (index) => {
-        if (index) {
-            await showAlert({
-                title: "🙌 We’ve Got your vote!",
-                text: `Thanks for participating. #${index + 1}`,
-                icon: "success",
-                customClass: {
-                    title: 'text-xl font-bold', // Tailwind style to resize title
-                    popup: 'p-6 rounded-xl',
-                    confirmButton: 'bg-red-700 text-white rounded hover:bg-red-700',
-                }
-            });
-        } else {
-            await showAlert({
-                title: "⚠️ No Nominee selected",
-                text: "Please vote, Your vote matters",
-                icon: "warning",
-                customClass: {
-                  title: 'text-lg font-bold',
-                  popup: 'p-6 rounded-xl',
-                  confirmButton: 'bg-yellow-500 text-white rounded hover:bg-yellow-600',
-                }
-              });
-        }
-    };
+    const [eventEnded, setEventEnded] = useState(false);
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -141,26 +111,57 @@ export default function VoteList() {
                             />
                         </>
                     )}
-                    { participated ? (
-                            <p className="text-white text-base font-normal">Thanks for voting, you voted, we noted <span className="font-semibold"> {data.title}</span> gonna be lit! 🔥</p>
+                    <div className="flex-col flex w-full text-center justify-center text-white text-2xl font-bold gap-1">
+                        <span className="text-white text-base font-medium">🗳️ Voting Ends In...</span>
+                        <CountdownTimer
+                            endDateTime={`${data.end_date} ${data.time_end}`}
+                            onEnd={() => setEventEnded(true)}
+                        />
+                    </div>
+                    {participated ? (
+                    <p className="text-white text-base font-normal">
+                        Thanks for voting, you voted, we noted <span className="font-semibold">{data.title}</span> gonna be lit! 🔥
+                    </p>
+                    ) : eventEnded ? (
+                    <div className="text-white text-base font-semibold">
+                        Voting has ended. Thank you for your interest! 🛑
+                    </div>
                     ) : (
-                        <div className="w-full text-justify justify-start">
-                            <div className="mb-2">
-                                <p className="text-white font-medium text-sm">🌟We’re excited to showcase the amazing talents here at KPN! Now it’s your turn to support them — vote for your favorite star! ✨</p>
-                            </div>
-                            {data.content_link && (
-                            <>
-                                <div className="mb-2">
-                                    <p className="text-white font-medium text-sm">📹Before you vote, make sure to watch the video of each talent here:</p>
-                                </div>
-                                <YouTubePlayer videoId={data.content_link} />
-                            </>
-                            )}
+                    <div className="w-full text-justify justify-start">
+                        <div className="mb-2">
+                        <p className="text-white font-medium text-sm">
+                            🌟We’re excited to showcase the amazing talents here at KPN! Now it’s your turn to support them — vote for your favorite star! ✨
+                        </p>
                         </div>
+
+                        {data.content_link && (
+                        <>
+                            <div className="mb-2">
+                            <p className="text-white font-medium text-sm">
+                                📹Before you vote, make sure to watch the video of each talent here:
+                            </p>
+                            </div>
+                            <YouTubePlayer videoId={data.content_link} />
+                        </>
+                        )}
+                    </div>
                     )}
+
                     <div>
                         {/* Form */}
-                        <VotingForm participated={participated} />
+                        {!eventEnded ? <VotingForm participated={participated} eventEnded={eventEnded} /> 
+                        : (
+                            <div className="flex flex-col items-center justify-center">
+                                <button
+                                onClick={() => navigate('/survey')}
+                                className="w-full px-5 py-2.5 rounded-lg shadow-md text-sm font-semibold text-red-700"
+                                style={{ backgroundColor: '#DEBD69' }}
+                                >
+                                Go Back
+                                </button>
+                            </div> 
+                        )
+                        }
                     </div>
                 </div>
             </div>
