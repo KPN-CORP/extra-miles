@@ -13,6 +13,7 @@ import SurveyForm from '../components/Forms/SurveyForm';
 import BannerLoader from "../components/Loader/BannerLoader";
 import SurveyLoader from "../components/Loader/SurveyLoader";
 import { motion } from "framer-motion";
+import CountdownTimer from "../components/Helper/countdownTImer";
 
 const pageVariants = {
     initial: { opacity: 0, x: 0 },     // Masuk dari kanan
@@ -30,7 +31,9 @@ export default function VoteList() {
     const { id } = useParams();
     const { token } = useAuth(); 
     const location = useLocation();
-    const participated = location.state?.participated ?? false;    
+    const participated = location.state?.participated ?? false;  
+    const [eventEnded, setEventEnded] = useState(false);
+      
 
     const [selectedItem, setSelectedItem] = useState(null);
 
@@ -140,19 +143,30 @@ export default function VoteList() {
                             />
                         </>
                     )}
+                    <div className="flex-col flex w-full text-center justify-center text-white text-2xl font-bold gap-1">
+                        <span className="text-white text-base font-medium">📝 Survey Closes In...</span>
+                        <CountdownTimer
+                            endDateTime={`${data.end_date} ${data.time_end}`}
+                            onEnd={() => setEventEnded(true)}
+                        />
+                    </div>
                     <div className="w-full text-justify justify-start">
                         <p className="text-white text-base font-semibold mb-2">Hi, {data.fullname}!👋</p>
                         { participated ? (
                             <p className="text-white text-sm font-normal">Thanks a bunch for taking part in
                             <span className="font-semibold"> {data.title}</span> survey!</p>
-                        ) : (
+                        ) : eventEnded ? (
+                            <div className="text-white text-base font-semibold">
+                                Survey has closed. Thank you for your interest! 🛑
+                            </div>
+                        ): (
                             <p className="text-white text-sm font-normal">Thanks for attending the <span className="text-white text-sm font-semibold">{data.title}</span> {data.description}</p>
                         )}
                     </div>
                     <div>
                         {/* Form */}
-                        { participated ? (
-                            <button onClick={() => window.history.back()} className="w-full flex flex-col text-center text-red-700 font-medium shadow-lg px-3 py-2 rounded-lg" style={{ backgroundColor: '#DEBD69' }}>Back</button>
+                        { participated || eventEnded ? (
+                            <button onClick={() => window.history.back()} className="w-full flex flex-col text-center text-red-700 font-medium shadow-lg px-3 py-2 rounded-lg" style={{ backgroundColor: '#DEBD69' }}>Go Back</button>
                         ) : (
                             <SurveyForm />
                         )}
