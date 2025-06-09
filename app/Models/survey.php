@@ -15,6 +15,10 @@ class Survey extends Model
     protected $appends = ['encrypted_id'];
     // protected $hidden = ['id'];
 
+    protected $fillable = [
+        'category','title','event_id','form_id','status','description','banner','icon','start_date','end_date','time_start','time_end','content_link','quota','businessUnit','unit','jobLevel','location','created_by'
+    ];
+
     public function surveyParticipant()
     {
         return $this->hasMany(SurveyParticipant::class, 'survey_id', 'id');
@@ -23,5 +27,10 @@ class Survey extends Model
     public function getEncryptedIdAttribute()
     {
         return Crypt::encryptString($this->id);
+    }
+
+    public function formTemplate()
+    {
+        return $this->belongsTo(FormTemplate::class, 'form_id', 'id');
     }
 }

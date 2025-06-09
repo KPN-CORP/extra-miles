@@ -28,7 +28,7 @@
                     <select class="form-select" id="related" name="related">
                         <option selected disabled>Please select</option>
                         @foreach($events as $event)
-                            <option value="{{ $event->id }}" @if($survey->form_id === $event->id) selected @endif>{{ $event->title }}</option>
+                            <option value="{{ $event->id }}" @if($survey->event_id === $event->id) selected @endif>{{ $event->title }}</option>
                         @endforeach
                     </select>
                 </div>

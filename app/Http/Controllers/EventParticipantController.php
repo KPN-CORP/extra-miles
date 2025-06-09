@@ -15,6 +15,7 @@ class EventParticipantController extends Controller
     {
         $parentLink = 'Event Management';
         $link = 'List Participant';
+        $back = 'admin.events.index';
 
         $id = Crypt::decryptString($encryptedId);
 
@@ -59,7 +60,7 @@ class EventParticipantController extends Controller
         $countCanceled = EventParticipant::where('event_id', $id)->where('status', 'Canceled')->count();
 
         return view('pages.admin.events.list-participants', compact(
-            'event', 'participants',
+            'event', 'participants', 'back',
             'countRequest', 'countWaitingList', 'countApproved',
             'countConfirmation', 'countConfirmed', 'countAttending', 'countNotAttending', 'parentLink', 'link', 'waitinglists', 'approveparticipants', 'attending', 'notattending', 'countCanceled'
         ));

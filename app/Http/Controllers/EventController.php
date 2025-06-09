@@ -20,7 +20,7 @@ class EventController extends Controller
     public function index()
     {
         $parentLink = 'Dashboard';
-        $link = 'Event Management';
+        $link = 'Event Management';        
 
         $eventsToUpdate = Event::whereIn('status', ['Open Registration', 'Full Booked'])->whereNull('deleted_at')->get();
         $now = Carbon::now();
@@ -80,6 +80,7 @@ class EventController extends Controller
     {
         $parentLink = 'Event Management';
         $link = 'Create Event';
+        $back = 'admin.events.index';
 
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
@@ -101,6 +102,7 @@ class EventController extends Controller
             ->get();
 
         return view('pages.admin.events.create', [
+            'back' => $back,
             'link' => $link,
             'parentLink' => $parentLink,
             'bisnisunits' => $bisnisunits,
@@ -167,6 +169,7 @@ class EventController extends Controller
         
         $parentLink = 'Event Management';
         $link = 'Edit Event';
+        $back = 'admin.events.index';
 
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
@@ -187,7 +190,7 @@ class EventController extends Controller
             ->orderBy('group_name')
             ->get();
 
-        return view('pages.admin.events.edit', compact('link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations'));
+        return view('pages.admin.events.edit', compact('back','link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations'));
     }
 
     public function update(Request $request, $id)

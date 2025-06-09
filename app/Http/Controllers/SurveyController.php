@@ -8,10 +8,13 @@ use App\Models\Location;
 use App\Models\Department;
 use App\Models\Grade;
 use App\Models\Event;
+use App\Models\FormTemplate;
 use App\Models\survey;
+use App\Models\SurveyParticipant;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SurveyController extends Controller
 {
@@ -62,6 +65,7 @@ class SurveyController extends Controller
         $type = $request->query('type', 'survey');
         $parentLink = 'Survey Management';
         $link = $type === 'vote' ? 'Create Voting' : 'Create Survey';
+        $back = 'admin.survey.index';
 
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
@@ -87,6 +91,7 @@ class SurveyController extends Controller
             ->get();
 
         return view('pages.admin.survey.create', [
+            'back' => $back,
             'link' => $link,
             'parentLink' => $parentLink,
             'bisnisunits' => $bisnisunits,
@@ -129,7 +134,7 @@ class SurveyController extends Controller
             'event_id'         => $request->related,
             'description'      => $request->description,
             'banner'           => $imagePath,
-            'icon'             => $request->survey_type === 'vote' ? 'vote-icon.png' : 'survey-icon.png',
+            'icon'             => $request->survey_type === 'vote' ? 'assets/images/surveys/vote/vote-icon.png' : 'assets/images/surveys/survey/survey-icon.png',
             'status'           => $request->action === 'draft' ? 'Draft' : 'Ongoing',
             'quota'            => $request->participants,
             'businessUnit'     => $request->business_unit ? json_encode($request->business_unit) : null,
@@ -152,6 +157,7 @@ class SurveyController extends Controller
 
         $parentLink = 'Survey Management';
         $link = $survey->category === 'vote' ? 'Update Voting' : 'Update Survey';
+        $back = 'admin.survey.index';
 
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
@@ -177,6 +183,7 @@ class SurveyController extends Controller
             ->get();
 
         return view('pages.admin.survey.edit', [
+            'back' => $back,
             'link' => $link,
             'survey' => $survey,
             'parentLink' => $parentLink,
@@ -208,7 +215,7 @@ class SurveyController extends Controller
         $survey->time_start       = $timeStart;
         $survey->end_date         = $endDate;
         $survey->time_end         = $timeEnd;
-        $survey->form_id          = $request->related;
+        $survey->event_id          = $request->related;
         $survey->title            = $request->form_name;
         $survey->description      = $request->description;
         $survey->quota            = $request->participants;
@@ -249,7 +256,9 @@ class SurveyController extends Controller
     public function listParticipants($encryptedId)
     {
         $id = Crypt::decryptString($encryptedId);
-        $survey = survey::findOrFail($id);
+        $survey = Survey::withCount('surveyParticipant')->findOrFail($id);
+        $listSurveyParticipants = SurveyParticipant::with('formTemplate')->where('survey_id', $id)->get();
+        
         $survey->businessUnit = json_decode($survey->businessUnit, true);
         $survey->unit = json_decode($survey->unit, true);
         $survey->jobLevel = json_decode($survey->jobLevel, true);
@@ -257,6 +266,7 @@ class SurveyController extends Controller
 
         $parentLink = 'Survey Management';
         $link = 'Participant Survey';
+        $back = 'admin.survey.index';
 
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
@@ -282,6 +292,7 @@ class SurveyController extends Controller
             ->get();
 
         return view('pages.admin.survey.surveyParticipants', [
+            'back' => $back,
             'link' => $link,
             'survey' => $survey,
             'parentLink' => $parentLink,
@@ -290,6 +301,68 @@ class SurveyController extends Controller
             'departments' => $departments,
             'grades' => $grades,
             'events' => $events,
+            'listParticipants' => $listSurveyParticipants,
         ]);
+    }
+    public function listVoteParticipants($encryptedId)
+    {
+        $id = Crypt::decryptString($encryptedId);
+        $survey = Survey::withCount('surveyParticipant')->findOrFail($id);
+        $listSurveyParticipants = SurveyParticipant::with('formTemplate')->where('survey_id', $id)->get();
+        
+        $survey->businessUnit = json_decode($survey->businessUnit, true);
+        $survey->unit = json_decode($survey->unit, true);
+        $survey->jobLevel = json_decode($survey->jobLevel, true);
+        $survey->location = json_decode($survey->location, true);
+
+        $parentLink = 'Survey Management';
+        $link = 'Voting Participant';
+        $back = 'admin.survey.index';
+
+        $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
+            ->orderBy('nama_bisnis')
+            ->pluck('nama_bisnis');
+        
+        $locations = Location::select('company_name', 'area', 'work_area')
+            ->orderBy('area')
+            ->get();
+
+        $departments = Department::select('parent_company_id', 'department_name', 'department_code')
+            ->where('status', 'Active')
+            ->orderBy('parent_company_id')
+            ->orderBy('department_name')
+            ->get();
+        
+        $grades = Grade::select('group_name')
+            ->distinct()
+            ->orderBy('group_name')
+            ->get();
+
+        $events = Event::whereNotIn('status', ['Draft'])
+            ->whereNull('deleted_at')
+            ->get();
+
+        return view('pages.admin.survey.voteParticipants', [
+            'back' => $back,
+            'link' => $link,
+            'survey' => $survey,
+            'parentLink' => $parentLink,
+            'bisnisunits' => $bisnisunits,
+            'locations' => $locations,
+            'departments' => $departments,
+            'grades' => $grades,
+            'events' => $events,
+            'listParticipants' => $listSurveyParticipants,
+        ]);
+    }
+
+    public function export($survey_id)
+    {
+        $survey = Survey::with(['participants' => function ($query) {
+            $query->whereNotNull('form_data');
+        }])->findOrFail($survey_id);
+
+        // Proses ekspor Excel menggunakan Laravel Excel (Maatwebsite\Excel)
+        return Excel::download(new SurveyExport($survey), 'survey_report.xlsx');
     }
 }
