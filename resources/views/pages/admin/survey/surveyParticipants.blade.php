@@ -3,9 +3,10 @@
 @section('css')
     <style>
         .nav-link.active {
-            background-color: #ab2f2b !important; /* Merah saat aktif */
-            color: white !important;
-            border-radius: 0.375rem;
+            background-color: white !important;
+            color: #ab2f2b !important;
+            border: 2px solid #ab2f2b !important;
+            border-radius: 0.5rem;
         }
 
         .nav-link {
@@ -15,77 +16,93 @@
         }
 
         .nav-link.active small {
-            color: white !important;
+            color: #ab2f2b !important;
         }
     </style>
 @endsection
 
 @section('content')
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5>Total Participant : <span class="text-danger">45</span> / 90</h5>
-        <div class="d-flex gap-2">
-            <select class="form-select" style="width: 150px;">
-                <option>All Status</option>
-                <option>Submitted</option>
-                <option>Not Yet</option>
-            </select>
-            <input type="text" class="form-control" placeholder="Search..." />
-            <button class="btn btn-danger">Search</button>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5>Total Participant : <span class="text-danger">{{ $survey->survey_participant_count }}</span> / {{ $survey->quota }}</h5>
+          <div class="d-flex gap-2">
+              <select id="statusFilter" class="form-select" style="width: 150px;">
+                  <option value="All">All Status</option>
+                  <option value="Submitted">Submitted</option>
+                  <option value="Not Yet">Not Yet</option>
+              </select>
+              <input type="text" id="searchInput" class="form-control" placeholder="Search..." />
+              <a href="{{ route('survey.export', ['survey_id' => $survey->id]) }}" class="btn btn-outline-success" title="Download Report"><i class="ri-file-excel-line"></i></a>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 <div class="row">
     <!-- Sidebar Tabs -->
     <div class="col-md-4">
       <div class="nav flex-column nav-pills gap-2" id="v-tabs" role="tablist" aria-orientation="vertical">
-        <button class="nav-link active text-start border rounded p-3" id="tab1-tab" data-bs-toggle="pill" data-bs-target="#tab1" type="button" role="tab">
-          <div class="d-flex justify-content-between">
-            <strong>Metta Saputra</strong>
-            <span class="badge bg-success">Submitted</span>
-          </div>
-          <small class="text-muted">14 Apr 2024 09:47 AM</small><br>
-          <small class="text-muted">KPN Corporation | UI/UX Designer</small>
-        </button>
-        <button class="nav-link text-start border rounded p-3" id="tab2-tab" data-bs-toggle="pill" data-bs-target="#tab2" type="button" role="tab">
-          <div class="d-flex justify-content-between">
-            <strong>Jeli Farida</strong>
-            <span class="badge bg-success">Submitted</span>
-          </div>
-          <small class="text-muted">14 Apr 2024 01:59 PM</small><br>
-          <small class="text-muted">KPN Corporation | Organization Development</small>
-        </button>
-        <button class="nav-link text-start border rounded p-3" id="tab3-tab" data-bs-toggle="pill" data-bs-target="#tab3" type="button" role="tab">
-          <div class="d-flex justify-content-between">
-            <strong>Alfian Nur Fatah Azis</strong>
-            <span class="badge bg-danger">Not Yet</span>
-          </div>
-          <small class="text-muted">KPN Corporation | HCIS Developer</small>
-        </button>
+        @foreach ($listParticipants as $index => $participant)
+            @php
+                $formData = json_decode($participant->form_data, true);
+                $isActive = $index === 0 ? 'active' : '';
+                $tabId = 'tab' . $index;
+            @endphp
+            <button class="nav-link text-start border rounded p-3 {{ $isActive }}" id="{{ $tabId }}-tab"
+                data-bs-toggle="pill" data-bs-target="#{{ $tabId }}" type="button" role="tab" data-status="{{ $participant->form_data ? 'Submitted' : 'Not Yet' }}"
+                data-name="{{ strtolower($participant->fullname) }}">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ $participant->fullname }}</strong>
+                    <span class="badge {{ $participant->form_data ? 'bg-success' : 'bg-danger' }}">
+                        {{ $participant->form_data ? 'Submitted' : 'Not Yet' }}
+                    </span>
+                </div>
+                @if ($participant->form_data && $participant->created_at)
+                    <small class="text-muted">{{ \Carbon\Carbon::parse($participant->created_at)->format('d M Y h:i A') }}</small><br>
+                @endif
+                <small class="text-muted">{{ $participant->business_unit }} | {{ $participant->location }}</small>
+            </button>
+        @endforeach
       </div>
     </div>
   
     <!-- Tab Content -->
     <div class="col-md-8">
       <div class="tab-content" id="v-tabsContent">
-        <div class="tab-pane fade show active" id="tab1" role="tabpanel">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Metta Saputra</h5>
-              <small class="text-muted">Corporation | UI/UX Designer</small>
-              <p><strong>Apakah puas dengan acara ini?</strong><br>Biasa saja</p>
-              <p><strong>Bagian mana dari acara yang paling kamu suka?</strong><br>Makanan/Minuman</p>
-              <p><strong>Apakah ada hal lain yang kamu suka dari acara ini?</strong><br>Panitianya asik-asik</p>
-              <p><strong>Ada saran atau masukan untuk acara selanjutnya?</strong><br>Durasi acaranya lebih lama biar asik</p>
+        @foreach ($listParticipants as $index => $participant)
+        @php
+            $formData = json_decode($participant->form_data, true);
+            $formSchema = json_decode($participant->formTemplate->form_schema ?? '[]', true);
+            $isActive = $index === 0 ? 'show active' : '';
+            $tabId = 'tab' . $index;
+        @endphp
+        <div class="tab-pane fade {{ $isActive }}" id="{{ $tabId }}" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                  <div class="p-3 mb-3 bg-light rounded">
+                    <h5 class="card-title">{{ $participant->fullname }}</h5>
+                    <small class="text-muted">{{ $participant->business_unit }} | {{ $participant->location }}</small>
+                  </div>
+                  @if (!empty($formSchema['fields']))
+                      @foreach ($formSchema['fields'] as $idx => $field)
+                          @php
+                              $questionNumber = $idx + 1;
+                              $label = $field['label'] ?? $field['name'];
+                              $answer = $formData[$field['name']] ?? '-';
+                          @endphp
+                          <p><strong>{{ $label }}</strong><br>{{ $answer }}</p>
+                      @endforeach
+                  @else
+                      <p class="text-muted fst-italic">Belum mengisi form.</p>
+                  @endif
+                </div>
             </div>
-          </div>
         </div>
-        <div class="tab-pane fade" id="tab2" role="tabpanel">
-          <!-- Isi konten Jeli Farida -->
-        </div>
-        <div class="tab-pane fade" id="tab3" role="tabpanel">
-          <!-- Isi konten Alfian -->
-        </div>
+    @endforeach
       </div>
     </div>
   </div>

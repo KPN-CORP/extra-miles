@@ -111,7 +111,7 @@
                                             <td>{{ $survey->category }}</td>
                                             <td>{{ $survey->title }}</td>
                                             <td style="text-align: center;">
-                                                {{ $survey->quota }}
+                                                {{ $survey->survey_participant_count }}
                                             </td>
                                             <td><span class="badge 
                                                 @if($survey->status === 'Ongoing')
@@ -128,8 +128,10 @@
                                                 @if($survey->status === 'Ongoing' || $survey->status == 'Draft')
                                                     <a href="{{ route('survey.edit', $survey->id) }}" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
                                                 @endif
-                                                @if($survey->status != 'Draft')
+                                                @if($survey->status != 'Draft' && $survey->category === 'survey')
                                                     <a href="{{ route('survey.participants', \Illuminate\Support\Facades\Crypt::encryptString($survey->id)) }}" class="btn btn-outline-info btn-sm"><i class="ri-eye-line"></i></a>
+                                                @elseif($survey->status != 'Draft' && $survey->category === 'vote')
+                                                    <a href="{{ route('vote.participants', \Illuminate\Support\Facades\Crypt::encryptString($survey->id)) }}" class="btn btn-outline-info btn-sm"><i class="ri-eye-line"></i></a>
                                                 @endif
                                                 @if($survey->status === 'Draft')
                                                     <form action="{{ route('survey.archive', $survey->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Arsipkan survey ini?')">

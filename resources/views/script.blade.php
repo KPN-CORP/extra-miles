@@ -49,6 +49,45 @@
 
     // script Archive Event
     document.addEventListener("DOMContentLoaded", function () {
+        const editButtons = document.querySelectorAll('.edit-quote-btn');
+        const form = document.getElementById('editQuoteForm');
+        const authorInput = document.getElementById('edit-author');
+        const quotesInput = document.getElementById('edit-quotes');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const author = this.dataset.author;
+                const quotes = this.dataset.quotes;
+
+                // Isi data ke form
+                authorInput.value = author;
+                quotesInput.value = quotes;
+
+                // Update form action
+                form.action = `/admin/quotes/${id}`;
+            });
+        });
+
+        document.querySelectorAll('.archive-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const quoteId = this.dataset.id;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This quote will be archived.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ab2f2b',
+                    cancelButtonColor: '#aaa',
+                    confirmButtonText: 'Yes, archive it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('archive-form-' + quoteId).submit();
+                    }
+                });
+            });
+        });
+
         document.querySelectorAll(".btn-archive").forEach(function (button) {
             button.addEventListener("click", function () {
                 const eventId = this.getAttribute("data-id");
@@ -204,5 +243,35 @@
             .catch(error => {
                 console.error(error);
             });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const statusFilter = document.getElementById('statusFilter');
+        const searchInput = document.getElementById('searchInput');
+        const participantButtons = document.querySelectorAll('#v-tabs button[data-status]');
+
+        function filterParticipants() {
+            const selectedStatus = statusFilter.value;
+            const searchQuery = searchInput.value.toLowerCase();
+
+            participantButtons.forEach(button => {
+                const status = button.getAttribute('data-status');
+                const name = button.getAttribute('data-name');
+
+                const matchesStatus = selectedStatus === 'All' || status === selectedStatus;
+                const matchesSearch = name.includes(searchQuery);
+
+                if (matchesStatus && matchesSearch) {
+                    button.style.display = 'block';
+                } else {
+                    button.style.display = 'none';
+                }
+            });
+        }
+
+        statusFilter.addEventListener('change', filterParticipants);
+        searchInput.addEventListener('input', filterParticipants);
     });
 </script>

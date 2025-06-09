@@ -131,7 +131,11 @@
                     <li class="breadcrumb-item active">{{ $link }}</li>
                 </ol>
             </div>
-            <h4 class="page-title">{{ $link }}</h4>
+            <h4 class="page-title">@if (!empty($back))
+                <a href="{{ route($back) }}" class="text-decoration-none me-2">
+                    <i class="ri-arrow-left-line"></i>
+                </a>
+            @endif {{ $link }}</h4>
         </div>
     </div>
 </div>

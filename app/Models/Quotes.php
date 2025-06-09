@@ -10,4 +10,8 @@ class Quotes extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'quotes','author','created_by'
+    ];
 }

@@ -10,4 +10,9 @@ class SurveyParticipant extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    public function formTemplate()
+    {
+        return $this->belongsTo(FormTemplate::class, 'form_id', 'id');
+    }
 }

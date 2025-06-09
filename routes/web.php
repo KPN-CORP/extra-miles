@@ -81,15 +81,23 @@ Route::prefix('admin')->group(function () {
         Route::put('/survey/{id}', [SurveyController::class, 'update'])->name('survey.update');
         Route::post('/survey/{id}/archive', [SurveyController::class, 'archive'])->name('survey.archive');
         Route::get('/survey/{encryptedId}/participants', [SurveyController::class, 'listParticipants'])->name('survey.participants');
+        Route::get('/vote/{encryptedId}/participants', [SurveyController::class, 'listVoteParticipants'])->name('vote.participants');
+        Route::get('/survey/{survey_id}/export', [SurveyController::class, 'export'])->name('survey.export');
 
         // Social
         Route::get('/social', [SocialController::class, 'index'])->name('admin.social.index');
 
         // Quotes
         Route::get('/quotes', [QuotesController::class, 'index'])->name('admin.quotes.index');
+        Route::post('/quotes/store', [QuotesController::class, 'store'])->name('quotes.store');
+        Route::put('/quotes/{id}', [QuotesController::class, 'update'])->name('quotes.update');
+        Route::delete('/quotes/{id}/delete', [QuotesController::class, 'destroy'])->name('quotes.destroy');
 
         Route::get('{first}/{second}', [HomeController::class, 'secondLevel'])->name('second');
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+        Route::get('login', function () {
+            return redirect()->away('https://kpncorporation.darwinbox.com');
+        })->name('login');
     });
     
 
