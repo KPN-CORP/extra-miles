@@ -332,7 +332,7 @@ export default function EventForm() {
                                 <input
                                 type="tel"
                                 name="whatsapp_number"
-                                value={values.whatsapp_number ?? personalMobileNumber}
+                                value={values.whatsapp_number}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
                                 placeholder="phone number"
