@@ -69,7 +69,7 @@
                 </a>
             </li>
             <li class="side-nav-item">
-                <a href="{{ url('/admin/dashboard') }}" class="side-nav-link">
+                <a href="{{ url('/admin/live') }}" class="side-nav-link">
                     <i class="ri-live-line"></i>
                     <span> LIVE </span>
                 </a>
@@ -78,6 +78,12 @@
                 <a href="{{ url('/admin/quotes') }}" class="side-nav-link">
                     <i class="ri-double-quotes-l"></i>
                     <span> Quotes/Affirmation </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
+                <a href="{{ url('/admin/formbuilder') }}" class="side-nav-link">
+                    <i class="ri-ai-generate"></i>
+                    <span> Form Builder </span>
                 </a>
             </li>
         </ul>
