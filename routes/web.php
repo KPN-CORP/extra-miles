@@ -21,8 +21,10 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\SocialController;
+use App\Http\Controllers\LiveContentController;
 use App\Http\Controllers\QuotesController;
 use App\Http\Controllers\EventParticipantController;
+use App\Http\Controllers\FormTemplateController;
 use App\Livewire\ManageParticipants;
 
 
@@ -36,7 +38,6 @@ Route::middleware('guest')->group(function () {
 Route::get('/{any?}', function () {
     return view('user-app');
 })->where('any', '^(?!admin).*$');
-
 
 Route::get('/images/{filename}', function ($filename) {
     $path = storage_path('app/public/' . $filename);
@@ -87,11 +88,20 @@ Route::prefix('admin')->group(function () {
         // Social
         Route::get('/social', [SocialController::class, 'index'])->name('admin.social.index');
 
+        //Live
+        Route::get('/live', [LiveContentController::class, 'index'])->name('live.index');
+        Route::post('/live/store', [LiveContentController::class, 'store'])->name('live.store');
+        Route::delete('/live/{id}', [LiveContentController::class, 'destroy'])->name('live.destroy');
+
         // Quotes
         Route::get('/quotes', [QuotesController::class, 'index'])->name('admin.quotes.index');
         Route::post('/quotes/store', [QuotesController::class, 'store'])->name('quotes.store');
         Route::put('/quotes/{id}', [QuotesController::class, 'update'])->name('quotes.update');
         Route::delete('/quotes/{id}/delete', [QuotesController::class, 'destroy'])->name('quotes.destroy');
+
+        // Form Builder
+        Route::get('/formbuilder', [FormTemplateController::class, 'index'])->name('form.index');
+        Route::get('/formbuilder/create', [FormTemplateController::class, 'create'])->name('form.create');
 
         Route::get('{first}/{second}', [HomeController::class, 'secondLevel'])->name('second');
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');

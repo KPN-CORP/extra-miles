@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\MasterBisnisunit;
 use App\Models\Location;
 use App\Models\Department;
+use App\Models\Employee;
 use App\Models\Grade;
 use App\Models\Event;
 use App\Models\EventParticipant;
@@ -90,10 +91,10 @@ class EventController extends Controller
             ->orderBy('area')
             ->get();
 
-        $departments = Department::select('parent_company_id', 'department_name', 'department_code')
-            ->where('status', 'Active')
-            ->orderBy('parent_company_id')
-            ->orderBy('department_name')
+        $departments = Employee::select('group_company', 'unit', 'office_area')
+            ->groupBy('group_company', 'unit', 'office_area')
+            ->orderBy('group_company')
+            ->orderBy('unit')
             ->get();
         
         $grades = Grade::select('group_name')
@@ -179,10 +180,10 @@ class EventController extends Controller
             ->orderBy('area')
             ->get();
 
-        $departments = Department::select('parent_company_id', 'department_name', 'department_code')
-            ->where('status', 'Active')
-            ->orderBy('parent_company_id')
-            ->orderBy('department_name')
+        $departments = Employee::select('group_company', 'unit', 'office_area')
+            ->groupBy('group_company', 'unit', 'office_area')
+            ->orderBy('group_company')
+            ->orderBy('unit')
             ->get();
         
         $grades = Grade::select('group_name')

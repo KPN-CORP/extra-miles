@@ -274,4 +274,25 @@
         statusFilter.addEventListener('change', filterParticipants);
         searchInput.addEventListener('input', filterParticipants);
     });
+
+    document.querySelectorAll('.archive-live-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.getAttribute('data-id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will archive the live content.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ab2f2b',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'Yes, archive it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('archive-live-form-' + id).submit();
+                }
+            });
+        });
+    });
 </script>

@@ -97,7 +97,7 @@
                             $selectedunit = old('unit', (array) $survey->unit);
                         @endphp
                         @foreach($departments as $dep)
-                            <option value="{{ $dep->department_code }}" {{ in_array($dep->department_code, (array) $selectedunit) ? 'selected' : '' }}>{{ $dep->department_name." (".$dep->parent_company_id.")" }}</option>
+                            <option value="{{ $dep->unit }}" {{ in_array($dep->unit, (array) $selectedunit) ? 'selected' : '' }}>{{ $dep->unit." - ".$dep->group_company." - ".$dep->office_area }}</option>
                         @endforeach
                     </select>
                     <small class="text-muted">Blank means it applies to every Unit.</small>

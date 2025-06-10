@@ -67,7 +67,7 @@
                     <select class="select2 form-control select2-multiple" name="unit[]" id="unit" data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
                         <option value="" disabled>Please select</option>
                         @foreach($departments as $department)
-                            <option value="{{ $department->department_code }}">{{ $department->department_name." (".$department->parent_company_id.")" }}</option>
+                            <option value="{{ $department->unit }}">{{ $department->unit." - ".$department->group_company." - ".$department->office_area}}</option>
                         @endforeach
                     </select>
                     <small class="text-muted">Blank means it applies to every Unit.</small>

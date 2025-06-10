@@ -10,4 +10,8 @@ class FormTemplate extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'category','title','form_schema','created_at'
+    ];
 }
