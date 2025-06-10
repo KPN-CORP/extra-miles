@@ -118,7 +118,7 @@ export default function EventForm() {
                 const formSchema = response.data;                
 
                     // Set form fields
-                    setFormFields(formSchema.fields);
+                    setFormFields(Array.isArray(formSchema.fields) ? formSchema.fields : []);
 
                     // Set initial values
                     const initialValues = {};
@@ -146,9 +146,7 @@ export default function EventForm() {
         fetchFormSchema();
     }, [apiUrl]);
 
-    const validationSchema = useMemo(() => {
-        return formFields.length > 0 ? generateValidationSchema(formFields) : null;
-    }, [formFields]);    
+    const validationSchema = formFields.length > 0 ? generateValidationSchema(formFields) : null;   
 
     const onSubmit = async (values, { setSubmitting }) => {
         setIsSubmitting(true);
@@ -296,11 +294,11 @@ export default function EventForm() {
             </div>
             </>
         );
-    }
+    }    
 
     return (
         <div className='w-full mb-2'>
-            {initialValues && validationSchema && (
+            {initialValues && (
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
