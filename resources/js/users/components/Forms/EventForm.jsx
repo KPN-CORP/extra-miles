@@ -146,7 +146,9 @@ export default function EventForm() {
         fetchFormSchema();
     }, [apiUrl]);
 
-    const validationSchema = formFields.length > 0 ? generateValidationSchema(formFields) : null;
+    const validationSchema = useMemo(() => {
+        return formFields.length > 0 ? generateValidationSchema(formFields) : null;
+    }, [formFields]);    
 
     const onSubmit = async (values, { setSubmitting }) => {
         setIsSubmitting(true);
