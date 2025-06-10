@@ -28,7 +28,7 @@
     "src": "public/images/bg-auth.jpg"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BXDFPUoq.css",
+    "file": "assets/app-89PVmLeA.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -85,7 +85,7 @@
     "isEntry": true
   },
   "resources/js/users/main.jsx": {
-    "file": "assets/main-Bmqli3eq.js",
+    "file": "assets/main-d9Pg7wY2.js",
     "name": "main",
     "src": "resources/js/users/main.jsx",
     "isEntry": true,
@@ -93,7 +93,7 @@
       "_cloneDeep-DzRP12Gi.js"
     ],
     "css": [
-      "assets/main-C4775MlY.css"
+      "assets/main-3xDy5pvu.css"
     ],
     "assets": [
       "assets/remixicon-BVJ9S1ev.eot",

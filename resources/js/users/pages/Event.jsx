@@ -29,7 +29,7 @@ export default function Event() {
     const [events, setEvent] = useState([]);
     const [loading, setLoading] = useState(true);
     const apiUrl = useApiUrl();
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(null);
     const [activeMonth, setActiveMonth] = useState(new Date().getMonth());
     const [activeYear, setActiveYear] = useState(new Date().getFullYear());
     const [selectedBU, setSelectedBU] = useState("All BU");
@@ -151,6 +151,19 @@ export default function Event() {
                                 setActiveMonth(activeStartDate.getMonth());
                                 setActiveYear(activeStartDate.getFullYear());
                             }}
+                            tileClassName={({ date }) => {
+                                const today = new Date();
+                                const isToday = date.toDateString() === today.toDateString();
+                                
+                                const isSelected =
+                                  selectedDate && date.toDateString() === today.toDateString();
+                            
+                                if (isToday && !isSelected) {
+                                  return "today-tile";
+                                }
+                            
+                                return null;
+                            }}
                             tileContent={({ date, view }) => {
                                 const found = events.find(
                                 (e) => new Date(e.start_date).toDateString() === date.toDateString()
@@ -225,10 +238,10 @@ export default function Event() {
                                         </div>
                 
                                         {/* Content */}
-                                        <div className="w-24 flex-1">
-                                            <div data-color="primary" data-size="H6" data-type="normal" className="bg-white/0 inline-flex flex-col justify-center items-center">
-                                                <div className={`px-2 py-1 ${statusColors.bg} rounded inline-flex justify-center items-center overflow-hidden`}>
-                                                    <div className={`text-center justify-center ${statusColors.text} text-[10px] font-medium  leading-[10px]`}>{isClosed || isOngoing || closedRegistration ? eventStatus : (registeredStatus ?? event.status) }
+                                        <div className="w-24 flex-1 flex flex-col justify-start gap-0.5 py-0.5">
+                                            <div data-color="primary" data-type="normal" className="bg-white/0 inline-flex flex-col justify-start items-start">
+                                                <div className={`px-2 py-0.5 ${statusColors.bg} rounded inline-flex justify-center items-center overflow-hidden`}>
+                                                    <div className={`text-center justify-center ${statusColors.text} text-[8px] font-medium leading-[10px]`}>{isClosed || isOngoing || closedRegistration ? eventStatus : (registeredStatus ?? event.status) }
                                                     </div>
                                                     {(event.status === "Ongoing" && isOngoing) && (
                                                         <div className="ms-1">
@@ -244,15 +257,15 @@ export default function Event() {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="text-sm font-bold text-gray-800 truncate">{event.title}</div>
-                                            <div className="flex items-center text-sm text-gray-600 gap-2">
+                                            <div className="text-xs font-bold text-gray-800 truncate">{event.title}</div>
+                                            <div className="flex-row items-center text-[10px] text-gray-600 gap-2">
                                                 <div className="flex justify-start items-center gap-0.5">
                                                     <i className="ri-time-line"></i>
-                                                    <div className="justify-start text-xs font-normal leading-none truncate">{`${startTime}-${endTime}`}</div>
+                                                    <div className="justify-start font-normal leading-none">{`${startTime}-${endTime}`}</div>
                                                 </div>
                                                 <div className="flex justify-start items-center gap-0.5">
                                                     <i className="ri-map-pin-line"></i>
-                                                    <div className="justify-start text-xs font-normal leading-none">{event.event_location}</div>
+                                                    <div className="justify-start font-normal leading-none truncate">{event.event_location}</div>
                                                 </div>
                                             </div>
                                         </div>
