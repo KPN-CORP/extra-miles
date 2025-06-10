@@ -51,6 +51,7 @@
 .react-calendar {
     border: none;
   }
+  
   .react-calendar__tile--active {
     background: #f97316;
     color: white;
