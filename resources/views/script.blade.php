@@ -4,6 +4,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @if(Session::has('toast'))
 <script>
@@ -74,7 +75,7 @@
                 const quoteId = this.dataset.id;
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "This quote will be archived.",
+                    text: "This data will be archived.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ab2f2b',
@@ -294,5 +295,33 @@
                 }
             });
         });
+    });
+
+    //view Form Schema di tabel
+    $(document).on('click', '.view-schema', function () {
+        const title = $(this).data('title');
+        
+        const schema = $(this).data('schema');
+        console.log($(this).data('schema'));
+        $('#schemaModalLabel').text(title);
+        let content = '';
+    
+        if (schema.fields && schema.fields.length > 0) {
+            schema.fields.forEach((field, index) => {
+                content += `
+                    <div class="mb-3">
+                        <strong>${index + 1}. ${field.label}</strong><br>
+                        <em>Type:</em> ${field.type} |
+                        <em>Required:</em> ${field.required ? 'Yes' : 'No'} |
+                        <em>Validation:</em> ${field.validation || '-'}
+                    </div>
+                `;
+            });
+        } else {
+            content = '<p class="text-muted">No fields available.</p>';
+        }
+    
+        $('#schemaFields').html(content);
+        $('#viewSchemaModal').modal('show');
     });
 </script>

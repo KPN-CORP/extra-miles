@@ -90,17 +90,27 @@
                                                 <td>{{ $form->created_at }}</td>
                                                 <td>{{ $form->category }}</td>
                                                 <td>{{ $form->title }}</td>
-                                                <td><span class="badge bg-info">View</span></td>
+                                                <td>
+                                                    <span class="badge bg-info text-white view-schema"
+                                                          style="cursor:pointer"
+                                                          data-id="{{ $form->id }}"
+                                                          data-title="{{ $form->title }}"
+                                                          data-schema='@json(json_decode($form->form_schema))'>
+                                                          <i class="ri-search-line"></i> View
+                                                    </span>
+                                                </td>
                                                 <td><span class="badge bg-success">Active</span></td>
                                                 <td> 
-                                                    <a href="#" class="btn btn-outline-warning btn-sm edit-quote-btn">
-                                                        <i class="ri-edit-box-line"></i>
-                                                    </a>
+                                                    <a href="{{ route('formbuilder.edit', $form->id) }}" 
+                                                        class="btn btn-outline-warning btn-sm edit-quote-btn" 
+                                                        data-id="{{ $form->id }}">
+                                                         <i class="ri-edit-box-line"></i>
+                                                     </a>
                                                     <button type="button" class="btn btn-outline-danger btn-sm archive-btn" data-id="{{ $form->id }}">
                                                         <i class="ri-archive-line"></i>
                                                     </button>
                                                     
-                                                    <form id="archive-form-{{ $form->id }}" action="" method="POST" style="display: none;">
+                                                    <form id="archive-form-{{ $form->id }}" action="{{ route('formbuilder.archive', $form->id) }}" method="POST" style="display: none;">
                                                         @csrf
                                                         @method('DELETE')
                                                     </form>
@@ -158,6 +168,19 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="viewSchemaModal" tabindex="-1" aria-labelledby="schemaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="schemaModalLabel">Form Schema</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="schemaFields">
+            <!-- Dynamic content -->
+        </div>
         </div>
     </div>
 </div>
