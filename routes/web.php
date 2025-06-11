@@ -102,6 +102,10 @@ Route::prefix('admin')->group(function () {
         // Form Builder
         Route::get('/formbuilder', [FormTemplateController::class, 'index'])->name('form.index');
         Route::get('/formbuilder/create', [FormTemplateController::class, 'create'])->name('form.create');
+        Route::post('/form-builder/store', [FormTemplateController::class, 'store'])->name('form-builder.store');
+        Route::delete('/formbuilder/archive/{id}', [FormTemplateController::class, 'archive'])->name('formbuilder.archive');
+        Route::get('/formbuilder/{id}/edit', [FormTemplateController::class, 'edit'])->name('formbuilder.edit');
+        Route::put('/formbuilder/{id}', [FormTemplateController::class, 'update'])->name('formbuilder.update');
 
         Route::get('{first}/{second}', [HomeController::class, 'secondLevel'])->name('second');
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
