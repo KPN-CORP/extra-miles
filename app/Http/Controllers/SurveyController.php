@@ -90,6 +90,11 @@ class SurveyController extends Controller
         $events = Event::whereNotIn('status', ['Draft'])
             ->whereNull('deleted_at')
             ->get();
+        
+        $formTemplates = FormTemplate::select('id','title','form_schema','created_at')
+            ->where('category','!=','event')
+            ->orderBy('title')
+            ->get();
 
         return view('pages.admin.survey.create', [
             'back' => $back,
@@ -101,6 +106,7 @@ class SurveyController extends Controller
             'grades' => $grades,
             'type' => $type,
             'events' => $events,
+            'formTemplates' => $formTemplates,
         ]);
     }
 
@@ -125,6 +131,15 @@ class SurveyController extends Controller
             $imagePath = $request->file('banner')->store($folder, 'public');
         }
 
+        $formSchema = null;
+
+        if ($request->form_id) {
+            $formTemplate = FormTemplate::find($request->form_id);
+            if ($formTemplate) {
+                $formSchema = $formTemplate->form_schema;
+            }
+        }
+
         survey::create([
             'category'         => $request->survey_type,
             'title'            => $request->form_name,
@@ -133,6 +148,8 @@ class SurveyController extends Controller
             'end_date'         => $endDate,
             'time_end'         => $timeEnd,
             'event_id'         => $request->related,
+            'form_id'          => $request->form_id,
+            'form_schema'      => $formSchema,
             'description'      => $request->description,
             'banner'           => $imagePath,
             'icon'             => $request->survey_type === 'vote' ? 'assets/images/surveys/vote/vote-icon.png' : 'assets/images/surveys/survey/survey-icon.png',
@@ -182,6 +199,11 @@ class SurveyController extends Controller
         $events = Event::whereNotIn('status', ['Draft'])
             ->whereNull('deleted_at')
             ->get();
+        
+        $formTemplates = FormTemplate::select('id','title','form_schema','created_at')
+            ->where('category','!=','event')
+            ->orderBy('title')
+            ->get();
 
         return view('pages.admin.survey.edit', [
             'back' => $back,
@@ -193,6 +215,7 @@ class SurveyController extends Controller
             'departments' => $departments,
             'grades' => $grades,
             'events' => $events,
+            'formTemplates' => $formTemplates,
         ]);
     }
 
@@ -211,16 +234,26 @@ class SurveyController extends Controller
         $endDate = date('Y-m-d', strtotime($request->end_date));
         $timeEnd = date('H:i:s', strtotime($request->end_date));
 
+        $formSchema = null;
+
+        if ($request->form_id) {
+            $formTemplate = FormTemplate::find($request->form_id);
+            if ($formTemplate) {
+                $formSchema = $formTemplate->form_schema;
+            }
+        }
+
         $imagePath = null;
         $survey->start_date       = $startDate;
         $survey->time_start       = $timeStart;
         $survey->end_date         = $endDate;
         $survey->time_end         = $timeEnd;
-        $survey->event_id          = $request->related;
+        $survey->event_id         = $request->related;
         $survey->title            = $request->form_name;
         $survey->description      = $request->description;
         $survey->quota            = $request->participants;
-
+        $survey->form_id          = $request->form_id;
+        $survey->form_schema      = $formSchema;
         // JSON encode untuk multiple select fields
         $survey->businessUnit     = $request->business_unit ? json_encode($request->business_unit) : null;
         $survey->unit             = $request->unit ? json_encode($request->unit) : null;

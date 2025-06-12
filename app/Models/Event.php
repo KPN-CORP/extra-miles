@@ -28,7 +28,7 @@ class Event extends Model
     protected $fillable = [
         'category', 'start_date', 'time_start', 'end_date', 'time_end','event_location',
         'title', 'description', 'image', 'logo', 'status', 'status_survey',
-        'status_voting', 'quota', 'regist_deadline', 'businessUnit', 'unit',
+        'status_voting', 'quota', 'regist_deadline', 'businessUnit', 'unit','form_id','form_schema',
         'jobLevel', 'location', 'barcode_token','created_by','deleted_at'
     ];
 

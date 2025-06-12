@@ -151,7 +151,8 @@
         <div class="card bg-light shadow">
             <div class="card-header">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="custom_form" id="custom_form">
+                    <input class="form-check-input" type="checkbox" name="custom_form" id="custom_form"
+                        {{ $event->form_id ? 'checked' : '' }}>
                     <label class="form-check-label" for="custom_form">
                         Custom Registration Form
                     </label>
@@ -159,6 +160,21 @@
             </div>
             <div class="card-body">
                 <strong>CUSTOM REGISTRATION FORM BUILDER</strong>
+                <div class="row">
+                    <div class="col-md-4 {{ $event->form_id ? '' : 'd-none' }}" id="form-select-wrapper">
+                        <select class="form-select" id="form_id" name="form_id">
+                            <option disabled {{ !$event->form_id ? 'selected' : '' }}>Please select</option>
+                            @foreach($formTemplates as $form)
+                                <option value="{{ $form->id }}" {{ $form->id == $event->form_id ? 'selected' : '' }}>
+                                    {{ $form->title." (".$form->created_at->format('d M Y').")" }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-8 {{ $event->form_id ? '' : 'd-none' }}" id="form-preview-wrapper">
+                        <div id="form-preview" class="bg-white p-3 rounded"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -173,3 +189,69 @@
     </form>
 </div>
 @endsection
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkbox = document.getElementById('custom_form');
+        const formSelectWrapper = document.getElementById('form-select-wrapper');
+        const formPreviewWrapper = document.getElementById('form-preview-wrapper');
+        const formSelect = document.getElementById('form_id');
+        const formPreview = document.getElementById('form-preview');
+    
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                formSelectWrapper.classList.remove('d-none');
+                formPreviewWrapper.classList.remove('d-none');
+            } else {
+                formSelectWrapper.classList.add('d-none');
+                formPreviewWrapper.classList.add('d-none');
+                formPreview.innerHTML = '';
+                formSelect.value = '';
+            }
+        });
+    
+        document.getElementById('form_id').addEventListener('change', function () {
+            const formId = this.value;
+            if (!formId) return;
+    
+            fetch(`/admin/forms/${formId}/schema`)
+                .then(response => {
+                    console.log('Raw response:', response);
+                    if (!response.ok) throw new Error("Fetch error: " + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    const previewDiv = document.getElementById('form-preview');
+                    previewDiv.innerHTML = '';
+    
+                    data.fields.forEach(field => {
+                        const fieldWrapper = document.createElement('div');
+                        fieldWrapper.className = 'mb-3';
+    
+                        const label = document.createElement('label');
+                        label.className = 'form-label';
+                        label.textContent = field.label;
+                        fieldWrapper.appendChild(label);
+    
+                        let input;
+                        if (field.type === 'textarea') {
+                            input = document.createElement('textarea');
+                            input.className = 'form-control';
+                        } else {
+                            input = document.createElement('input');
+                            input.type = field.type;
+                            input.className = 'form-control';
+                        }
+    
+                        input.name = field.name;
+                        //input.required = field.required || false;
+                        fieldWrapper.appendChild(input);
+    
+                        previewDiv.appendChild(fieldWrapper);
+                    });
+                })
+                .catch(error => {
+                    console.error('Gagal load schema:', error);
+                });
+        });
+    });
+</script>

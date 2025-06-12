@@ -47,7 +47,7 @@
                         <input type="text" class="form-control" name="validation[]" placeholder="Validation">
                     </div>
                     <div class="col-md-2">
-                        <input type="checkbox" class="form-check-input" name="required[]">
+                        <input type="checkbox" class="form-check-input" name="required[]" value="1">
                         <label class="form-check-label">required?</label>
                     </div>
                 </div>
@@ -61,29 +61,9 @@
 
         {{-- Buttons --}}
         <div class="d-flex justify-content-end mb-4">
-            <button type="submit" name="action" value="draft" class="btn btn-secondary me-2">Save as Draft</button>
             <button type="submit" name="action" value="create" class="btn btn-primary me-2">Create Form</button>
             <a href="{{ route('form.index') }}" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </form>
 </div>
 @endsection
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function () {
-    $('#add-row').click(function () {
-        let newRow = $('.form-row-item').first().clone();
-        newRow.find('input, select').val('');
-        newRow.find('input[type="checkbox"]').prop('checked', false);
-        newRow.find('.remove-row').show();
-        $('#form-builder-wrapper').append(newRow);
-    });
-
-    // Event delegasi untuk tombol remove
-    $(document).on('click', '.remove-row', function () {
-        if ($('.form-row-item').length > 1) {
-            $(this).closest('.form-row-item').remove();
-        }
-    });
-});
-</script>

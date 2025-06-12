@@ -104,7 +104,20 @@
                 </div>
             </div>
             <div class="card-body">
-                <strong>CUSTOM REGISTRATION FORM BUILDER</strong>
+                <strong>CUSTOM EVENT FORM BUILDER</strong>
+                <div class="row">
+                    <div class="col-md-4 d-none" id="form-select-wrapper">
+                        <select class="form-select" id="form_id" name="form_id">
+                            <option selected disabled>Please select</option>
+                            @foreach($formTemplates as $form)
+                                <option value="{{ $form->id }}">{{ $form->title." (".$form->created_at->format('d M Y').")" }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-8 d-none" id="form-preview-wrapper">
+                        <div id="form-preview" class="bg-white p-3 rounded"></div>
+                    </div>
+                </div>
             </div>
         </div>
 

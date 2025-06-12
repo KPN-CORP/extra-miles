@@ -145,7 +145,7 @@
                                             <th>Title</th>
                                             <th>Detail</th>
                                             <th>Status</th>
-                                            <th>Action</th>
+                                            <th>Deleted At</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -155,7 +155,15 @@
                                                 <td>{{ $form->created_at }}</td>
                                                 <td>{{ $form->category }}</td>
                                                 <td>{{ $form->title }}</td>
-                                                <td><span class="badge bg-info">View</span></td>
+                                                <td>
+                                                    <span class="badge bg-info text-white view-schema"
+                                                          style="cursor:pointer"
+                                                          data-id="{{ $form->id }}"
+                                                          data-title="{{ $form->title }}"
+                                                          data-schema='@json(json_decode($form->form_schema))'>
+                                                          <i class="ri-search-line"></i> View
+                                                    </span>
+                                                </td>
                                                 <td><span class="badge bg-danger">Archive</span></td>
                                                 <td>{{ $form->deleted_at }}</td>
                                             </tr>
