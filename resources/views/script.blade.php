@@ -324,4 +324,122 @@
         $('#schemaFields').html(content);
         $('#viewSchemaModal').modal('show');
     });
+
+    $(document).ready(function () {
+        $('#add-row').click(function () {
+            let newRow = $('.form-row-item').first().clone();
+            newRow.find('input, select').val('');
+            newRow.find('input[type="checkbox"]').prop('checked', false).val('1');
+            newRow.find('.remove-row').show();
+            $('#form-builder-wrapper').append(newRow);
+        });
+
+        // Event delegasi untuk tombol remove
+        $(document).on('click', '.remove-row', function () {
+            if ($('.form-row-item').length > 1) {
+                $(this).closest('.form-row-item').remove();
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#add-row-edit').click(function () {
+            let newRow = $('.form-row-item').first().clone();
+            newRow.find('input, select').val('');
+            newRow.find('input[type="checkbox"]').prop('checked', false).val('1');
+
+            // Update semua name input agar sesuai urutan (reindex)
+            $('#form-builder-wrapper').append(newRow);
+            updateInputNames();
+        });
+
+        function updateInputNames() {
+            $('.form-row-item').each(function(index) {
+                $(this).find('select[name^="type"]').attr('name', 'type['+index+']');
+                $(this).find('input[name^="label"]').attr('name', 'label['+index+']');
+                $(this).find('input[name^="validation"]').attr('name', 'validation['+index+']');
+                $(this).find('input[type="checkbox"]').attr('name', 'required['+index+']');
+            });
+        }
+
+        $(document).on('click', '.remove-row', function () {
+            if ($('.form-row-item').length > 1) {
+                $(this).closest('.form-row-item').remove();
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkbox = document.getElementById('custom_form');
+        const formSelectWrapper = document.getElementById('form-select-wrapper');
+        const formPreviewWrapper = document.getElementById('form-preview-wrapper');
+        const formSelect = document.getElementById('form_id');
+        const formPreview = document.getElementById('form-preview');
+    
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                formSelectWrapper.classList.remove('d-none');
+                formPreviewWrapper.classList.remove('d-none');
+            } else {
+                formSelectWrapper.classList.add('d-none');
+                formPreviewWrapper.classList.add('d-none');
+                formPreview.innerHTML = '';
+                formSelect.value = '';
+            }
+        });
+    
+        formSelect.addEventListener('change', function () {
+            const formId = this.value;
+            if (!formId) return;
+    
+            fetch(`/admin/forms/${formId}/schema`)
+                .then(response => {
+                    console.log('Raw response:', response);
+                    if (!response.ok) throw new Error("Fetch error: " + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    const previewDiv = document.getElementById('form-preview');
+                    previewDiv.innerHTML = '';
+    
+                    data.fields.forEach(field => {
+                        const fieldWrapper = document.createElement('div');
+                        fieldWrapper.className = 'mb-3';
+    
+                        const label = document.createElement('label');
+                        label.className = 'form-label';
+                        label.textContent = field.label;
+                        fieldWrapper.appendChild(label);
+    
+                        let input;
+                        if (field.type === 'textarea') {
+                            input = document.createElement('textarea');
+                            input.className = 'form-control';
+                        } else {
+                            input = document.createElement('input');
+                            input.type = field.type;
+                            input.className = 'form-control';
+                        }
+    
+                        input.name = field.name;
+                        // Abaikan required agar bisa submit tanpa isian
+                        // input.required = field.required || false;
+    
+                        fieldWrapper.appendChild(input);
+                        previewDiv.appendChild(fieldWrapper);
+                    });
+                })
+                .catch(error => {
+                    console.error('Gagal load schema:', error);
+                });
+        });
+    
+        // Trigger otomatis jika ada form_id saat halaman edit
+        if (formSelect && formSelect.value) {
+            // checkbox.checked = true;
+            // formSelectWrapper.classList.remove('d-none');
+            // formPreviewWrapper.classList.remove('d-none');
+            formSelect.dispatchEvent(new Event('change'));
+        }
+    });
 </script>

@@ -116,4 +116,10 @@ class FormTemplateController extends Controller
 
         return redirect()->back()->with('success', 'Form archived (soft deleted) successfully.');
     }
+    public function getSchema($id)
+    {
+        $form = FormTemplate::findOrFail($id);
+        
+        return response()->json(json_decode($form->form_schema, true));
+    }
 }

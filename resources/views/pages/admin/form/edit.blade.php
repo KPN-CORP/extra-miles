@@ -38,20 +38,21 @@
 
                 <div class="card-body row g-3">
                     <div class="col-md-2">
-                        <select class="form-select" name="type[]" required>
+                        <select class="form-select" name="type[{{ $index }}]" required>
                             <option disabled>Please select Type</option>
                             <option value="text" {{ $field['type'] == 'text' ? 'selected' : '' }}>Text</option>
                             <option value="textarea" {{ $field['type'] == 'textarea' ? 'selected' : '' }}>Textarea</option>
                         </select>
                     </div>
                     <div class="col-md-5">
-                        <input type="text" class="form-control" name="label[]" placeholder="Label" value="{{ $field['label'] }}" required>
+                        <input type="text" class="form-control" name="label[{{ $index }}]" placeholder="Label" value="{{ $field['label'] }}" required>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" class="form-control" name="validation[]" placeholder="Validation" value="{{ $field['validation'] ?? '' }}">
+                        <input type="text" class="form-control" name="validation[{{ $index }}]" placeholder="Validation" value="{{ $field['validation'] ?? '' }}">
                     </div>
                     <div class="col-md-2">
-                        <input type="checkbox" class="form-check-input" name="required[]" {{ isset($field['required']) && $field['required'] ? 'checked' : '' }}>
+                        <input type="checkbox" class="form-check-input" name="required[{{ $index }}]" value="1"
+                        {{ isset($field['required']) && $field['required'] ? 'checked' : '' }}>
                         <label class="form-check-label">required?</label>
                     </div>
                 </div>
@@ -60,7 +61,7 @@
         </div>
 
         <div class="mb-3">
-            <button type="button" class="btn btn-primary" id="add-row">Add Row</button>
+            <button type="button" class="btn btn-primary" id="add-row-edit">Add Row</button>
         </div>
 
         <div class="d-flex justify-content-end mb-4">
@@ -70,24 +71,3 @@
     </form>
 </div>
 @endsection
-
-@push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function () {
-    $('#add-row').click(function () {
-        let newRow = $('.form-row-item').first().clone();
-        newRow.find('input, select').val('');
-        newRow.find('input[type="checkbox"]').prop('checked', false);
-        newRow.find('.remove-row').show();
-        $('#form-builder-wrapper').append(newRow);
-    });
-
-    $(document).on('click', '.remove-row', function () {
-        if ($('.form-row-item').length > 1) {
-            $(this).closest('.form-row-item').remove();
-        }
-    });
-});
-</script>
-@endpush
