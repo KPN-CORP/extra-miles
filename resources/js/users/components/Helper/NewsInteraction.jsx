@@ -40,6 +40,10 @@ const NewsInteraction = ({ newsIdEncrypted, isLikedInitial, triggerLikeExternall
   }, [hasViewed, newsIdEncrypted, token]);
 
   useEffect(() => {
+    setIsLiked(isLikedInitial);
+  }, [isLikedInitial]);
+  
+  useEffect(() => {
     if (typeof triggerLikeExternally === 'function') {
       triggerLikeExternally(handleLike);
     }

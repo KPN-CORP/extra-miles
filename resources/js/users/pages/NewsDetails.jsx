@@ -153,7 +153,7 @@ export default function NewsDetails() {
               </div>
               <NewsInteraction
                 newsIdEncrypted={news.encrypted_id} // yang dikirim dari backend, misalnya via Crypt
-                isLikedInitial={news.news_likes} // bisa dari API backend
+                isLikedInitial={news.news_likes.length > 0} // bisa dari API backend
                 triggerLikeExternally={(fn) => {
                   likeFnRef.current = fn;
                 }}
