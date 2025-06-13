@@ -17,11 +17,11 @@ export default function NewsCard({ image, date, title, tags = [] }) {
                     {title}
                 </div>
             </div>
-            <div className="flex gap-1 mt-1 overflow-x-auto whitespace-nowrap">
+            <div className="flex gap-1 mt-1 overflow-x-auto whitespace-nowrap min-h-[10px]">
                 {tags.map((tag, idx) => (
                     <span
                     key={idx}
-                    className="text-[10px] bg-gray-200 text-gray-700 px-2 py-1 rounded-md inline-block"
+                    className="text-[10px] bg-gray-200 text-gray-700 px-1 py-0 rounded-md inline-block"
                     >
                     {tag}
                     </span>

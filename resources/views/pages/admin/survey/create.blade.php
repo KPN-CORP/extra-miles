@@ -54,7 +54,7 @@
                 </div>
                 <div class="col-md-4">
                     <label for="business_unit" class="form-label">Business Unit</label>
-                    <select class="select2 form-control select2-multiple" name="business_unit[]" id="business_unit" data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
+                    <select class="select2 form-control select2-multiple text-sm" name="business_unit[]" id="business_unit" data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
                         <option value="" disabled>Please select</option>
                         @foreach($bisnisunits as $bisnisunit)
                             <option value="{{ $bisnisunit }}">{{ $bisnisunit }}</option>
