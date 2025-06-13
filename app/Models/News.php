@@ -12,6 +12,11 @@ class News extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        // Kolom-kolom lainnya,
+        'category', 'title', 'publish_date', 'content', 'image', 'link', 'businessUnit', 'status', 'created_by', 'deleted_at'
+    ];
+
     protected $appends = ['encrypted_id'];
     // protected $hidden = ['id'];
 
