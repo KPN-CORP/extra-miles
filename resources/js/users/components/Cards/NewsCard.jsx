@@ -1,6 +1,7 @@
 import React from "react";
 
 export default function NewsCard({ image, date, title, tags = [] }) {
+    
   return (
     <div className="flex bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition">
         <div className="min-w-16 basis-1/4">
