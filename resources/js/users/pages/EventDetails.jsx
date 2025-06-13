@@ -45,24 +45,55 @@ export default function EventDetails() {
     fetchEvent();
   }, [apiUrl, id, token]);
 
+  const confirmAlertConfig = {
+    title: "Are you sure?",
+    text: "Do you want to confirm your attendance?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Yes, confirm it!",
+    cancelButtonText: "Cancel"
+  };
+  
+  const cancelAlertConfig = {
+    title: "Cancel attendance?",
+    text: "Please tell us why you can't attend:",
+    icon: "warning",
+    input: "textarea",
+    inputPlaceholder: "Write your reason here...",
+    inputAttributes: { 'aria-label': 'Reason' },
+    showCancelButton: true,
+    confirmButtonText: "Submit",
+    cancelButtonText: "Back"
+  };
+  
   const handleConfirm = async () => {
-    const result = await showAlert({ /* ...same as before */ });
+    const result = await showAlert(confirmAlertConfig);
     if (result.isConfirmed) {
       try {
         await axios.post(`${apiUrl}/api/event-confirmation`, {
           eventId: event.encrypted_id,
           status: 'confirm'
         }, { headers: { Authorization: `Bearer ${token}` } });
-        await showAlert({ title: "Confirmed!", text: "Thank you! We’ll see you there! 🎉", icon: "success" });
+        
+        await showAlert({
+          title: "Confirmed!",
+          text: "Thank you! We’ll see you there! 🎉",
+          icon: "success"
+        });
+        
         navigate('/');
       } catch {
-        showAlert({ title: "Error", text: "Failed to confirm your attendance.", icon: "error" });
+        showAlert({
+          title: "Error",
+          text: "Failed to confirm your attendance.",
+          icon: "error"
+        });
       }
     }
   };
-
+  
   const handleCancel = async () => {
-    const result = await showAlert({ /* ...input textarea reason */ });
+    const result = await showAlert(cancelAlertConfig);
     if (result.isConfirmed) {
       try {
         await axios.post(`${apiUrl}/api/event-confirmation`, {
@@ -70,10 +101,20 @@ export default function EventDetails() {
           status: 'cancel',
           messages: result.value
         }, { headers: { Authorization: `Bearer ${token}` } });
-        await showAlert({ title: "Canceled", text: "No worries — thank you!", icon: "info" });
+  
+        await showAlert({
+          title: "Canceled",
+          text: "No worries — thank you!",
+          icon: "info"
+        });
+  
         navigate('/');
       } catch {
-        showAlert({ title: "Error", text: "Failed to submit your reason.", icon: "error" });
+        showAlert({
+          title: "Error",
+          text: "Failed to submit your reason.",
+          icon: "error"
+        });
       }
     }
   };
