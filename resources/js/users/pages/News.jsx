@@ -194,7 +194,7 @@ export default function News() {
                 speed={600}
               >
                 {latestNews.map((item) => {
-                    const newsDate = new Date(item.date);
+                    const newsDate = new Date(item.publish_date);
                     const day = newsDate.toLocaleDateString("id-ID", {
                       weekday: "long",
                       day: "2-digit",
