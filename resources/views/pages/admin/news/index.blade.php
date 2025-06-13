@@ -76,8 +76,8 @@
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $row->category }}</td>
                                         <td>{{ \Illuminate\Support\Str::limit($row->title, 35, '...') }}</td>
-                                        <td>777</td>
-                                        <td>88</td>
+                                        <td>{{ $row->news_views_count }}</td>
+                                        <td>{{ $row->news_likes_count }}</td>
                                         <td>{{ $row->created_at->format('d M Y H:m:s') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($row->publish_date)->format('d M Y') }}</td>
                                         <td class="text-center"><span class="badge {{ $row->status == 'Publish' ? 'bg-info' : 'bg-secondary' }}">{{ $row->status }}</span></td>

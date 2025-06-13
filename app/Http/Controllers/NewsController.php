@@ -15,7 +15,7 @@ class NewsController extends Controller
         $parentLink = 'Dashboard';
         $link = 'News Update';
 
-        $news = News::all();
+        $news = News::withCount('newsLikes', 'newsViews')->get();
 
         return view('pages.admin.news.index', [
             'link' => $link,

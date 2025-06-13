@@ -51,7 +51,7 @@ class NewsController extends Controller
             $id = Crypt::decryptString($id);
             Log::info('Token payload employee_id: ' . $employee_id);
 
-            $news = News::with('newsLike')->findOrFail($id);
+            $news = News::with('newsLikes')->findOrFail($id);
 
             // Refresh agar data terbaru termasuk views baru ikut dikirim
             $news->refresh();
