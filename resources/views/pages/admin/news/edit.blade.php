@@ -167,8 +167,8 @@
                             <div class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="link" class="form-label">Youtube link</label>
-                                        <input type="text" class="form-control" name="link" id="link" placeholder="https://www.youtube.com/watch?v=example" value="{{ old('link', $news->link) }}">
+                                        <label for="link" class="form-label">Youtube video ID</label>
+                                        <input type="text" class="form-control" name="link" id="link" placeholder="Add video ID here.." value="{{ old('link', $news->link) }}">
                                     </div>
                                 </div>
                             </div>

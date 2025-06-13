@@ -21,7 +21,7 @@ class QuotesController extends Controller
         try {
             $payload = JWTAuth::parseToken()->getPayload();
 
-            $datas = Quotes::first();
+            $datas = Quotes::orderBy('id', 'desc')->first();
             
             return response()->json($datas);
 

@@ -33,6 +33,8 @@ class QuotesController extends Controller
             'quote' => 'required|string',
         ]);
 
+        Quotes::whereNull('deleted_at')->update(['deleted_at' => now()]);
+
         Quotes::create([
             'author'     => $request->author,
             'quotes'     => $request->quote,

@@ -80,6 +80,7 @@ class NewsController extends Controller
             'status'           => $request->action === 'draft' ? 'Draft' : 'Publish',
             'image'            => $imagePath,
             'hashtag'          => $request->hashtag,
+            'link'             => $request->link,
             'businessUnit'     => $request->business_unit ? json_encode($request->business_unit) : null,
             'created_by'       => Auth::id(),
         ]);
