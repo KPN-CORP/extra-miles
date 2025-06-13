@@ -30,7 +30,7 @@ export default function Social() {
   const navigate = useNavigate();
   const apiUrl = useApiUrl();
   const { token } = useAuth();
-
+  
   const [latestYoutube, setLatestYoutube] = useState([]);
   const [latestIG, setLatestIG] = useState([]);
   const [latestTiktok, setLatestTiktok] = useState([]);
@@ -43,20 +43,26 @@ export default function Social() {
           headers: { Authorization: `Bearer ${token}` },
         });
         
+
+        
         // Ambil hanya kategori 'youtube' lalu urutkan berdasarkan created_at terbaru
         const sortedYoutube = res.data
         .filter((item) => item.category?.toLowerCase() === 'youtube')
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
+        
         // Ambil 3 konten youtube terbaru
         const sortedLatestYoutube = sortedYoutube.slice(0, 3);
-
+        
         setLatestYoutube(sortedLatestYoutube);
-                
-        const sortedLatestIG = sortedYoutube.slice(0, 3);
+        
+        const sortedLatestIG = res.data
+        .filter((item) => item.category?.toLowerCase() === 'instagram')
+        .slice(0, 1); // Get only the first data
         setLatestIG(sortedLatestIG);
         
-        const sortedLatestTiktok = sortedYoutube.slice(0, 3);
+        const sortedLatestTiktok = res.data
+        .filter((item) => item.category?.toLowerCase() === 'tiktok')
+        .slice(0, 1);
         setLatestTiktok(sortedLatestTiktok);
   
       } catch (err) {
@@ -133,7 +139,7 @@ export default function Social() {
                 followFinger={true}
                 speed={600}
               >
-                {latestYoutube.map((item) => {
+                {latestYoutube.map((item, idx) => {
                   
                     return (
                     <SwiperSlide key={item.encrypted_id}>
@@ -147,7 +153,7 @@ export default function Social() {
 
                           {/* YouTube Embed */}
                           <div className="absolute inset-0 pointer-events-none">
-                            <YouTubePlayer videoId={item.link} />
+                            <YouTubePlayer key={idx} videoId={item.link} />
                           </div>
                         </div>
                     </SwiperSlide>
@@ -160,13 +166,17 @@ export default function Social() {
               <div>
                 <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Instagram</span>
                 <div className="mt-2 bg-white rounded overflow-hidden">
-                  <InstagramPlayer postUrl="DKb_LyvzYo8" />
+                {latestIG.map((item, index) => (
+                  <InstagramPlayer key={index} reelId={item.link} />
+                ))}
                 </div>
               </div>
               <div>
                 <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Tiktok</span>
                 <div className="mt-2 bg-white rounded overflow-hidden">
-                  <TikTokPlayer videoId="7350998068466126086" />
+                {latestTiktok.map((item, index) => (
+                  <TikTokPlayer key={index} videoId={item.link} />
+                ))}
                 </div>
               </div>
             </div>

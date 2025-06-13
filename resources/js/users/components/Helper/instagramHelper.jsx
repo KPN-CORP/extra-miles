@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 
 const InstagramPlayer = ({ reelId }) => {
-  const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnail, setThumbnail] = useState(null);  
 
   useEffect(() => {
+    if (!reelId) return;
+
     fetch(`https://noembed.com/embed?url=https://www.instagram.com/reel/${reelId}/`)
       .then((res) => res.json())
       .then((data) => setThumbnail(data.thumbnail_url))
@@ -34,7 +36,7 @@ const InstagramPlayer = ({ reelId }) => {
       <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-0 group-hover:bg-opacity-50 transition">
         <div className="px-3 py-3 bg-pink-600 text-white font-semibold rounded-lg shadow-lg flex items-center gap-2">
           <i className="ri-instagram-fill text-xl"></i>
-          <span className="text-xs">Lihat di Instagram</span>
+          <span className="text-xs">Open in Instagram</span>
         </div>
       </div>
     </div>
