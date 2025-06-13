@@ -10,4 +10,8 @@ class LiveContent extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'title','content_link','created_by'
+    ];
 }

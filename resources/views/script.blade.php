@@ -4,6 +4,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @if(Session::has('toast'))
 <script>
@@ -74,7 +75,7 @@
                 const quoteId = this.dataset.id;
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "This quote will be archived.",
+                    text: "This data will be archived.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ab2f2b',
@@ -321,5 +322,172 @@
 
         statusFilter.addEventListener('change', filterParticipants);
         searchInput.addEventListener('input', filterParticipants);
+    });
+
+    document.querySelectorAll('.archive-live-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.getAttribute('data-id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will archive the live content.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ab2f2b',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'Yes, archive it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('archive-live-form-' + id).submit();
+                }
+            });
+        });
+    });
+
+    //view Form Schema di tabel
+    $(document).on('click', '.view-schema', function () {
+        const title = $(this).data('title');
+        
+        const schema = $(this).data('schema');
+        console.log($(this).data('schema'));
+        $('#schemaModalLabel').text(title);
+        let content = '';
+    
+        if (schema.fields && schema.fields.length > 0) {
+            schema.fields.forEach((field, index) => {
+                content += `
+                    <div class="mb-3">
+                        <strong>${index + 1}. ${field.label}</strong><br>
+                        <em>Type:</em> ${field.type} |
+                        <em>Required:</em> ${field.required ? 'Yes' : 'No'} |
+                        <em>Validation:</em> ${field.validation || '-'}
+                    </div>
+                `;
+            });
+        } else {
+            content = '<p class="text-muted">No fields available.</p>';
+        }
+    
+        $('#schemaFields').html(content);
+        $('#viewSchemaModal').modal('show');
+    });
+
+    $(document).ready(function () {
+        $('#add-row').click(function () {
+            let newRow = $('.form-row-item').first().clone();
+            newRow.find('input, select').val('');
+            newRow.find('input[type="checkbox"]').prop('checked', false).val('1');
+            newRow.find('.remove-row').show();
+            $('#form-builder-wrapper').append(newRow);
+        });
+
+        // Event delegasi untuk tombol remove
+        $(document).on('click', '.remove-row', function () {
+            if ($('.form-row-item').length > 1) {
+                $(this).closest('.form-row-item').remove();
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#add-row-edit').click(function () {
+            let newRow = $('.form-row-item').first().clone();
+            newRow.find('input, select').val('');
+            newRow.find('input[type="checkbox"]').prop('checked', false).val('1');
+
+            // Update semua name input agar sesuai urutan (reindex)
+            $('#form-builder-wrapper').append(newRow);
+            updateInputNames();
+        });
+
+        function updateInputNames() {
+            $('.form-row-item').each(function(index) {
+                $(this).find('select[name^="type"]').attr('name', 'type['+index+']');
+                $(this).find('input[name^="label"]').attr('name', 'label['+index+']');
+                $(this).find('input[name^="validation"]').attr('name', 'validation['+index+']');
+                $(this).find('input[type="checkbox"]').attr('name', 'required['+index+']');
+            });
+        }
+
+        $(document).on('click', '.remove-row', function () {
+            if ($('.form-row-item').length > 1) {
+                $(this).closest('.form-row-item').remove();
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkbox = document.getElementById('custom_form');
+        const formSelectWrapper = document.getElementById('form-select-wrapper');
+        const formPreviewWrapper = document.getElementById('form-preview-wrapper');
+        const formSelect = document.getElementById('form_id');
+        const formPreview = document.getElementById('form-preview');
+    
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                formSelectWrapper.classList.remove('d-none');
+                formPreviewWrapper.classList.remove('d-none');
+            } else {
+                formSelectWrapper.classList.add('d-none');
+                formPreviewWrapper.classList.add('d-none');
+                formPreview.innerHTML = '';
+                formSelect.value = '';
+            }
+        });
+    
+        formSelect.addEventListener('change', function () {
+            const formId = this.value;
+            if (!formId) return;
+    
+            fetch(`/admin/forms/${formId}/schema`)
+                .then(response => {
+                    console.log('Raw response:', response);
+                    if (!response.ok) throw new Error("Fetch error: " + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    const previewDiv = document.getElementById('form-preview');
+                    previewDiv.innerHTML = '';
+    
+                    data.fields.forEach(field => {
+                        const fieldWrapper = document.createElement('div');
+                        fieldWrapper.className = 'mb-3';
+    
+                        const label = document.createElement('label');
+                        label.className = 'form-label';
+                        label.textContent = field.label;
+                        fieldWrapper.appendChild(label);
+    
+                        let input;
+                        if (field.type === 'textarea') {
+                            input = document.createElement('textarea');
+                            input.className = 'form-control';
+                        } else {
+                            input = document.createElement('input');
+                            input.type = field.type;
+                            input.className = 'form-control';
+                        }
+    
+                        input.name = field.name;
+                        // Abaikan required agar bisa submit tanpa isian
+                        // input.required = field.required || false;
+    
+                        fieldWrapper.appendChild(input);
+                        previewDiv.appendChild(fieldWrapper);
+                    });
+                })
+                .catch(error => {
+                    console.error('Gagal load schema:', error);
+                });
+        });
+    
+        // Trigger otomatis jika ada form_id saat halaman edit
+        if (formSelect && formSelect.value) {
+            // checkbox.checked = true;
+            // formSelectWrapper.classList.remove('d-none');
+            // formPreviewWrapper.classList.remove('d-none');
+            formSelect.dispatchEvent(new Event('change'));
+        }
     });
 </script>

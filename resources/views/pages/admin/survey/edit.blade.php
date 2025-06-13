@@ -97,7 +97,7 @@
                             $selectedunit = old('unit', (array) $survey->unit);
                         @endphp
                         @foreach($departments as $dep)
-                            <option value="{{ $dep->department_code }}" {{ in_array($dep->department_code, (array) $selectedunit) ? 'selected' : '' }}>{{ $dep->department_name." (".$dep->parent_company_id.")" }}</option>
+                            <option value="{{ $dep->unit }}" {{ in_array($dep->unit, (array) $selectedunit) ? 'selected' : '' }}>{{ $dep->unit." - ".$dep->group_company." - ".$dep->office_area }}</option>
                         @endforeach
                     </select>
                     <small class="text-muted">Blank means it applies to every Unit.</small>
@@ -134,7 +134,8 @@
         <div class="card bg-light shadow">
             <div class="card-header">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="custom_form" id="custom_form">
+                    <input class="form-check-input" type="checkbox" name="custom_form" id="custom_form"
+                        {{ $survey->form_id ? 'checked' : '' }}>
                     <label class="form-check-label" for="custom_form">
                         Custom Registration Form
                     </label>
@@ -142,6 +143,21 @@
             </div>
             <div class="card-body">
                 <strong>CUSTOM REGISTRATION FORM BUILDER</strong>
+                <div class="row">
+                    <div class="col-md-4 {{ $survey->form_id ? '' : 'd-none' }}" id="form-select-wrapper">
+                        <select class="form-select" id="form_id" name="form_id">
+                            <option disabled {{ !$survey->form_id ? 'selected' : '' }}>Please select</option>
+                            @foreach($formTemplates as $form)
+                                <option value="{{ $form->id }}" {{ $form->id == $survey->form_id ? 'selected' : '' }}>
+                                    {{ $form->title." (".$form->created_at->format('d M Y').")" }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-8 {{ $survey->form_id ? '' : 'd-none' }}" id="form-preview-wrapper">
+                        <div id="form-preview" class="bg-white p-3 rounded"></div>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\MasterBisnisunit;
 use App\Models\Location;
 use App\Models\Department;
+use App\Models\Employee;
 use App\Models\Grade;
 use App\Models\Event;
+use App\Models\FormTemplate;
 use App\Models\EventParticipant;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
@@ -90,15 +92,20 @@ class EventController extends Controller
             ->orderBy('area')
             ->get();
 
-        $departments = Department::select('parent_company_id', 'department_name', 'department_code')
-            ->where('status', 'Active')
-            ->orderBy('parent_company_id')
-            ->orderBy('department_name')
+        $departments = Employee::select('group_company', 'unit', 'office_area')
+            ->groupBy('group_company', 'unit', 'office_area')
+            ->orderBy('group_company')
+            ->orderBy('unit')
             ->get();
         
         $grades = Grade::select('group_name')
             ->distinct()
             ->orderBy('group_name')
+            ->get();
+
+        $formTemplates = FormTemplate::select('id','title','form_schema','created_at')
+            ->where('category','event')
+            ->orderBy('title')
             ->get();
 
         return view('pages.admin.events.create', [
@@ -109,6 +116,7 @@ class EventController extends Controller
             'locations' => $locations,
             'departments' => $departments,
             'grades' => $grades,
+            'formTemplates' => $formTemplates,
         ]);
     }
 
@@ -133,6 +141,15 @@ class EventController extends Controller
             $imagePath = $request->file('banner')->store('assets/images/events', 'public');
         }
 
+        $formSchema = null;
+
+        if ($request->form_id) {
+            $formTemplate = FormTemplate::find($request->form_id);
+            if ($formTemplate) {
+                $formSchema = $formTemplate->form_schema;
+            }
+        }
+
         Event::create([
             'category'         => $request->category,
             'start_date'       => $startDate,
@@ -152,6 +169,8 @@ class EventController extends Controller
             'unit'             => $request->unit ? json_encode($request->unit) : null,
             'jobLevel'         => $request->job_level ? json_encode($request->job_level) : null,
             'location'         => $request->location ? json_encode($request->location) : null,
+            'form_id'          => $request->form_id,
+            'form_schema'      => $formSchema,
             'barcode_token'    => Str::uuid(),
             'created_by'       => Auth::id(),
         ]);
@@ -179,18 +198,23 @@ class EventController extends Controller
             ->orderBy('area')
             ->get();
 
-        $departments = Department::select('parent_company_id', 'department_name', 'department_code')
-            ->where('status', 'Active')
-            ->orderBy('parent_company_id')
-            ->orderBy('department_name')
+        $departments = Employee::select('group_company', 'unit', 'office_area')
+            ->groupBy('group_company', 'unit', 'office_area')
+            ->orderBy('group_company')
+            ->orderBy('unit')
             ->get();
         
         $grades = Grade::select('group_name')
             ->distinct()
             ->orderBy('group_name')
             ->get();
+        
+        $formTemplates = FormTemplate::select('id','title','form_schema','created_at')
+            ->where('category','event')
+            ->orderBy('title')
+            ->get();
 
-        return view('pages.admin.events.edit', compact('back','link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations'));
+        return view('pages.admin.events.edit', compact('back','link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations', 'formTemplates'));
     }
 
     public function update(Request $request, $id)
@@ -214,6 +238,15 @@ class EventController extends Controller
         $endDate = date('Y-m-d', strtotime($request->end_date));
         $timeEnd = date('H:i:s', strtotime($request->end_date));
 
+        $formSchema = null;
+
+        if ($request->form_id) {
+            $formTemplate = FormTemplate::find($request->form_id);
+            if ($formTemplate) {
+                $formSchema = $formTemplate->form_schema;
+            }
+        }
+
         // Update data
         $event->category         = $request->category;
         $event->start_date       = $startDate;
@@ -232,7 +265,8 @@ class EventController extends Controller
         $event->unit             = $request->unit ? json_encode($request->unit) : null;
         $event->jobLevel         = $request->job_level ? json_encode($request->job_level) : null;
         $event->location         = $request->location ? json_encode($request->location) : null;
-
+        $event->form_id          = $request->form_id;
+        $event->form_schema      = $formSchema;
         // Upload banner jika ada
         if ($request->hasFile('banner')) {
             $path = $request->file('banner')->store('assets/images/events', 'public');

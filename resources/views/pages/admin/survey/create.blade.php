@@ -67,7 +67,7 @@
                     <select class="select2 form-control select2-multiple" name="unit[]" id="unit" data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
                         <option value="" disabled>Please select</option>
                         @foreach($departments as $department)
-                            <option value="{{ $department->department_code }}">{{ $department->department_name." (".$department->parent_company_id.")" }}</option>
+                            <option value="{{ $department->unit }}">{{ $department->unit." - ".$department->group_company." - ".$department->office_area}}</option>
                         @endforeach
                     </select>
                     <small class="text-muted">Blank means it applies to every Unit.</small>
@@ -104,7 +104,20 @@
                 </div>
             </div>
             <div class="card-body">
-                <strong>CUSTOM REGISTRATION FORM BUILDER</strong>
+                <strong>CUSTOM EVENT FORM BUILDER</strong>
+                <div class="row">
+                    <div class="col-md-4 d-none" id="form-select-wrapper">
+                        <select class="form-select" id="form_id" name="form_id">
+                            <option selected disabled>Please select</option>
+                            @foreach($formTemplates as $form)
+                                <option value="{{ $form->id }}">{{ $form->title." (".$form->created_at->format('d M Y').")" }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-8 d-none" id="form-preview-wrapper">
+                        <div id="form-preview" class="bg-white p-3 rounded"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
