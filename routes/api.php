@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\LiveContentController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\QuotesController;
+use App\Http\Controllers\api\SocialController;
 use App\Http\Controllers\Api\SurveyVoteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -39,6 +40,7 @@ Route::middleware('auth.token')->group(function () {
     Route::post('/news/{id}/view', [NewsController::class, 'recordView']);
     Route::post('/news/{id}/like', [NewsController::class, 'like']);
     Route::delete('/news/{id}/like', [NewsController::class, 'unlike']);
+    Route::get('/social', [SocialController::class, 'index']);
     Route::get('/quotes', [QuotesController::class, 'getQuotes']);
     Route::get('/live-content', [LiveContentController::class, 'getLiveContent']);
 });

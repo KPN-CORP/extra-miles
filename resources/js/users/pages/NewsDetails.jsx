@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useApiUrl } from '../components/context/ApiContext';
@@ -16,7 +16,7 @@ const pageVariants = {
   exit: { opacity: 0, y: 50 },       // Keluar ke kiri
 };
 
-export default function NewsDetails() {
+export default function NewsDetails({ onLike }) {
   const { id } = useParams();
   const apiUrl = useApiUrl();
   const { token } = useAuth();
@@ -25,9 +25,11 @@ export default function NewsDetails() {
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const likeFnRef = useRef(null);
-  const lastTapRef = useRef(0);
+  const lastTapRef = useRef(0);  
 
+  
   useEffect(() => {
+    likeFnRef.current = onLike;
     const fetchNews = async () => {
       try {
         const res = await axios.get(`${apiUrl}/api/news/${id}`, {
@@ -40,10 +42,19 @@ export default function NewsDetails() {
         setLoading(false);
       }
     };
-
+    
     fetchNews();
-  }, [apiUrl, id, token]);
+  }, [apiUrl, id, token, onLike]);
+  
+  const handleDoubleTap = useCallback(() => {
+    const now = Date.now();
 
+    if (now - lastTapRef.current < 300) {
+      likeFnRef.current?.();
+    }
+
+    lastTapRef.current = now;
+  }, []);
 
   if (loading) return <NewsLoader />;
 
@@ -88,13 +99,6 @@ export default function NewsDetails() {
   .map(tag => tag.trim())
   .filter(tag => tag); // remove empty strings
 
-  const handleDoubleTap = () => {
-    const now = Date.now();
-    if (now - lastTapRef.current < 300) {
-      likeFnRef.current?.(); // panggil fungsi like dari dalam NewsInteraction
-    }
-    lastTapRef.current = now;
-  };
 
   return (
     <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
@@ -138,7 +142,7 @@ export default function NewsDetails() {
                   ))}
               </div>
           </div>
-          <div onClick={handleDoubleTap} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-3">
               <img
                   src={getImageUrl(apiUrl, news.image)}
                   alt={news.title}
@@ -147,7 +151,7 @@ export default function NewsDetails() {
               {news.link && (
                 <YouTubePlayer videoId={news.link} />
               )}
-              <div className="prose prose-sm leading-relaxed text-stone-800 max-w-none [&>p]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1 pl-2 pr-1">
+              <div onClick={handleDoubleTap} onTouchStart={handleDoubleTap} className="prose prose-sm leading-relaxed text-stone-800 max-w-none [&>p]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1 pl-2 pr-1">
                 {parse(news.content)}
               </div>
           </div>
@@ -156,8 +160,8 @@ export default function NewsDetails() {
                 <p>Show your love if you liked this!</p>
               </div>
               <NewsInteraction
-                newsIdEncrypted={news.encrypted_id} // yang dikirim dari backend, misalnya via Crypt
-                isLikedInitial={news.news_likes} // bisa dari API backend
+                newsIdEncrypted={news?.encrypted_id} // yang dikirim dari backend, misalnya via Crypt
+                isLikedInitial={news?.news_likes} // bisa dari API backend
                 triggerLikeExternally={(fn) => {
                   likeFnRef.current = fn;
                 }}

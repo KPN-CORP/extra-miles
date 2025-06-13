@@ -16,7 +16,7 @@ const heartColors = [
 
 const NewsInteraction = ({ newsIdEncrypted, isLikedInitial, triggerLikeExternally }) => {
   const [hasViewed, setHasViewed] = useState(false);
-  const [isLiked, setIsLiked] = useState(isLikedInitial);
+  const [isLiked, setIsLiked] = useState(false);
   const [showBigHeart, setShowBigHeart] = useState(false);
   const [likeBounceKey, setLikeBounceKey] = useState(0);
   const [rotateKey, setRotateKey] = useState(0);
@@ -38,21 +38,18 @@ const NewsInteraction = ({ newsIdEncrypted, isLikedInitial, triggerLikeExternall
 
     return () => clearTimeout(timer);
   }, [hasViewed, newsIdEncrypted, token]);
-
-  useEffect(() => {
-    setIsLiked(isLikedInitial);
-  }, [isLikedInitial]);
   
   useEffect(() => {
-    if (typeof triggerLikeExternally === 'function') {
-      triggerLikeExternally(handleLike);
+    if (typeof triggerLikeExternally === 'function') {      
+      
+      triggerLikeExternally(() => handleLike(true)); // Force like
     }
   }, [triggerLikeExternally]);
 
-  const handleLike = async () => {
+  const handleLike = async (forceLike = false) => {
     setRotateKey(prev => prev + 1);
   
-    if (!isLiked) {
+    if (forceLike && !isLiked) {
       setIsLiked(true);
       setLikeBounceKey(prev => prev + 1);
   

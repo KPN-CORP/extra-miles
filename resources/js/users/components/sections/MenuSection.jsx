@@ -96,7 +96,7 @@ return (
           <button onClick={() => navigate("/survey")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-xs font-semibold">
               🗳️ Your Voice Matters!
           </button>
-          <button className="flex-1 min-w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-xs font-semibold">
+          <button onClick={() => navigate("/social")} className="flex-1 min-w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-xs font-semibold">
               🔗 Social Media
           </button>
         </div>
