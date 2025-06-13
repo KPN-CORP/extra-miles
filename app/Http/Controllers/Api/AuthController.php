@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Exception\RequestException;
 
 class AuthController extends Controller
 {
@@ -13,7 +14,9 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        $this->client = new Client();
+        $this->client = new Client([
+            'timeout' => 5, // agar tidak menggantung terlalu lama
+        ]);
     }
 
     // Endpoint untuk login yang diarahkan ke auth-service
@@ -21,7 +24,7 @@ class AuthController extends Controller
     {
         try {
             $response = $this->client->get(env('AUTH_SERVICE_URL') . '/auth-service', [
-                'json' => $request->all()
+                'json' => $request->all(),
             ]);
 
             $data = json_decode($response->getBody(), true);
@@ -32,12 +35,23 @@ class AuthController extends Controller
             }
 
             return response()->json([
-                'error' => 'Token not found'
+                'error' => 'Token not found in response',
             ], 400);
-        } catch (\Exception $e) {
-            Log::error('Login error: ' . $e->getMessage());
+        } catch (RequestException $e) {
+            $message = $e->hasResponse()
+                ? $e->getResponse()->getBody()->getContents()
+                : $e->getMessage();
+
+            Log::error('Login error from auth-service: ' . $message);
+
             return response()->json([
-                'error' => 'Auth Service unavailable'
+                'error' => 'Service is unavailable, please try again in few minutes',
+            ], 503); // gunakan 503 untuk service unavailable
+        } catch (\Exception $e) {
+            Log::error('Unexpected login error: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'Unexpected server error',
             ], 500);
         }
     }

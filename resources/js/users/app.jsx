@@ -17,6 +17,7 @@ import VoteDetails from './pages/VoteDetails';
 import { AuthProvider } from './components/context/AuthContext';
 import News from './pages/News';
 import NewsDetails from './pages/NewsDetails';
+import Social from './pages/Social';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -34,6 +35,7 @@ const AnimatedRoutes = () => {
         <Route path="/vote/:id" element={<VoteDetails />} />
         <Route path="/news" element={<News />} />
         <Route path="/news/:id" element={<NewsDetails />} />
+        <Route path="/social" element={<Social />} />
       </Routes>
     </AnimatePresence>
   );

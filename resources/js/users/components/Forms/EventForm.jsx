@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
 import { PulseLoader } from 'react-spinners';
 import { useApiUrl } from '../context/ApiContext';
 import axios from 'axios';
@@ -9,70 +8,7 @@ import { showAlert } from '../Helper/alertHelper';
 import { useAuth } from '../context/AuthContext';
 import PageLoader from '../Loader/PageLoader';
 
-function generateValidationSchema(fields) {
-    const shape = {};
-
-    fields.forEach(field => {
-    let schema;
-
-    switch (field.type) {
-        case 'text':
-        case 'textarea':
-        case 'select':
-        case 'radio':
-            schema = Yup.string();
-            if (typeof field.validation === 'string' && field.validation.includes('required')) {
-                schema = schema.required(`This field is required`);
-            }
-            // min dan max untuk string bisa diterapkan juga jika ada
-            const minMatch = typeof field.validation === 'string'
-                ? field.validation.match(/min:(\d+)/)
-                : null;
-            if (minMatch) {
-                const min = parseInt(minMatch[1]);
-                schema = schema.min(min, `This field must be at least ${min} characters`);
-            }
-            const maxMatch = typeof field.validation === 'string'
-                ? field.validation.match(/max:(\d+)/)
-                : null;
-            if (maxMatch) {
-                const max = parseInt(maxMatch[1]);
-                schema = schema.max(max, `This field must be at most ${max} characters`);
-            }
-            break;
-
-            case 'checkbox':
-                schema = Yup.boolean();
-                if (typeof field.required === 'boolean' && field.required) {
-                    schema = schema.oneOf([true], `This field is required`);
-                }
-            break;
-
-        // jika ada tipe lain, tambahkan di sini
-
-        default:
-            schema = Yup.string(); // fallback string
-            if (typeof field.validation === 'string' && field.validation.includes('required')) {
-                schema = schema.required(`This field is required`);
-            }
-    }
-
-    // Set label for better error messages
-    schema = schema.label(field.label);
-
-    shape[field.name] = schema;
-    });
-
-    shape['countryCode'] = Yup.string().required('Country code mandatory');
-    shape['whatsapp_number'] = Yup.string()
-    .required('WhatsApp number mandatory')
-    .matches(/^[0-9]+$/, 'Only Numbers are allowed')
-    .max(15, 'Max 15 digits')
-    .min(8, 'WhatsApp number must be at least 8 digits')
-    .test('no-plus', 'Do not include country code (+)', val => !val || !val.includes('+'));
-
-    return Yup.object().shape(shape);
-}
+import { generateValidationSchema } from '../Helper/generateValidationSchema';
 
 function parsePhoneNumber(fullNumber) {
     const knownCountryCodes = ['+62', '+60', '+65', '+63', '+66', '+84', '+91', '+966', '+81', '+1'];
@@ -124,11 +60,15 @@ export default function EventForm() {
                     const initialValues = {};
                     if (Array.isArray(formSchema?.fields)) {
                         formSchema.fields.forEach(field => {
+                            if (Array.isArray(field.options)) {
+                            initialValues[field.name] = field.type === 'checkbox' ? [] : '';
+                            } else {
                             initialValues[field.name] = field.type === 'checkbox' ? false : '';
+                            }
                         });
                     }
 
-                    const cleanNumber = (user?.whatsapp_number ?? user?.personal_mobile_number ?? '').replace(/'/g, '');
+                    const cleanNumber = (user?.whatsapp_number ? user?.whatsapp_number : (user?.personal_mobile_number ?? '')).replace(/'/g, '');                    
 
                     const parsedWhatsapp = parsePhoneNumber(user? cleanNumber : '');
 
@@ -145,8 +85,6 @@ export default function EventForm() {
 
         fetchFormSchema();
     }, [apiUrl]);
-
-    const validationSchema = formFields.length > 0 ? generateValidationSchema(formFields) : null;   
 
     const onSubmit = async (values, { setSubmitting }) => {
         setIsSubmitting(true);
@@ -296,16 +234,23 @@ export default function EventForm() {
         );
     }    
 
+    let schema;
+try {
+  schema = generateValidationSchema(formFields);
+} catch (err) {
+  console.error("Validation Schema Error:", err);
+}
+
     return (
         <div className='w-full mb-2'>
             {initialValues && (
             <Formik
                 initialValues={initialValues}
-                validationSchema={validationSchema}
+                validationSchema={generateValidationSchema(formFields)}
                 onSubmit={onSubmit}
                 enableReinitialize
             >
-                {({ values, handleChange, handleBlur, isSubmitting, touched, errors }) => (
+                {({ values, handleChange, handleBlur, isSubmitting, touched, errors, setFieldValue }) => (
                     <Form>
                         <div className="mb-6">
                             <label className="block text-gray-700 mb-2" htmlFor="whatsapp_number">
@@ -350,7 +295,32 @@ export default function EventForm() {
                                     {field.label}
                                 </label>
     
-                                {field.type === 'checkbox' ? (
+                                {field.type === 'checkbox' && Array.isArray(field.options) ? (
+                                    <div className="space-y-2">
+                                        {field.options.map((option, index) => (
+                                        <label key={index} className="flex items-center">
+                                            <input
+                                            type="checkbox"
+                                            name={field.name}
+                                            value={option}
+                                            checked={Array.isArray(values[field.name]) && values[field.name].includes(option)}
+                                            onChange={(e) => {
+                                                const currentValue = Array.isArray(values[field.name]) ? values[field.name] : [];
+                                                const set = new Set(currentValue);
+                                                if (e.target.checked) {
+                                                set.add(option);
+                                                } else {
+                                                set.delete(option);
+                                                }
+                                                setFieldValue(field.name, Array.from(set));
+                                            }}
+                                            className="mr-2"
+                                            />
+                                            {option}
+                                        </label>
+                                        ))}
+                                    </div>
+                                    ) : field.type === 'checkbox' ? (
                                     <label className="flex items-center">
                                         <Field 
                                         id={field.name}
@@ -363,7 +333,24 @@ export default function EventForm() {
                                         />
                                         I agree
                                     </label>
-                                ) : field.type === 'select' ? (
+                                ) : field.type === 'radio' ? (
+                                    <div className="space-y-2">
+                                      {field.options.map((option, index) => (
+                                        <label key={index} className="flex items-center">
+                                          <input
+                                            type="radio"
+                                            name={field.name}
+                                            value={option}
+                                            checked={values[field.name] === option}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            className="mr-2"
+                                          />
+                                          {option}
+                                        </label>
+                                      ))}
+                                    </div>
+                                  ) : field.type === 'select' ? (
                                     <select
                                         id={field.name}
                                         name={field.name}
