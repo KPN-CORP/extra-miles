@@ -106,7 +106,7 @@ export default function News() {
   // Memoize filteredNews supaya tidak rerender berlebihan
   const filteredNews = useMemo(() => {
     return allNews.filter((news) => {
-      const newsDate = new Date(news.date);
+      const newsDate = new Date(news.publish_date);
   
       const matchBU =
         selectedBU === "All BU" ||
@@ -265,7 +265,7 @@ export default function News() {
             {/* News List */}
             <div className="space-y-3">
               {filteredNews.map((news) => {
-                const newsDate = new Date(news.date);
+                const newsDate = new Date(news.publish_date);
                 const day = newsDate.toLocaleDateString("id-ID", {
                   weekday: "long",
                   day: "2-digit",
@@ -286,7 +286,11 @@ export default function News() {
 
                 const year = newsDate.getFullYear();
 
-                const tags = [businessUnit, year, news.category].filter(Boolean);
+                const hashtag = news?.hashtag || "";
+                const tags = hashtag
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag); // remove empty strings
 
                 return (
                   <div

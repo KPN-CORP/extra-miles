@@ -15,6 +15,11 @@ class News extends Model
     protected $appends = ['encrypted_id'];
     // protected $hidden = ['id'];
 
+    public function newsLike()
+    {
+        return $this->belongsTo(NewsLike::class, 'id', 'news_id');
+    }
+
     public function getEncryptedIdAttribute()
     {
         return Crypt::encryptString($this->id);

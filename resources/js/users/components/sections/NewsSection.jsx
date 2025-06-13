@@ -41,7 +41,7 @@ export default () => {
         }));
   
         // Urutkan berdasarkan created_at (terbaru di atas)
-        const sortedNews = [...newsData].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        const sortedNews = [...newsData].sort((a, b) => new Date(b.publish_date) - new Date(a.publish_date));
   
         // Ambil 3 berita terbaru
         const latest = sortedNews.slice(0, 3);
@@ -82,7 +82,7 @@ export default () => {
         >
           {/* Slides */}
           {latestNews.map((item) => {
-            const newsDate = new Date(item.date);
+            const newsDate = new Date(item.publish_date);
             const day = newsDate.toLocaleDateString("id-ID", {
               weekday: "long",
               day: "2-digit",

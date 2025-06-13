@@ -36,7 +36,9 @@ Route::middleware('auth.token')->group(function () {
     Route::get('/voting-result/{id}', [SurveyVoteController::class, 'getVotingResult']);
     Route::get('/news', [NewsController::class, 'getNews']);
     Route::get('/news/{id}', [NewsController::class, 'getNewsDetails']);
-    Route::post('/news/{id}/like', [NewsController::class, 'handleLike']);
+    Route::post('/news/{id}/view', [NewsController::class, 'recordView']);
+    Route::post('/news/{id}/like', [NewsController::class, 'like']);
+    Route::delete('/news/{id}/like', [NewsController::class, 'unlike']);
     Route::get('/quotes', [QuotesController::class, 'getQuotes']);
     Route::get('/live-content', [LiveContentController::class, 'getLiveContent']);
 });

@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useApiUrl } from '../components/context/ApiContext';
 import { useAuth } from '../components/context/AuthContext';
-import { showAlert } from '../components/Helper/alertHelper';
-import { PuffLoader } from 'react-spinners';
-import { dateTimeHelper } from '../components/Helper/dateTimeHelper';
 import { getImageUrl } from '../components/Helper/imagePath';
 import NewsLoader from '../components/Loader/NewsLoader';
 import { motion } from "framer-motion";
 import parse from "html-react-parser";
+import NewsInteraction from '../components/Helper/NewsInteraction';
 
 const pageVariants = {
   initial: { opacity: 0, y: 50 },     // Masuk dari kanan
@@ -22,33 +20,11 @@ export default function NewsDetails() {
   const apiUrl = useApiUrl();
   const { token } = useAuth();
   const navigate = useNavigate();
-
+  
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [liked, setLiked] = useState(false);
-  const [animate, setAnimate] = useState(false);
-
-  const handleClick = async () => {
-    if (liked) return; // jangan lakukan apa-apa kalau sudah like
-  
-    setLiked(true);
-    setAnimate(true);
-  
-    try {
-      const res = await axios.post(`${apiUrl}/api/news/${id}/like`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-    } catch (error) {
-      console.error('Gagal like:', error);
-      setLiked(false); // rollback jika gagal
-    }
-  
-    setTimeout(() => setAnimate(false), 400);
-  };
-  
+  const likeFnRef = useRef(null);
+  const lastTapRef = useRef(0);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -84,7 +60,7 @@ export default function NewsDetails() {
     );
   }
 
-  const newsDate = new Date(news.date);
+  const newsDate = new Date(news.publish_date);
   const day = newsDate.toLocaleDateString("id-ID", {
     weekday: "long",
     day: "2-digit",
@@ -103,9 +79,21 @@ export default function NewsDetails() {
       businessUnit = ""; // fallback kalau JSON parse gagal
   }
 
-  const year = newsDate.getFullYear();
+  const year = newsDate.getFullYear();  
 
-  const tags = [businessUnit, year, news.category].filter(Boolean);
+  const hashtag = news?.hashtag || "";
+  const tags = hashtag
+  .split(',')
+  .map(tag => tag.trim())
+  .filter(tag => tag); // remove empty strings
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      likeFnRef.current?.(); // panggil fungsi like dari dalam NewsInteraction
+    }
+    lastTapRef.current = now;
+  };
 
   return (
     <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
@@ -149,30 +137,27 @@ export default function NewsDetails() {
                   ))}
               </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
+          <div onClick={handleDoubleTap} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-3">
               <img
                   src={getImageUrl(apiUrl, news.image)}
                   alt={news.title}
                   className="w-full h-36 object-fill rounded"
               />
-              <div className="prose prose-sm leading-relaxed text-stone-800 max-w-none [&>p]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1 pl-2 pr-1 mb-4">
+              <div className="prose prose-sm leading-relaxed text-stone-800 max-w-none [&>p]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1 pl-2 pr-1">
                 {parse(news.content)}
               </div>
           </div>
           <div className="w-full inline-flex flex-col justify-center items-center gap-3 mb-2">
               <div className="justify-start text-red-700 text-sm font-bold font-['Montserrat'] leading-none">
-                <p>Thumbs up if you liked this!</p>
+                <p>Show your love if you liked this!</p>
               </div>
-              <button
-                onClick={handleClick}
-                className="w-10 h-10 p-2 rounded-full outline outline-2 outline-offset-[-2px] outline-red-700 flex justify-center items-center text-red-700 text-xl transition-transform duration-200"
-              >
-                <i
-                  className={`${
-                    liked ? 'ri-thumb-up-fill' : 'ri-thumb-up-line'
-                  } transition-all duration-300 ${animate ? 'rotate-left' : ''}`}
-                ></i>
-              </button>
+              <NewsInteraction
+                newsIdEncrypted={news.encrypted_id} // yang dikirim dari backend, misalnya via Crypt
+                isLikedInitial={news.news_like} // bisa dari API backend
+                triggerLikeExternally={(fn) => {
+                  likeFnRef.current = fn;
+                }}
+              />
           </div>
           </motion.div>
           </>
