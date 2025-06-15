@@ -152,7 +152,7 @@ export default function Social() {
                           )}
 
                           {/* YouTube Embed */}
-                          <div className=" inset-0 pointer-events-none">
+                          <div  onClick={() => window.open(`https://www.youtube.com/watch?v=${item.link}`, '_blank')} className=" inset-0 pointer-events-none">
                             <YouTubePlayer key={idx} videoId={item.link} />
                           </div>
                         </div>

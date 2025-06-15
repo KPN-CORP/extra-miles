@@ -6,14 +6,20 @@ const InstagramPlayer = ({ postId }) => {
       <InstagramEmbed
         url={`https://www.instagram.com/p/${postId}/`}
         width="100%"
-        className="w-full h-full"
+        className="w-full h-full pointer-events-none"
       />
-        <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-0 group-hover:bg-opacity-50 transition">
-            <div className="p-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg flex items-center gap-2">
-                <i className="ri-instagram-line text-xl"></i>
-                <span className="text-xs">View on Instagram</span>
-            </div>
-        </div>
+      {/* Overlay tombol di tengah bawah */}
+      <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-0 group-hover:bg-opacity-50 transition">
+        <a
+          href={`https://www.instagram.com/p/${postId}/`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg flex items-center gap-2"
+        >
+          <i className="ri-instagram-line text-xl"></i>
+          <span className="text-xs">View on Instagram</span>
+        </a>
+      </div>
     </div>
   );
 };
