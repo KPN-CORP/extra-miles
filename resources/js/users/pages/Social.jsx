@@ -142,21 +142,30 @@ export default function Social() {
                 {latestYoutube.map((item, idx) => {
                   
                     return (
-                    <SwiperSlide key={item.encrypted_id}>
-                        <div className="w-full aspect-[16/9] relative rounded-lg overflow-hidden">
+                      <SwiperSlide key={item.encrypted_id}>
+                      <div
+                        onClick={() => item.link && window.open(`https://www.youtube.com/watch?v=${item.link}`, '_blank')}
+                        className="w-full aspect-[16/9] relative rounded-lg overflow-hidden cursor-pointer group"
+                        aria-label="Open YouTube Video"
+                      >
                         {/* Loader overlay */}
-                          {!item.link && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-orange-50 z-10">
-                              <BannerLoader />
-                            </div>
-                          )}
-
-                          {/* YouTube Embed */}
-                          <div  onClick={() => window.open(`https://www.youtube.com/watch?v=${item.link}`, '_blank')} className=" inset-0 pointer-events-none">
+                        {!item.link && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-orange-50 z-10">
+                            <BannerLoader />
+                          </div>
+                        )}
+                    
+                        {/* YouTube Embed */}
+                        {item.link && (
+                          <div className="absolute inset-0 pointer-events-none transition-transform group-hover:scale-[1.02]">
                             <YouTubePlayer key={idx} videoId={item.link} />
                           </div>
-                        </div>
-                    </SwiperSlide>
+                        )}
+                    
+                        {/* Optional hover overlay */}
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition duration-300" />
+                      </div>
+                    </SwiperSlide>                    
                     )
                 }
                 )}
