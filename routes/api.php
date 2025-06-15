@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\LiveContentController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\QuotesController;
-use App\Http\Controllers\api\SocialController;
+use App\Http\Controllers\Api\SocialController;
 use App\Http\Controllers\Api\SurveyVoteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

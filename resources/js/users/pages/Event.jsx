@@ -32,7 +32,8 @@ export default function Event() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [activeMonth, setActiveMonth] = useState(new Date().getMonth());
     const [activeYear, setActiveYear] = useState(new Date().getFullYear());
-    const [selectedBU, setSelectedBU] = useState("All BU");
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [categories, setCategories] = useState([]);
     const { token } = useAuth(); 
     const handleSwipeLeft = () => {
         const newMonth = new Date(activeYear, activeMonth + 1, 1);
@@ -59,10 +60,24 @@ export default function Event() {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                setEvent(res.data.map(e => ({
-                    ...e,
-                    businessUnit: Array.isArray(e.businessUnit) ? e.businessUnit : [e.businessUnit]
-                })));
+
+                const allEvents = res.data;
+                setEvent(allEvents);
+
+                // Ambil semua kategori dan flatten jika nested
+                const allCategories = allEvents.flatMap((event) => {
+                    try {
+                    const parsed = JSON.parse(event.category);
+                    return Array.isArray(parsed) ? parsed : [parsed];
+                    } catch {
+                    return event.category ? [event.category] : [];
+                    }
+                });
+
+                 // Ambil yang unik
+                const uniqueCategories = [...new Set(allCategories)];
+                setCategories(["All", ...uniqueCategories]);
+
             } catch (err) {
                 showAlert({
                     icon: 'warning',
@@ -82,7 +97,7 @@ export default function Event() {
         if(token) {
             fetchEvent();
         }
-    }, [token]);
+    }, [apiUrl, token]);
     
 
     const handleDateChange = (date) => {
@@ -95,11 +110,21 @@ export default function Event() {
       };
 
     const filteredEvents = events.filter((event) => {
-        const matchBU =
-            selectedBU === "All BU" ||
-            (Array.isArray(event.businessUnit ?? []) && event.businessUnit.some(bu => JSON.parse(bu).includes(selectedBU)));
-
         const eventDate = new Date(event.start_date);
+        
+        const matchCategory =
+        selectedCategory === "All" ||
+        (() => {
+            try {
+            const parsed = JSON.parse(event.category);
+            return Array.isArray(parsed)
+                ? parsed.includes(selectedCategory)
+                : parsed === selectedCategory;
+            } catch {
+            return event.category === selectedCategory;
+            }
+        })();
+
         const matchDate =
             !selectedDate || eventDate.toDateString() === selectedDate.toDateString();
         
@@ -107,7 +132,7 @@ export default function Event() {
             selectedDate !== null ? true : // only apply month filter if date is unselected
             eventDate.getFullYear() === activeYear;
         
-        return matchBU && matchDate && matchYear;
+        return matchCategory && matchDate && matchYear;
     });    
   
     return (
@@ -179,19 +204,19 @@ export default function Event() {
 
                     {/* Right Column: Filters and Event Cards */}
                     <div className="flex flex-wrap gap-2">
-                        {["All BU", "KPN Corporation", "Property", "Cement", "Downstream", "Plantations"].map((bu) => (
-                            <button
-                            key={bu}
-                            onClick={() => setSelectedBU(bu)}
-                            className={`px-2 py-1 rounded-full ${
-                                selectedBU === bu
-                                ? "bg-red-700 text-white text-sm"
-                                : "bg-transparent outline outline-1 text-sm outline-stone-400 text-gray-600"
-                            }`}
-                            >
-                            {bu}
-                            </button>
-                        ))}
+                    {categories.map((item) => (
+                        <button
+                        key={item}
+                        onClick={() => setSelectedCategory(item)}
+                        className={`px-2 py-1 rounded-full ${
+                            selectedCategory === item
+                            ? "bg-red-700 text-white text-sm"
+                            : "bg-transparent outline outline-1 text-sm outline-stone-400 text-gray-600"
+                        }`}
+                        >
+                        {item}
+                        </button>
+                    ))}
                     </div>
                     <div className="space-y-3">
                         {filteredEvents.map((event, index) => {      

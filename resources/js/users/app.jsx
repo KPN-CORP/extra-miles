@@ -18,6 +18,7 @@ import { AuthProvider } from './components/context/AuthContext';
 import News from './pages/News';
 import NewsDetails from './pages/NewsDetails';
 import Social from './pages/Social';
+import LoginFailed from './pages/LoginFailed';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -26,6 +27,7 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/login-success" element={<ConfirmLogin />} />
+        <Route path="/login-failed" element={<LoginFailed />} />
         <Route path="/" element={<Home />} />
         <Route path="/event" element={<Event />} />
         <Route path="/event/:id" element={<EventDetails />} />
