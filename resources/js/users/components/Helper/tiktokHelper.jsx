@@ -1,47 +1,30 @@
-import { useEffect, useState } from 'react';
-
-const TikTokPlayer = ({ videoId }) => {
-  const [thumbnail, setThumbnail] = useState(null);
+const TikTokPlayer = ({
+    videoId,
+    autoplay = 0,
+    loop = 0,
+    controls = 1,
+    playButton = 1,
+    volumeControl = 1,
+    fullscreenButton = 1,
+    timestamp = 1,
+    musicInfo = 1,
+    description = 1,
+  }) => {
+    const playerUrl = `https://www.tiktok.com/player/v1/${videoId}?autoplay=${autoplay}&loop=${loop}&controls=${controls}&play_button=${playButton}&volume_control=${volumeControl}&fullscreen_button=${fullscreenButton}&timestamp=${timestamp}&music_info=${musicInfo}&description=${description}`;
   
-  useEffect(() => {
-    fetch(`https://api.microlink.io/?url=https://www.tiktok.com/@lifeatkpn/video/${videoId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const thumb = data?.data?.image?.url || null;
-        setThumbnail(thumb);
-      })
-      .catch(() => setThumbnail(null));
-  }, [videoId]);
-
-  const handleClick = () => {
-    window.open(`https://www.tiktok.com/@lifeatkpn/video/${videoId}`, '_blank');
-  };
-
-  return (
-    <div
-      onClick={handleClick}
-      className="aspect-[9/16] w-full rounded shadow-md overflow-hidden bg-black relative cursor-pointer group"
-    >
-      {thumbnail ? (
-        <img
-          src={thumbnail}
-          alt="TikTok Video"
-          className="w-full h-full object-cover group-hover:brightness-75 transition"
+    return (
+      <div className="w-full aspect-[9/16] max-w-[605px]">
+        <iframe
+          title="TikTok Video"
+          width="100%"
+          height="100%"
+          allowFullScreen
+          src={playerUrl}
+          className="rounded shadow"
         />
-      ) : (
-        <div className="w-full h-full bg-gray-800 flex items-center justify-center text-white">
-          Loading...
-        </div>
-      )}
-
-      <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-0 group-hover:bg-opacity-50 transition">
-        <div className="px-3 py-3 bg-black text-white font-semibold rounded-lg shadow-lg flex items-center gap-2">
-          <i className="ri-tiktok-fill text-xl"></i>
-          <span className="text-xs">Open in TikTok</span>
-        </div>
       </div>
-    </div>
-  );
-};
-
-export default TikTokPlayer;
+    );
+  };
+  
+  export default TikTokPlayer;
+  

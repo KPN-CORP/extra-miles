@@ -106,7 +106,7 @@ export default function Social() {
               </button>
               <div style={{ flexBasis: "40px" }} /> {/* placeholder for symmetry */}
             </div>
-            <div className="fixed bottom-0 right-0 w-1/2 overflow-hidden">
+            <div className="fixed bottom-0 right-0 w-1/2 overflow-hidden z-0 pointer-events-none">
               <img
               className="w-full h-full object-cover"
               src={getImageUrl(apiUrl, 'assets/images/Element Extra Mile 2.png')}
@@ -135,7 +135,7 @@ export default function Social() {
               <Swiper
                 modules={[FreeMode]}
                 spaceBetween={15}
-                slidesPerView={1.5}
+                slidesPerView={1.25}
                 followFinger={true}
                 speed={600}
               >
@@ -143,7 +143,7 @@ export default function Social() {
                   
                     return (
                     <SwiperSlide key={item.encrypted_id}>
-                        <div onClick={() => navigate(`/news/${item.encrypted_id}`)} className="w-full aspect-[16/9] relative rounded-lg overflow-hidden">
+                        <div className="w-full aspect-[16/9] relative rounded-lg overflow-hidden">
                         {/* Loader overlay */}
                           {!item.link && (
                             <div className="absolute inset-0 flex items-center justify-center bg-orange-50 z-10">
@@ -152,7 +152,7 @@ export default function Social() {
                           )}
 
                           {/* YouTube Embed */}
-                          <div className="absolute inset-0 pointer-events-none">
+                          <div className=" inset-0 pointer-events-none">
                             <YouTubePlayer key={idx} videoId={item.link} />
                           </div>
                         </div>
@@ -166,16 +166,21 @@ export default function Social() {
               <div>
                 <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Instagram</span>
                 <div className="mt-2 bg-white rounded overflow-hidden">
-                {latestIG.map((item, index) => (
-                  <InstagramPlayer key={index} reelId={item.link} />
-                ))}
+                {latestIG.map((item, index) => {
+                  return (
+                    <InstagramPlayer key={index} postId={item.link} />
+                  )
+                })}
                 </div>
               </div>
               <div>
                 <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Tiktok</span>
                 <div className="mt-2 bg-white rounded overflow-hidden">
                 {latestTiktok.map((item, index) => (
-                  <TikTokPlayer key={index} videoId={item.link} />
+                  <TikTokPlayer key={index} videoId={item.link}
+                  autoplay={0}
+                  loop={1}
+                  controls={0} />
                 ))}
                 </div>
               </div>

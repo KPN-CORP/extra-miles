@@ -34,25 +34,17 @@ class AuthController extends Controller
                 return redirect()->away(env('APP_URL') . "/login-success?token=" . urlencode($token));
             }
 
-            return response()->json([
-                'error' => 'Token not found in response',
-            ], 400);
+            return redirect()->away(env('APP_URL') . "/login-failed?error=" . urlencode("Token not found in response"));
         } catch (RequestException $e) {
             $message = $e->hasResponse()
                 ? $e->getResponse()->getBody()->getContents()
                 : $e->getMessage();
 
             Log::error('Login error from auth-service: ' . $message);
-
-            return response()->json([
-                'error' => 'Service is unavailable, please try again in few minutes',
-            ], 503); // gunakan 503 untuk service unavailable
+            return redirect()->away(env('APP_URL') . "/login-failed?error=" . urlencode("Service is unavailable. Please try again later."));
         } catch (\Exception $e) {
             Log::error('Unexpected login error: ' . $e->getMessage());
-
-            return response()->json([
-                'error' => 'Unexpected server error',
-            ], 500);
+            return redirect()->away(env('APP_URL') . "/login-failed?error=" . urlencode("Unexpected server error occurred."));
         }
     }
 }
