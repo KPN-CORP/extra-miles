@@ -135,8 +135,9 @@ export default function EventDetails() {
     );
   }
 
-  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing, closedRegistration, totalDay } = dateTimeHelper(event);
-  const formattedDate = `${day} ${month} ${year}`;
+  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing, closedRegistration, totalDay, endDay, endMonth, endYear } = dateTimeHelper(event);
+  
+  const formattedDate = totalDay > 1 ? `${day} ${month} ${year}, ${startTime} - ${endDay} ${endMonth} ${endYear}, ${endTime}` : `${day} ${month} ${year}`;
 
   const getStatusColor = () => {
     if (isClosed || closedRegistration) return { text: 'text-black', bg: 'bg-gray-100' };
@@ -219,21 +220,31 @@ export default function EventDetails() {
                   <div className="self-stretch justify-start text-red-700 text-lg font-semibold">{event.title}</div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="self-stretch inline-flex justify-between items-center">
-                      <div className="flex-1 flex justify-start items-center gap-0.5 text-stone-700">
+                      <div className="flex-1 flex justify-start items-center gap-1 text-stone-700">
                         <i className="ri-calendar-line"></i>
                         <div className="flex-1 justify-start text-sm font-normal leading-none">{formattedDate}</div>
                       </div>
-                      <div className="flex-1 flex justify-start items-center gap-0.5 text-stone-700">
+                      {totalDay === 1 && (
+                      <div className="flex-1 flex justify-start items-center gap-1 text-stone-700">
                         <i className="ri-time-line"></i>
-                        <div className="flex-1 justify-start text-sm font-normal leading-none">{totalDay > 1 ? `${totalDay} days` : `${startTime} - ${endTime}`}</div>
+                        <div className="flex-1 justify-start text-sm font-normal leading-none">{startTime} - {endTime}</div>
                       </div>
+                      )}
                     </div>
+                    {totalDay > 1 && (
+                        <div className="self-stretch inline-flex justify-between items-center">
+                          <div className="flex-1 flex justify-start items-center gap-1 text-stone-700">
+                            <i className="ri-time-line"></i>
+                            <div className="flex-1 justify-start text-sm font-normal leading-none">{`${totalDay} days`}</div>
+                          </div>
+                        </div>
+                    )}
                     <div className="self-stretch inline-flex justify-start items-center">
-                      <div className="flex-1 flex justify-start items-center gap-0.5 text-stone-700">
+                      <div className="flex-1 flex justify-start items-center gap-1 text-stone-700">
                         <i className="ri-map-pin-line"></i>
                         <div className="flex-1 justify-start text-sm font-normal leading-none">{event.event_location}</div>
                       </div>
-                      <div className="flex-1 flex justify-start items-center gap-0.5 text-stone-700">
+                      <div className="flex-1 flex justify-start items-center gap-1 text-stone-700">
                         <i className="ri-user-line"></i>
                         <div className="flex-1 justify-start text-sm font-normal leading-none">{event.quota}</div>
                       </div>
