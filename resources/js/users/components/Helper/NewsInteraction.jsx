@@ -34,7 +34,7 @@ const NewsInteraction = ({ newsIdEncrypted, isLikedInitial, triggerLikeExternall
         }).then(() => setHasViewed(true))
           .catch((err) => console.error('View error:', err));
       }
-    }, 15000);
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, [hasViewed, newsIdEncrypted, token]);
