@@ -20,11 +20,18 @@ export function dateTimeHelper(event) {
 
     // Format month (e.g., "May")
     const month = startDate.toLocaleString('en-US', { month: 'short' });
+    const endMonth = endDate.toLocaleString('en-US', { month: 'short' });
 
     // Format day (e.g., "14")
     const day = startDate.getDate();
 
+    const endDay = endDate.getDate();
+
+    const totalDay = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+
     const year = startDate.toLocaleString('en-US', { year: 'numeric' });
+    const endYear = endDate.toLocaleString('en-US', { year: 'numeric' });
 
     // Format start and end times (e.g., "09:00")
     const startTime = event.time_start?.replace(/:/g, ':').slice(0, 5) || '';
@@ -72,5 +79,9 @@ export function dateTimeHelper(event) {
         endDate,
         daysUntil,
         closedRegistration,
+        endDay,
+        totalDay,
+        endYear,
+        endMonth,
     };
 }

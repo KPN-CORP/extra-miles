@@ -135,7 +135,7 @@ export default function EventDetails() {
     );
   }
 
-  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing, closedRegistration } = dateTimeHelper(event);
+  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing, closedRegistration, totalDay } = dateTimeHelper(event);
   const formattedDate = `${day} ${month} ${year}`;
 
   const getStatusColor = () => {
@@ -225,7 +225,7 @@ export default function EventDetails() {
                       </div>
                       <div className="flex-1 flex justify-start items-center gap-0.5 text-stone-700">
                         <i className="ri-time-line"></i>
-                        <div className="flex-1 justify-start text-sm font-normal leading-none">{`${startTime} - ${endTime}`}</div>
+                        <div className="flex-1 justify-start text-sm font-normal leading-none">{totalDay > 1 ? `${totalDay} days` : `${startTime} - ${endTime}`}</div>
                       </div>
                     </div>
                     <div className="self-stretch inline-flex justify-start items-center">
