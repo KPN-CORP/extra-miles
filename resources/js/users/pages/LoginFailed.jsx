@@ -21,7 +21,11 @@ function LoginFailed() {
       timer: 3000,
       showConfirmButton: false,
     }).then(() => {
-      window.location.href = "https://kpncorporation.darwinbox.com/";
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = "https://kpncorporation.darwinbox.com/";
+      }      
     });
   }, [searchParams]);
 

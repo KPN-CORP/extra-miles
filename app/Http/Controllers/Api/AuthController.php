@@ -15,7 +15,7 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->client = new Client([
-            'timeout' => 5, // agar tidak menggantung terlalu lama
+            'timeout' => 15, // agar tidak menggantung terlalu lama
         ]);
     }
 
