@@ -288,6 +288,8 @@ class EventController extends Controller
           // Decrypt event ID
           $eventId = Crypt::decryptString($request->eventId);
 
+          $cekUser = Employee::where('employee_id', $employee_id)->first();
+
           // Validate event: must be active or not closed
           $cekEvent = Event::where(function ($query) {
                   $query->whereDate('start_date', '>=', now()->today())
@@ -324,6 +326,10 @@ class EventController extends Controller
           $eventParticipant->employee_id = $employee_id;
           $eventParticipant->form_id = $formId;
           $eventParticipant->form_data = $formData;
+          $eventParticipant->job_level = $cekUser->job_level;
+          $eventParticipant->unit = $cekUser->unit;
+          $eventParticipant->business_unit = $cekUser->group_company;
+          $eventParticipant->location = $cekUser->office_area;
           $eventParticipant->created_by = $userId;
           $eventParticipant->save();
 
