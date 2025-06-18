@@ -36,7 +36,12 @@ const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
 
         <div className="flex items-center gap-2 pl-4 text-stone-600 text-xs font-base truncate whitespace-nowrap">
           <div className="inline-block animate-marquee">
-            {`${formattedDate} `}<span className={`font-medium ${totalDay > 1 ? 'd-none' : ''}`}>| {` ${startTime} - ${endTime} `}</span><span className="font-medium">|</span>{` ${event.event_location}`}
+            {`${formattedDate} `}
+            <span className={`font-medium ${totalDay > 1 ? 'hidden' : ''}`}>
+              | {`${startTime} - ${endTime}`}
+            </span>
+            <span className="font-medium">|</span>
+            {` ${event?.event_location ?? '-'}`}
           </div>
         </div>
       </div>
