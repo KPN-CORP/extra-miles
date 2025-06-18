@@ -171,7 +171,7 @@ export default function Social() {
                 )}
               </Swiper>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-2 gap-4">
               <div>
                 <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Instagram</span>
                 <div className="mt-2 bg-white rounded overflow-hidden">
@@ -193,7 +193,7 @@ export default function Social() {
                 ))}
                 </div>
               </div>
-            </div>
+            </div> */}
             {/* Footer */}
             <div className="mt-6 text-start space-y-3">
               <p className="text-sm">Never miss an <span className="font-bold">Update!</span></p>
