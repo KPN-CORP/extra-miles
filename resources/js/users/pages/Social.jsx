@@ -182,17 +182,14 @@ export default function Social() {
                 })}
                 </div>
               </div>
-              {/* <div>
+              <div>
                 <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Tiktok</span>
                 <div className="mt-2 bg-white rounded overflow-hidden">
                 {latestTiktok.map((item, index) => (
-                  <TikTokPlayer key={index} videoId={item.link}
-                  autoplay={0}
-                  loop={1}
-                  controls={0} />
+                  <TikTokPlayer key={index} videoId={item.link} />
                 ))}
                 </div>
-              </div> */}
+              </div>
             </div>
             {/* Footer */}
             <div className="mt-6 text-start space-y-3">
