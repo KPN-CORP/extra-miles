@@ -85,10 +85,6 @@ export default function Social() {
     if (token) fetchContent();
   }, [apiUrl, token]);
 
-  const handleImageLoad = (id) => {
-    setLoadedImages((prev) => ({ ...prev, [id]: true }));
-  };
-
   return (
     <>
       {loading ? (
@@ -146,17 +142,14 @@ export default function Social() {
                           className="w-full aspect-[16/9] relative rounded-lg overflow-hidden cursor-pointer group"
                           aria-label="Open YouTube Video"
                         >
-                          {/* Loader overlay */}
-                          {!item.link && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-orange-50 z-10">
-                              <BannerLoader />
-                            </div>
-                          )}
-
                           {/* YouTube Embed */}
-                          {item.link && (
+                          {item.link ? (
                             <div className="absolute inset-0 pointer-events-none transition-transform group-hover:scale-[1.02]">
                               <YouTubePlayer key={idx} videoId={item.link} />
+                            </div>
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center bg-orange-50 z-10">
+                              <BannerLoader />
                             </div>
                           )}
 
@@ -173,18 +166,16 @@ export default function Social() {
                 <div>
                   <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Instagram</span>
                   <div className="mt-2 bg-white rounded overflow-hidden">
-                    {latestIG.map((item, index) => {
-                      return (
-                        <InstagramPlayer key={index} postId={item.link} />
-                      )
-                    })}
+                    {latestIG.map((item, index) => (
+                        item.link ? <InstagramPlayer key={index} postId={item.link} /> : null
+                    ))}
                   </div>
                 </div>
                 <div>
                   <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Tiktok</span>
                   <div className="mt-2 bg-white rounded overflow-hidden">
                     {latestTiktok.map((item, index) => (
-                      <TikTokPlayer key={index} videoId={item.link} />
+                      item.link ? <TikTokPlayer key={index} videoId={item.link} /> : null
                     ))}
                   </div>
                 </div>
