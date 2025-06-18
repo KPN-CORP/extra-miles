@@ -33,6 +33,8 @@ class SurveyVoteController extends Controller
 
             $datas = Survey::with(['surveyParticipant' => function ($query) use ($employee_id) {
                 $query->where('employee_id', $employee_id);
+            }, 'eventParticipant' => function ($query) use ($employee_id) {
+                $query->where('employee_id', $employee_id);
             }])
             ->where(function ($query) {
                 $query->where('status', '!=', 'Closed')

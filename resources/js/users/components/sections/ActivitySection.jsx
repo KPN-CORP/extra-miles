@@ -137,7 +137,7 @@ const ActivitySection = () => {
                   }
                   buttonClass={`${
                     eventDay ? "bg-red-700" : "bg-stone-300"
-                  } text-white text-sm font-medium`}
+                  } text-white text-xs font-medium`}
                 />
               );
             })}
