@@ -12,7 +12,7 @@
                 <div class="col-md-6">
                     <label for="category" class="form-label">Category</label>
                     <select class="form-select" id="category" name="category" required>
-                        <option selected disabled>Please select</option>
+                        <option value="" selected disabled>Please select</option>
                         <option value="event">Event</option>
                         <option value="survey">Survey</option>
                         <option value="vote">Vote</option>
@@ -30,25 +30,42 @@
         </div>
         <div id="form-builder-wrapper">
             <div class="card bg-light shadow mb-4 border-0 position-relative form-row-item">
-                    <button type="button" class="btn btn-danger btn-sm remove-row position-absolute" style="top: 10px; right: 10px; display:none;">X</button>
-                
+                <button type="button" class="btn btn-danger btn-sm remove-row position-absolute" style="top: 10px; right: 10px; display:none;">X</button>
                 <div class="card-body row g-3">
                     <div class="col-md-2">
                         <select class="form-select" name="type[]" required>
-                            <option selected disabled>Please select Type</option>
+                            <option value="" selected disabled>Please select Type</option>
                             <option value="text">Text</option>
                             <option value="textarea">Textarea</option>
+                            <option value="checkbox">Checkbox</option>
+                            <option value="radio">Radio</option>
                         </select>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-3">
                         <input type="text" class="form-control" name="label[]" placeholder="Label" required>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 options-wrapper d-none">
+                        <input type="text" class="form-control" name="options[]" placeholder="Example: Option 1, Option 2, Option 3">
+                    </div>
+                    <div class="col-md-2">
                         <input type="text" class="form-control" name="validation[]" placeholder="Validation">
                     </div>
                     <div class="col-md-2">
                         <input type="checkbox" class="form-check-input" name="required[]" value="1">
-                        <label class="form-check-label">required?</label>
+                        <label class="form-check-label">Required?</label><br>
+                        <input type="checkbox" class="form-check-input options-confirmation d-none" name="confirmation[]" value="1">
+                        <label class="form-check-label options-confirmation d-none">Confirmation?</label>
+                    </div>
+                </div>
+                <div class="card-body row g-3 checkbox-confirmation d-none">
+                    <div class="col-md-2">
+                        {{-- <select class="form-select" name="type_confirmation[]">
+                            <option value="text" selected>Text</option>
+                        </select> --}}
+                        <input type="text" class="form-control bg-light text-confirmation" name="type_confirmation[]" value="text" readonly>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="label_confirmation[]" placeholder="Label">
                     </div>
                 </div>
             </div>

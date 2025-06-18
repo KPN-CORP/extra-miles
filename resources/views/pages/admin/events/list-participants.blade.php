@@ -207,10 +207,10 @@
                                                     <td>{{ $p->job_level }}</td>
                                                     <td>{{ $p->location }}</td>
                                                     <td>
-                                                        @if ($p->attending_status != '')
-                                                            <span class="badge bg-success">Confirmed</span>
-                                                        @else
-                                                        <span class="badge bg-warning">Confirmation Needed</span>
+                                                        @if ($p->status === 'Registered')
+                                                            <span class="badge bg-success">Registered</span>
+                                                        @elseif($p->status === 'Confirmation')
+                                                            <span class="badge bg-warning">Confirmation Needed</span>
                                                         @endif
                                                     </td>
                                                     <td>
