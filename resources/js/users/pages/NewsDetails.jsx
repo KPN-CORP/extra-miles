@@ -146,7 +146,7 @@ export default function NewsDetails({ onLike }) {
               <img
                   src={getImageUrl(apiUrl, news.image)}
                   alt={news.title}
-                  className="w-full h-36 object-fill rounded"
+                  className="w-full aspect-[16/9] object-fill rounded"
               />
               {news.link && (
                 <YouTubePlayer videoId={news.link} />
