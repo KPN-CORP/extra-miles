@@ -7,10 +7,10 @@ import { getImageUrl } from "../Helper/imagePath";
 
 const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
   const apiUrl = useApiUrl();
-  const { day, month, year, startTime, endTime, eventStatus, isClosed, isOngoing, closedRegistration } = dateTimeHelper(event); 
+  const { day, month, year, startTime, endTime, isOngoing, totalDay, endDay, endMonth, endYear } = dateTimeHelper(event); 
   
   const date = new Date(event.start_date);
-  const formattedDate = `${day} ${month} ${year}`;  
+  const formattedDate = totalDay > 1 ? `${day} ${month} ${year}, ${startTime} - ${endDay} ${endMonth} ${endYear}, ${endTime}` : `${day} ${month} ${year}`;
   
   const navigate = useNavigate()
   const today = new Date();
@@ -36,7 +36,7 @@ const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
 
         <div className="flex items-center gap-2 pl-4 text-stone-600 text-xs font-base truncate whitespace-nowrap">
           <div className="inline-block animate-marquee">
-            {`${formattedDate} `}<span className="font-medium">|</span>{` ${startTime} - ${endTime} `}<span className="font-medium">|</span>{` ${event.event_location}`}
+            {`${formattedDate} `}<span className={`font-medium ${totalDay > 1 ? 'd-none' : ''}`}>| {` ${startTime} - ${endTime} `}</span><span className="font-medium">|</span>{` ${event.event_location}`}
           </div>
         </div>
       </div>
