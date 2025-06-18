@@ -27,6 +27,7 @@
         "@fullcalendar/interaction": "^6.1.17",
         "@fullcalendar/list": "^6.1.6",
         "@fullcalendar/timegrid": "^6.1.6",
+        "@mantine/core": "^8.1.1",
         "@popperjs/core": "^2.11.8",
         "@yudiel/react-qr-scanner": "^2.3.1",
         "admin-resources": "git+https://github.com/coderthemes/admin-resources.git#master",
