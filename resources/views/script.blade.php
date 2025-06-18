@@ -330,8 +330,48 @@
             let newRow = $('.form-row-item').first().clone();
             newRow.find('input, select').val('');
             newRow.find('input[type="checkbox"]').prop('checked', false).val('1');
+            newRow.find('.options-wrapper').addClass('d-none').find('input').val('');
+            newRow.find('.options-confirmation').addClass('d-none');
+            newRow.find('.checkbox-confirmation').addClass('d-none');
             newRow.find('.remove-row').show();
             $('#form-builder-wrapper').append(newRow);
+        });
+
+        $(document).ready(function () {
+            $(document).on('change', 'select[name="type[]"]', function () {
+                let selectedType = $(this).val();
+                let wrapper = $(this).closest('.form-row-item');
+                let optionsDiv = wrapper.find('.options-wrapper');
+                let optionsConf = wrapper.find('.options-confirmation');
+                let confirmationSection = wrapper.find('.checkbox-confirmation');
+
+                if (selectedType === 'checkbox') {
+                    optionsDiv.removeClass('d-none');
+                    optionsConf.addClass('d-none');
+                    confirmationSection.addClass('d-none');
+                    confirmationSection.find('[name="type_confirmation[]"], [name="label_confirmation[]"]').prop('required', false);
+                } else if (selectedType === 'radio') {
+                    optionsDiv.removeClass('d-none');
+                    optionsConf.removeClass('d-none');
+                } else {
+                    optionsDiv.addClass('d-none');
+                    optionsConf.addClass('d-none');
+                    confirmationSection.addClass('d-none');
+                    optionsDiv.find('input').val('');
+                    confirmationSection.find('[name="type_confirmation[]"], [name="label_confirmation[]"]').prop('required', false);
+                }
+            });
+
+            $(document).on('change', '.options-confirmation', function () {
+                const container = $(this).closest('.form-row-item');
+                const show = $(this).is(':checked');
+                const input = container.find('input.text-confirmation');
+                const confirmationSection = container.find('.checkbox-confirmation');
+
+                confirmationSection.toggleClass('d-none', !show);
+                confirmationSection.find('[name="type_confirmation[]"], [name="label_confirmation[]"]').prop('required', show);
+                input.val('text');
+            });
         });
 
         // Event delegasi untuk tombol remove
