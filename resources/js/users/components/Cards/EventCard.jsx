@@ -21,25 +21,32 @@ const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
 
   return (
     <div className="w-full h-14 p-3 bg-white rounded-lg flex items-center gap-1">
-      <div className="flex-1 flex flex-col gap-1" onClick={() => navigate(`/event/${event.encrypted_id}`)}>
+      <div
+        className="flex-1 flex flex-col gap-1 overflow-hidden"
+        onClick={() => navigate(`/event/${event.encrypted_id}`)}
+      >
         <div className="flex items-center gap-1">
           <img
             className="w-3 h-3"
             src={getImageUrl(apiUrl, event.logo)}
             alt={event.title}
           />
-          <div className="text-stone-700 text-sm font-semibold">{event.title}</div>
+          <div className="text-stone-700 text-sm font-semibold truncate flex-1">{event.title}</div>
         </div>
-        <div className="flex items-center gap-2 pl-4 text-stone-600 text-xs font-normal">
-          <div>{formattedDate}</div>
-          <div>{`${startTime} - ${endTime}`}</div>
-          <div className="flex-1 truncate">{event.event_location}</div>
+
+        <div className="flex items-center gap-2 pl-4 text-stone-600 text-xs font-base truncate whitespace-nowrap">
+          <div className="inline-block animate-marquee">
+            {`${formattedDate} `}<span className="font-medium">|</span>{` ${startTime} - ${endTime} `}<span className="font-medium">|</span>{` ${event.event_location}`}
+          </div>
         </div>
       </div>
+
       {event.status === 'Ongoing' && isOngoing && event.event_participant?.[0]?.attending_status === 'Attending' ? (
-        <p className="p-2 text-green-700 font-medium text-xl">
+        <p className="p-2 pe-0">
+        <span className="p-2 py-1 flex items-center justify-center rounded-full ring-1 ring-green-400 text-green-700 text-xl font-medium">
           <i className="ri-check-double-line"></i>
-        </p>
+        </span>
+      </p>      
       ) : (
         <button
           onClick={() => {

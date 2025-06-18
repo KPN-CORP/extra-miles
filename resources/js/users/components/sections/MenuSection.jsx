@@ -74,7 +74,7 @@ export default () => {
 return (
     <div className="self-stretch flex flex-col justify-start items-start gap-3">
         <div className="self-stretch inline-flex justify-center items-start gap-3">
-          <button onClick={() => navigate("/event")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-xs font-semibold">
+          <button onClick={() => navigate("/event")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
             🎉 Upcoming Events
           </button>
           <button
@@ -85,7 +85,7 @@ return (
                 handleOffAir();
               }
             }}
-            className={`flex-1 min-w-fit p-3 rounded-lg shadow-md flex justify-center items-center gap-2 text-xs font-semibold
+            className={`flex-1 min-w-fit p-3 rounded-lg shadow-md flex justify-center items-center gap-2 text-[10px] font-semibold
               ${data.content_link ? 'bg-white text-red-700 ring-1 ring-red-700 ring-inset' : 'bg-red-700 text-white'}`}
           >
             <span className={`${data.content_link ? 'on-pulse' : 'off-pulse'} me-1`}></span>
@@ -93,10 +93,10 @@ return (
           </button>
         </div>
         <div className="self-stretch inline-flex justify-center items-start gap-3">
-          <button onClick={() => navigate("/survey")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-xs font-semibold">
+          <button onClick={() => navigate("/survey")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
               🗳️ Your Voice Matters!
           </button>
-          <button onClick={() => navigate("/social")} className="flex-1 min-w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-xs font-semibold">
+          <button onClick={() => navigate("/social")} className="flex-1 min-w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
               🔗 Social Media
           </button>
         </div>

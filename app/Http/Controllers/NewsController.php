@@ -94,8 +94,8 @@ class NewsController extends Controller
         $news = News::findOrFail($id);
         $news->businessUnit = json_decode($news->businessUnit, true);
 
-        $parentLink = 'Survey Management';
-        $link = $news->category === 'vote' ? 'Update Voting' : 'Update Survey';
+        $parentLink = 'News Management';
+        $link = $news->category === 'vote' ? 'Update Voting' : 'Update News';
         $back = 'admin.news.index';
         $invalidFeedback = 'Please fill out this field.';
 
@@ -160,8 +160,8 @@ class NewsController extends Controller
     public function archive($id)
     {
         $id = Crypt::decryptString($id);
-        $survey = News::findOrFail($id);
-        $survey->delete(); // Soft delete
+        $news = News::findOrFail($id);
+        $news->delete(); // Soft delete
         
         return redirect()->back()->with('success', 'News archived successfully.');
     }

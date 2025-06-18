@@ -78,4 +78,25 @@
     animation: rotate-left 0.4s ease;
   }
   
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes pop {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .animate-success-pop {
+    animation: pop 0.4s ease-out forwards;
+  }
   

@@ -29,11 +29,19 @@ export default function Survey() {
 
     const navigate = useNavigate()
     const [datas, setData] = useState([]);
+    const [dataEventParticipant, setDataEventParticipant] = useState([]);
     const [loading, setLoading] = useState(true);
     const apiUrl = useApiUrl();
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedBU, setSelectedBU] = useState("All BU");
-    const { token } = useAuth();         
+    const { token } = useAuth();  
+    
+    const mergedData = [
+        ...new Map([
+            ...datas.map(d => [d.encrypted_id, d]),
+            ...dataEventParticipant.map(d => [d.encrypted_id, d])
+        ]).values()
+    ];
 
     useEffect(() => {
         const fetchData = async () => {
@@ -42,23 +50,74 @@ export default function Survey() {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                });                
+                });                        
                 
-                setData(res.data.map(e => ({
-                    ...e,
-                    businessUnit: Array.isArray(e.businessUnit) ? e.businessUnit : [e.businessUnit]
-                })));
+                setData(
+                    res.data.map(item => {
+                        // Safely parse businessUnit from JSON string if needed
+                        let businessUnit = [];
+                        try {
+                          businessUnit = typeof item.businessUnit === 'string'
+                            ? JSON.parse(item.businessUnit)
+                            : Array.isArray(item.businessUnit)
+                              ? item.businessUnit
+                              : [];
+                        } catch (e) {
+                          businessUnit = [];
+                        }
+                    
+                        // Normalize event_participant as an array
+                        const event_participant = Array.isArray(item.event_participant)
+                          ? item.event_participant.filter(p => p.status != 'Registered')
+                          : (item.event_participant ? [item.event_participant] : []).filter(p => p.status != 'Registered');
+                    
+                        return {
+                          ...item,
+                          businessUnit,
+                          event_participant
+                        };
+                    }).filter(e => e.event_participant.length > 0)
+                );
+
+                setDataEventParticipant(
+                    res.data.map(item => {
+                      // Safely parse businessUnit from JSON string if needed
+                      let businessUnit = [];
+                      try {
+                        businessUnit = typeof item.businessUnit === 'string'
+                          ? JSON.parse(item.businessUnit)
+                          : Array.isArray(item.businessUnit)
+                            ? item.businessUnit
+                            : [];
+                      } catch (e) {
+                        businessUnit = [];
+                      }
+                  
+                      // Normalize event_participant as an array
+                      const event_participant = Array.isArray(item.event_participant)
+                        ? item.event_participant.filter(p => p.status === 'Registered')
+                        : (item.event_participant ? [item.event_participant] : []).filter(p => p.status === 'Registered');
+                  
+                      return {
+                        ...item,
+                        businessUnit,
+                        event_participant
+                      };
+                    }).filter(e => e.event_participant.length > 0) // optional: exclude events with no registered participants
+                );
+                                
+                  
             } catch (err) {
                 showAlert({
                     icon: 'warning',
                     title: 'Connection Ended',
-                    text: 'Unable to connect to the server. Please try again later.',
+                    text: 'Unablet to connect to the server. Please try again later.',
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
                     console.log(err);
                     
-                    window.location.href = "https://kpncorporation.darwinbox.com/";
+                    // window.location.href = "https://kpncorporation.darwinbox.com/";
                 });
             } finally {
                 setLoading(false);
@@ -143,12 +202,12 @@ export default function Survey() {
             className="flex-1 w-full bg-red-700 rounded-t-3xl p-5 overflow-auto"
             >
                 <div className="flex flex-col justify-start items-start gap-3 w-full">
-                {datas.length === 0 ? (
+                {mergedData.length === 0 ? (
                     <div className="w-full justify-center text-center text-white font-medium py-4">
                         No Survey / Vote available.
                     </div>
                     ) : (
-                        datas.map((data, index) => {    
+                        mergedData.map((data, index) => {    
                             const { daysUntil } = dateTimeHelper(data);  
                             const participated = Array.isArray(data.survey_participant) && data.survey_participant.length > 0;
                             
