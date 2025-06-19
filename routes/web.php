@@ -87,6 +87,9 @@ Route::prefix('admin')->group(function () {
 
         // Social
         Route::get('/social', [SocialController::class, 'index'])->name('admin.social.index');
+        Route::post('/social/store', [SocialController::class, 'store'])->name('social.store');
+        Route::delete('/social/{id}/delete', [SocialController::class, 'destroy'])->name('social.destroy');
+        Route::put('/social/{id}', [SocialController::class, 'update'])->name('social.update');
 
         //Live
         Route::get('/live', [LiveContentController::class, 'index'])->name('live.index');

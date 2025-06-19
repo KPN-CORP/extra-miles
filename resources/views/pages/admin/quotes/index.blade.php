@@ -194,8 +194,8 @@
             </form>
           </div>
         </div>
-      </div>
-      <div class="modal fade" id="editQuoteModal" tabindex="-1" aria-labelledby="editQuoteModalLabel" aria-hidden="true">
+    </div>
+    <div class="modal fade" id="editQuoteModal" tabindex="-1" aria-labelledby="editQuoteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <form method="POST" action="" id="editQuoteForm">
               @csrf
@@ -222,6 +222,6 @@
               </div>
           </form>
         </div>
-      </div>
+    </div>
 </div>
 @endsection
