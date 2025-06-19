@@ -70,6 +70,26 @@
             });
         });
 
+        const editButtonsSocial = document.querySelectorAll('.edit-social-btn');
+
+        editButtonsSocial.forEach(button => {
+            button.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const category = this.getAttribute('data-category');
+                const businessUnit = this.getAttribute('data-businessUnit');
+                const link = this.getAttribute('data-link');
+
+                // Isi form
+                document.getElementById('edit-category').value = category;
+                document.getElementById('edit-businessunit').value = businessUnit;
+                document.getElementById('edit-link').value = link;
+
+                // Ubah action form sesuai ID
+                const form = document.getElementById('editSocialForm');
+                form.action = `/admin/social/${id}`;
+            });
+        });
+
         document.querySelectorAll('.archive-btn').forEach(button => {
             button.addEventListener('click', function () {
                 const quoteId = this.dataset.id;
@@ -375,8 +395,11 @@
 
     $(document).ready(function () {
         $('#add-row').click(function () {
+            let rowCount = $('.form-row-item').length;
             let newRow = $('.form-row-item').first().clone();
+
             newRow.find('input, select').val('');
+            newRow.find('input[name^="required"]').attr('name', `required[${rowCount}]`);
             newRow.find('input[type="checkbox"]').prop('checked', false).val('1');
             newRow.find('.options-wrapper').addClass('d-none').find('input').val('');
             newRow.find('.options-confirmation').addClass('d-none');
@@ -432,13 +455,55 @@
 
     $(document).ready(function () {
         $('#add-row-edit').click(function () {
+            let rowCount = $('.form-row-item').length;
             let newRow = $('.form-row-item').first().clone();
-            newRow.find('input, select').val('');
-            newRow.find('input[type="checkbox"]').prop('checked', false).val('1');
 
-            // Update semua name input agar sesuai urutan (reindex)
+            newRow.find('input, select').val('');
+            newRow.find('input[name^="required"]').attr('name', `required[${rowCount}]`);
+            newRow.find('input[type="checkbox"]').prop('checked', false).val('1');
+            newRow.find('.options-wrapper').addClass('d-none').find('input').val('');
+            newRow.find('.options-confirmation').addClass('d-none');
+            newRow.find('.checkbox-confirmation').addClass('d-none');
+            newRow.find('.remove-row').show();
             $('#form-builder-wrapper').append(newRow);
             updateInputNames();
+        });
+
+        $(document).on('change', 'select[name^="type"]', function () {
+            let selectedType = $(this).val();
+            let wrapper = $(this).closest('.form-row-item');
+            let optionsDiv = wrapper.find('.options-wrapper');
+            let optionsConf = wrapper.find('.options-confirmation');
+            let confirmationSection = wrapper.find('.checkbox-confirmation');
+
+            if (selectedType === 'checkbox') {
+                optionsDiv.removeClass('d-none');
+                optionsConf.addClass('d-none');
+                confirmationSection.addClass('d-none');
+                confirmationSection.find('[name^="type_confirmation"], [name^="label_confirmation"]').prop('required', false);
+            } else if (selectedType === 'radio') {
+                optionsDiv.removeClass('d-none');
+                optionsConf.removeClass('d-none');
+            } else {
+                optionsDiv.addClass('d-none');
+                optionsConf.addClass('d-none');
+                confirmationSection.addClass('d-none');
+                optionsDiv.find('input').val('');
+                confirmationSection.find('[name^="type_confirmation"], [name^="label_confirmation"]').prop('required', false);
+            }
+        });
+
+        $(document).on('change', '.options-confirmation', function () {
+            const container = $(this).closest('.form-row-item');
+            const show = $(this).is(':checked');
+            const input = container.find('input.text-confirmation');
+            const input_label = container.find('input.label-confirm');
+            const confirmationSection = container.find('.checkbox-confirmation');
+
+            confirmationSection.toggleClass('d-none', !show);
+            confirmationSection.find('[name^="type_confirmation"], [name^="label_confirmation"]').prop('required', show);
+            input.val('text');
+            input_label.val('');
         });
 
         function updateInputNames() {

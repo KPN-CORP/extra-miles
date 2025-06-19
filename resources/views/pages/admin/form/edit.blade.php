@@ -33,30 +33,55 @@
 
         <div id="form-builder-wrapper">
             @foreach($formSchema['fields'] as $index => $field)
-            <div class="card bg-light shadow mb-4 border-0 position-relative form-row-item">
-                <button type="button" class="btn btn-danger btn-sm remove-row position-absolute" style="top: 10px; right: 10px; {{ $loop->first ? 'display:none;' : '' }}">X</button>
+                @if (!str_contains($field['name'], 'reason'))
+                    <div class="card bg-light shadow mb-4 border-0 position-relative form-row-item">
+                        <button type="button" class="btn btn-danger btn-sm remove-row position-absolute" style="top: 10px; right: 10px; {{ $loop->first ? 'display:none;' : '' }}">X</button>
 
-                <div class="card-body row g-3">
-                    <div class="col-md-2">
-                        <select class="form-select" name="type[{{ $index }}]" required>
-                            <option disabled>Please select Type</option>
-                            <option value="text" {{ $field['type'] == 'text' ? 'selected' : '' }}>Text</option>
-                            <option value="textarea" {{ $field['type'] == 'textarea' ? 'selected' : '' }}>Textarea</option>
-                        </select>
+                        <div class="card-body row g-3">
+                            <div class="col-md-2">
+                                <select class="form-select" name="type[{{ $index }}]" required>
+                                    <option disabled>Please select Type</option>
+                                    <option value="text" {{ $field['type'] == 'text' ? 'selected' : '' }}>Text</option>
+                                    <option value="textarea" {{ $field['type'] == 'textarea' ? 'selected' : '' }}>Textarea</option>
+                                    <option value="checkbox" {{ $field['type'] == 'checkbox' ? 'selected' : '' }}>Checkbox</option>
+                                    <option value="radio" {{ $field['type'] == 'radio' ? 'selected' : '' }}>Radio</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" name="label[{{ $index }}]" placeholder="Label" value="{{ $field['label'] }}" required>
+                            </div>
+                            <div class="col-md-3 options-wrapper {{ isset($field['options']) ? '' : 'd-none' }}">
+                                <input type="text" class="form-control" name="options[{{ isset($field['options']) ? $index : '' }}]" placeholder="Example: Option 1, Option 2, Option 3" value="{{ isset($field['options']) && is_array($field['options']) ? implode(', ', $field['options']) : '' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" name="validation[{{ $index }}]" placeholder="Validation" value="{{ $field['validation'] ?? '' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="checkbox" class="form-check-input" name="required[{{ $index }}]" value="1"
+                                {{ isset($field['required']) && $field['required'] ? 'checked' : '' }}>
+                                <label class="form-check-label">required?</label><br>
+                                <input type="checkbox" class="form-check-input options-confirmation {{ $field['type'] == 'radio' ? '' : 'd-none' }}" name="confirmation[{{ (str_contains($field['name'], 'confirmation') && $field['type'] == 'radio') ? $index : '' }}]" value="1" {{ (str_contains($field['name'], 'confirmation') && $field['type'] == 'radio') ? 'checked' : '' }}>
+                                <label class="form-check-label options-confirmation {{ $field['type'] == 'radio' ? '' : 'd-none' }}">Confirmation?</label>
+                            </div>
+                        </div>
+                    
+                        <div class="card-body row g-3 checkbox-confirmation {{ (str_contains($field['name'], 'confirmation') && $field['type'] == 'radio') ? '' : 'd-none' }}">
+                            <div class="col-md-2">
+                                <input type="text" class="form-control bg-light text-confirmation" name="type_confirmation[]" value="text" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                @php
+                                    $isConfirmationRadio = str_contains($field['name'], 'confirmation') && $field['type'] == 'radio';
+                                    $nextLabel = $isConfirmationRadio && isset($formSchema['fields'][$index + 1]) ? $formSchema['fields'][$index + 1]['label'] : '';
+                                @endphp
+                                <input type="text" class="form-control label-confirm"
+                                    name="label_confirmation[{{ $isConfirmationRadio ? $index+1 : '' }}]"
+                                    placeholder="Label"
+                                    value="{{ $nextLabel }}">
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-5">
-                        <input type="text" class="form-control" name="label[{{ $index }}]" placeholder="Label" value="{{ $field['label'] }}" required>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" name="validation[{{ $index }}]" placeholder="Validation" value="{{ $field['validation'] ?? '' }}">
-                    </div>
-                    <div class="col-md-2">
-                        <input type="checkbox" class="form-check-input" name="required[{{ $index }}]" value="1"
-                        {{ isset($field['required']) && $field['required'] ? 'checked' : '' }}>
-                        <label class="form-check-label">required?</label>
-                    </div>
-                </div>
-            </div>
+                @endif
             @endforeach
         </div>
 

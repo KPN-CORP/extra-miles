@@ -45,13 +45,12 @@ class FormTemplateController extends Controller
             'type' => 'required|array',
             'label' => 'required|array',
         ]);
-        // dd($request);
+        dd($request);
         $fields = [];
         foreach ($request->type as $index => $type) {
             $label = $request->label[$index] ?? '';
             $required = isset($request->required[$index]);
             $validation = $request->validation[$index] ?? '';
-            $conf = 0;
 
             if (in_array($type, ['checkbox', 'radio']) && !empty($request->options[$index])) {
                 $options = array_map('trim', explode(',', $request->options[$index]));
@@ -98,13 +97,13 @@ class FormTemplateController extends Controller
             'title' => $request->title,
             'fields' => $fields,
         ];
-        dd($schema);
+        // dd($schema);
 
-        // FormTemplate::create([
-        //     'category' => $request->category,
-        //     'title' => $request->title,
-        //     'form_schema' => json_encode($schema),
-        // ]);
+        FormTemplate::create([
+            'category' => $request->category,
+            'title' => $request->title,
+            'form_schema' => json_encode($schema),
+        ]);
 
         return redirect()->route('form.index')->with('success', 'Form berhasil disimpan!');
     }
@@ -125,17 +124,52 @@ class FormTemplateController extends Controller
 
         $form->title = $request->input('title');
         $form->category = $request->input('category');
-
+        // dd($request);
         $fields = [];
+        foreach ($request->type as $index => $type) {
+            $label = $request->label[$index] ?? '';
+            $required = isset($request->required[$index]);
+            $validation = $request->validation[$index] ?? '';
 
-        foreach ($request->input('type') as $i => $type) {
-            $fields[] = [
-                'name' => 'question_' . ($i + 1),
-                'type' => $type,
-                'label' => $request->label[$i],
-                'validation' => $request->validation[$i],
-                'required' => isset($request->required[$i]) ? true : false,
-            ];
+            if (in_array($type, ['checkbox', 'radio']) && !empty($request->options[$index])) {
+                $options = array_map('trim', explode(',', $request->options[$index]));
+
+                if ($type === 'radio' && isset($request->label_confirmation[$index])) {
+                    $fields[] = [
+                        'name' => 'confirmation_' . ($index + 1),
+                        'type' => $type,
+                        'label' => $label,
+                        'options' => $options,
+                        'required' => $required,
+                        'validation' => $validation,
+                    ];
+
+                    $fields[] = [
+                        'name' => 'confirmation_' . ($index + 1) . '_reason',
+                        'type' => 'text',
+                        'label' => $request->label_confirmation[$index],
+                        'required' => false,
+                        'validation' => '',
+                    ];
+                } else {
+                    $fields[] = [
+                        'name' => 'question_' . ($index + 1),
+                        'type' => $type,
+                        'label' => $label,
+                        'options' => $options,
+                        'required' => $required,
+                        'validation' => $validation,
+                    ];
+                }
+            } else {
+                $fields[] = [
+                    'name' => 'question_' . ($index + 1),
+                    'type' => $type,
+                    'label' => $label,
+                    'required' => $required,
+                    'validation' => $validation,
+                ];
+            }
         }
 
         $form->form_schema = json_encode([

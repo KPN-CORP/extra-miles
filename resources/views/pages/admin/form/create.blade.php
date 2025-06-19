@@ -51,7 +51,7 @@
                         <input type="text" class="form-control" name="validation[]" placeholder="Validation">
                     </div>
                     <div class="col-md-2">
-                        <input type="checkbox" class="form-check-input" name="required[]" value="1">
+                        <input type="checkbox" class="form-check-input" name="required[0]" value="1">
                         <label class="form-check-label">Required?</label><br>
                         <input type="checkbox" class="form-check-input options-confirmation d-none" name="confirmation[]" value="1">
                         <label class="form-check-label options-confirmation d-none">Confirmation?</label>
@@ -59,9 +59,6 @@
                 </div>
                 <div class="card-body row g-3 checkbox-confirmation d-none">
                     <div class="col-md-2">
-                        {{-- <select class="form-select" name="type_confirmation[]">
-                            <option value="text" selected>Text</option>
-                        </select> --}}
                         <input type="text" class="form-control bg-light text-confirmation" name="type_confirmation[]" value="text" readonly>
                     </div>
                     <div class="col-md-3">
