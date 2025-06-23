@@ -297,7 +297,7 @@ export default function Event() {
                                         <img
                                             src={getImageUrl(apiUrl, event.image)}
                                             alt="Event Thumbnail"
-                                            className="object-cover w-20 min-h-20"
+                                            className="object-cover w-20 h-20"
                                         />
                                     </div>
                                 </div>
