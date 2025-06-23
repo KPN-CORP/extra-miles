@@ -458,14 +458,21 @@
             let rowCount = $('.form-row-item').length;
             let newRow = $('.form-row-item').first().clone();
 
-            newRow.find('input, select').val('');
-            newRow.find('input[name^="required"]').attr('name', `required[${rowCount}]`);
-            newRow.find('input[type="checkbox"]').prop('checked', false).val('1');
-            newRow.find('.options-wrapper').addClass('d-none').find('input').val('');
+            newRow.find('input, select').each(function () {
+                if ($(this).is(':checkbox')) {
+                    $(this).prop('checked', false);
+                } else {
+                    $(this).val('');
+                }
+            });
+
+            newRow.find('.options-wrapper').addClass('d-none');
             newRow.find('.options-confirmation').addClass('d-none');
             newRow.find('.checkbox-confirmation').addClass('d-none');
             newRow.find('.remove-row').show();
+
             $('#form-builder-wrapper').append(newRow);
+
             updateInputNames();
         });
 
@@ -507,11 +514,14 @@
         });
 
         function updateInputNames() {
-            $('.form-row-item').each(function(index) {
-                $(this).find('select[name^="type"]').attr('name', 'type['+index+']');
-                $(this).find('input[name^="label"]').attr('name', 'label['+index+']');
-                $(this).find('input[name^="validation"]').attr('name', 'validation['+index+']');
-                $(this).find('input[type="checkbox"]').attr('name', 'required['+index+']');
+            $('#form-builder-wrapper .form-row-item').each(function(index) {
+                $(this).find('select[name^="type"]').attr('name', `type[${index}]`);
+                $(this).find('input[name^="edit_label"]').attr('name', `edit_label[${index}]`);
+                $(this).find('input[name^="options"]').attr('name', `options[${index}]`);
+                $(this).find('input[name^="validation"]').attr('name', `validation[${index}]`);
+                $(this).find('input[name^="required"]').attr('name', `required[${index}]`);
+                $(this).find('input[name^="confirmation"]').attr('name', `confirmation[${index}]`);
+                $(this).find('input[name^="label_confirmation"]').attr('name', `label_confirmation[${index}]`);                
             });
         }
 

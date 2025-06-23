@@ -45,7 +45,7 @@ class FormTemplateController extends Controller
             'type' => 'required|array',
             'label' => 'required|array',
         ]);
-        dd($request);
+        // dd($request);
         $fields = [];
         foreach ($request->type as $index => $type) {
             $label = $request->label[$index] ?? '';
@@ -124,10 +124,11 @@ class FormTemplateController extends Controller
 
         $form->title = $request->input('title');
         $form->category = $request->input('category');
-        // dd($request);
+        
+        // dd($request->all());
         $fields = [];
         foreach ($request->type as $index => $type) {
-            $label = $request->label[$index] ?? '';
+            $label = $request->edit_label[$index] ?? '';
             $required = isset($request->required[$index]);
             $validation = $request->validation[$index] ?? '';
 
