@@ -35,7 +35,7 @@
             @foreach($formSchema['fields'] as $index => $field)
                 @if (!str_contains($field['name'], 'reason'))
                     <div class="card bg-light shadow mb-4 border-0 position-relative form-row-item">
-                        <button type="button" class="btn btn-danger btn-sm remove-row position-absolute" style="top: 10px; right: 10px; {{ $loop->first ? 'display:none;' : '' }}">X</button>
+                        <button type="button" class="btn btn-danger btn-sm remove-row position-absolute" style="top: 10px; right: 10px; {{ $loop->first ? 'display:none;' : '' }}">{{ $index }} X</button>
 
                         <div class="card-body row g-3">
                             <div class="col-md-2">
@@ -48,7 +48,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <input type="text" class="form-control" name="label[{{ $index }}]" placeholder="Label" value="{{ $field['label'] }}" required>
+                                <input type="text" class="form-control" name="edit_label[{{ $index }}]" placeholder="Label" value="{{ $field['label'] ?? '' }}">
                             </div>
                             <div class="col-md-3 options-wrapper {{ isset($field['options']) ? '' : 'd-none' }}">
                                 <input type="text" class="form-control" name="options[{{ isset($field['options']) ? $index : '' }}]" placeholder="Example: Option 1, Option 2, Option 3" value="{{ isset($field['options']) && is_array($field['options']) ? implode(', ', $field['options']) : '' }}">
@@ -74,10 +74,14 @@
                                     $isConfirmationRadio = str_contains($field['name'], 'confirmation') && $field['type'] == 'radio';
                                     $nextLabel = $isConfirmationRadio && isset($formSchema['fields'][$index + 1]) ? $formSchema['fields'][$index + 1]['label'] : '';
                                 @endphp
-                                <input type="text" class="form-control label-confirm"
+                                {{-- <input type="text" class="form-control label-confirm"
                                     name="label_confirmation[{{ $isConfirmationRadio ? $index+1 : '' }}]"
                                     placeholder="Label"
-                                    value="{{ $nextLabel }}">
+                                    value="{{ $nextLabel }}"> --}}
+                                <input type="text" class="form-control label-confirm"
+                                    name="label_confirmation[{{ $isConfirmationRadio ? $index : '' }}]"
+                                    placeholder="Label"
+                                    value="{{ $nextLabel }}">
                             </div>
                         </div>
                     </div>
