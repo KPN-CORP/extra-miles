@@ -128,10 +128,8 @@ export default function VoteList() {
                     </div>
                     ) : (
                     <div className="w-full text-justify justify-start">
-                        <div className="mb-2">
-                        <p className="text-white font-medium text-sm">
-                            🌟We’re excited to showcase the amazing talents here at KPN! Now it’s your turn to support them — vote for your favorite star! ✨
-                        </p>
+                        <div className="prose prose-sm leading-relaxed text-stone-800 max-w-none [&>p]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1 pl-2 pr-1 mb-2">
+                            {data.description}
                         </div>
 
                         {data.content_link && (
