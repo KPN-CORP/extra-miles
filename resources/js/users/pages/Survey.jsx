@@ -50,78 +50,78 @@ export default function Survey() {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                });                        
-                
+                });
+            
                 setData(
                     res.data.map(item => {
-                        // Safely parse businessUnit from JSON string if needed
                         let businessUnit = [];
                         try {
-                          businessUnit = typeof item.businessUnit === 'string'
-                            ? JSON.parse(item.businessUnit)
-                            : Array.isArray(item.businessUnit)
-                              ? item.businessUnit
-                              : [];
+                            businessUnit = typeof item.businessUnit === 'string'
+                                ? JSON.parse(item.businessUnit)
+                                : Array.isArray(item.businessUnit)
+                                    ? item.businessUnit
+                                    : [];
                         } catch (e) {
-                          businessUnit = [];
+                            businessUnit = [];
                         }
-                    
-                        // Normalize event_participant as an array
+            
                         const event_participant = Array.isArray(item.event_participant)
-                          ? item.event_participant.filter(p => p.status != 'Registered')
-                          : (item.event_participant ? [item.event_participant] : []).filter(p => p.status != 'Registered');
-                    
+                            ? item.event_participant.filter(p => p.status !== 'Registered')
+                            : (item.event_participant ? [item.event_participant] : []).filter(p => p.status !== 'Registered');
+            
                         return {
-                          ...item,
-                          businessUnit,
-                          event_participant
+                            ...item,
+                            businessUnit,
+                            event_participant
                         };
                     }).filter(e => e.event_participant.length > 0)
                 );
-
+            
                 setDataEventParticipant(
                     res.data.map(item => {
-                      // Safely parse businessUnit from JSON string if needed
-                      let businessUnit = [];
-                      try {
-                        businessUnit = typeof item.businessUnit === 'string'
-                          ? JSON.parse(item.businessUnit)
-                          : Array.isArray(item.businessUnit)
-                            ? item.businessUnit
-                            : [];
-                      } catch (e) {
-                        businessUnit = [];
-                      }
-                  
-                      // Normalize event_participant as an array
-                      const event_participant = Array.isArray(item.event_participant)
-                        ? item.event_participant.filter(p => p.status === 'Registered')
-                        : (item.event_participant ? [item.event_participant] : []).filter(p => p.status === 'Registered');
-                  
-                      return {
-                        ...item,
-                        businessUnit,
-                        event_participant
-                      };
-                    }).filter(e => e.event_participant.length > 0) // optional: exclude events with no registered participants
+                        let businessUnit = [];
+                        try {
+                            businessUnit = typeof item.businessUnit === 'string'
+                                ? JSON.parse(item.businessUnit)
+                                : Array.isArray(item.businessUnit)
+                                    ? item.businessUnit
+                                    : [];
+                        } catch (e) {
+                            businessUnit = [];
+                        }
+            
+                        const event_participant = Array.isArray(item.event_participant)
+                            ? item.event_participant.filter(p => p.status === 'Registered')
+                            : (item.event_participant ? [item.event_participant] : []).filter(p => p.status === 'Registered');
+            
+                        return {
+                            ...item,
+                            businessUnit,
+                            event_participant
+                        };
+                    }).filter(e => e.event_participant.length > 0)
                 );
-                                
-                  
+            
             } catch (err) {
-                showAlert({
-                    icon: 'warning',
-                    title: 'Connection Ended',
-                    text: 'Unablet to connect to the server. Please try again later.',
-                    timer: 2500,
-                    showConfirmButton: false,
-                }).then(() => {
-                    console.log(err);
-                    
-                    // window.location.href = "https://kpncorporation.darwinbox.com/";
-                });
+                const status = err.response?.status;
+                const message = err.response?.data?.message;
+            
+                if (status === 400 && message === "Survey/Vote not found") {
+                    console.log('Empty data: Survey/Vote not found');
+                } else {
+                    showAlert({
+                        icon: 'warning',
+                        title: 'Connection Ended',
+                        text: 'Unable to connect to the server. Please try again later.',
+                        timer: 2500,
+                        showConfirmButton: false,
+                    });
+                }
+            
+                console.log(err); // Optional: keep this for debugging other cases
             } finally {
                 setLoading(false);
-            }
+            }            
         };
         if(token) {
             fetchData();
