@@ -199,7 +199,9 @@ export default function VotingForm({ participated, eventEnded }) {
     return (
       <div className="w-full mb-8">
         <Formik
-          initialValues={initialValues || {}} 
+          initialValues={{
+            [initialValues]: [], // checkbox field as array
+          }}
           validationSchema={validationSchema}
           onSubmit={onSubmit}
           enableReinitialize
@@ -221,6 +223,7 @@ export default function VotingForm({ participated, eventEnded }) {
                 onSubmit(values, { setSubmitting: () => {} });
               }}
             >
+              {JSON.stringify(values, null, 2)}
               {formFields.map((field, index) => (
                 <div key={index}>
                   {field.type === 'checkbox' && field.options && !participated ? (
