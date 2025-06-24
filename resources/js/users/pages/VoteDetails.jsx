@@ -15,9 +15,12 @@ import CountdownTimer from "../components/Helper/countdownTImer";
 import parse from "html-react-parser";
 
 const pageVariants = {
-    initial: { opacity: 0, x: 0 },     // Masuk dari kanan
-    animate: { opacity: 1, x: 0 },       // Diam di tengah
-    exit: { opacity: 0, x: 0 },       // Keluar ke kiri
+    // initial: { opacity: 0, x: 0 },     // Masuk dari kanan
+    // animate: { opacity: 1, x: 0 },       // Diam di tengah
+    // exit: { opacity: 0, x: 0 },       // Keluar ke kiri
+    initial: { opacity: 0, y: 100 },     // Masuk dari kanan
+    animate: { opacity: 1, y: 0 },       // Diam di tengah
+    exit: { opacity: 0, y: 100 },       // Keluar ke kiri
 };
 
 export default function VoteList() {
