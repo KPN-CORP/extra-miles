@@ -253,7 +253,7 @@ export default function VotingForm({ participated, eventEnded }) {
                       </div>
                   ) : field.type === 'radio' ? (
                     <>
-                    <label className="block text-white font-medium mb-2" htmlFor={field.name}>{voteResults.total === 1 ? 'Voter' : 'Voters'}: {voteResults.total}
+                    <label className="block text-white font-medium mb-2" htmlFor={field.name}>{voteResults.total === 1 ? 'Voter' : 'Voters'} : {voteResults.total}
                     </label>
                     <div className="w-full p-3 bg-red-700 rounded-xl border border-white inline-flex flex-col justify-center items-center gap-4 mb-4">
                       <div className="self-stretch flex flex-col justify-start items-start gap-5">
@@ -263,7 +263,7 @@ export default function VotingForm({ participated, eventEnded }) {
                             className="w-full p-4 bg-white rounded-xl ring-1 ring-inset ring-red-700 shadow-lg flex items-center gap-3 overflow-hidden"
                           >
                             <img
-                              src={getImageUrl(apiUrl, 'assets/images/surveys/vote/candidate-img.jpg')}
+                              src={getImageUrl(apiUrl, 'assets/images/surveys/vote/vote-default-img.png')}
                               alt="Profile"
                               className="w-12 h-12 rounded-full"
                             />
