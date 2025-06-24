@@ -17,9 +17,12 @@ import CountdownTimer from "../components/Helper/countdownTImer";
 import parse from "html-react-parser";
 
 const pageVariants = {
-    initial: { opacity: 0, x: 0 },     // Masuk dari kanan
-    animate: { opacity: 1, x: 0 },       // Diam di tengah
-    exit: { opacity: 0, x: 0 },       // Keluar ke kiri
+    // initial: { opacity: 0, x: 0 },     // Masuk dari kanan
+    // animate: { opacity: 1, x: 0 },       // Diam di tengah
+    // exit: { opacity: 0, x: 0 },       // Keluar ke kiri
+    initial: { opacity: 0, y: 100 },     // Masuk dari kanan
+    animate: { opacity: 1, y: 0 },       // Diam di tengah
+    exit: { opacity: 0, y: 100 },       // Keluar ke kiri
 };
 
 export default function VoteList() {
@@ -91,11 +94,12 @@ export default function VoteList() {
     if (!data) {
         // No event found after loading
         return (
-          <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
-            <p className="text-red-700 text-xl font-semibold mb-4">Survey/Vote not found.</p>
+          <div className="flex flex-col items-center justify-center h-screen bg-red-700 p-5">
+            <p className="text-white text-xl font-semibold mb-4">Survey/Vote not found.</p>
             <button
               onClick={() => window.history.back()}
-              className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
+              className="px-4 py-2 text-white rounded"
+              style={{ backgroundColor: '#DEBD69' }}
             >
               Go Back Home
             </button>
