@@ -53,29 +53,33 @@ export default function Survey() {
                 });
             
                 setData(
-                    res.data.map(item => {
-                        let businessUnit = [];
-                        try {
-                            businessUnit = typeof item.businessUnit === 'string'
-                                ? JSON.parse(item.businessUnit)
-                                : Array.isArray(item.businessUnit)
-                                    ? item.businessUnit
-                                    : [];
-                        } catch (e) {
-                            businessUnit = [];
-                        }
-            
-                        const event_participant = Array.isArray(item.event_participant)
-                            ? item.event_participant.filter(p => p.status !== 'Registered')
-                            : (item.event_participant ? [item.event_participant] : []).filter(p => p.status !== 'Registered');
-            
-                        return {
-                            ...item,
-                            businessUnit,
-                            event_participant
-                        };
-                    }).filter(e => e.event_participant.length > 0)
-                );
+                    res.data
+                        .filter(item =>
+                            (item.event_id === null) &&
+                            (
+                                !item.event_participant || // null/undefined
+                                (Array.isArray(item.event_participant) && item.event_participant.length === 0)
+                            )
+                        )
+                        .map(item => {
+                            let businessUnit = [];
+                            try {
+                                businessUnit = typeof item.businessUnit === 'string'
+                                    ? JSON.parse(item.businessUnit)
+                                    : Array.isArray(item.businessUnit)
+                                        ? item.businessUnit
+                                        : [];
+                            } catch (e) {
+                                businessUnit = [];
+                            }
+                
+                            return {
+                                ...item,
+                                businessUnit,
+                                event_participant: [] // dijamin kosong
+                            };
+                        })
+                );                
             
                 setDataEventParticipant(
                     res.data.map(item => {
@@ -89,18 +93,23 @@ export default function Survey() {
                         } catch (e) {
                             businessUnit = [];
                         }
-            
+
+                        // const event_participant = Array.isArray(item.event_participant)
+                        //     ? item.event_participant.filter(p => p.status === 'Registered')
+                        //     : (item.event_participant ? [item.event_participant] : []).filter(p => p.status === 'Registered');
+                
+                        // Ambil semua event_participant tanpa filter status
                         const event_participant = Array.isArray(item.event_participant)
-                            ? item.event_participant.filter(p => p.status === 'Registered')
-                            : (item.event_participant ? [item.event_participant] : []).filter(p => p.status === 'Registered');
-            
+                            ? item.event_participant
+                            : (item.event_participant ? [item.event_participant] : []);
+                
                         return {
                             ...item,
                             businessUnit,
                             event_participant
                         };
-                    }).filter(e => e.event_participant.length > 0)
-                );
+                    }).filter(e => e.event_participant.length > 0) // hanya yang punya participant
+                );                
             
             } catch (err) {
                 const status = err.response?.status;
