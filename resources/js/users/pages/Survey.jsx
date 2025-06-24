@@ -74,7 +74,7 @@ export default function Survey() {
                             businessUnit,
                             event_participant
                         };
-                    }).filter(e => e.event_participant.length > 0)
+                    }).filter(e => e.event_participant.length === 0)
                 );
             
                 setDataEventParticipant(
