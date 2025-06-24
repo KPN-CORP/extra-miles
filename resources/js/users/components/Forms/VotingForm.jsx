@@ -136,7 +136,6 @@ export default function VotingForm({ participated, eventEnded }) {
     const validationSchema = formFields.length > 0 ? generateValidationSchema(formFields) : null;
   
     const onSubmit = async (values, { setSubmitting }, e) => {
-      e.preventDefault();
       if (eventEnded) {
         showAlert({
           icon: 'warning',
@@ -199,9 +198,7 @@ export default function VotingForm({ participated, eventEnded }) {
     return (
       <div className="w-full mb-8">
         <Formik
-          initialValues={{
-            [initialValues]: [], // checkbox field as array
-          }}
+          initialValues={initialValues || {}}
           validationSchema={validationSchema}
           onSubmit={onSubmit}
           enableReinitialize
