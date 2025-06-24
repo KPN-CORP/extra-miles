@@ -78,15 +78,15 @@ export default function VoteList() {
     };
   
     return (
-        <motion.div
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-        >
-            
-            <div className="w-full h-screen relative bg-red-700 overflow-auto min-h-screen p-5">
+        
+        <div className="w-full h-screen relative bg-red-700 overflow-auto min-h-screen p-5">
+            <motion.div
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
             {/* Header Section */}
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex-1">
@@ -166,7 +166,7 @@ export default function VoteList() {
                         }
                     </div>
                 </div>
-            </div>
-        </motion.div>
+            </motion.div>
+        </div>
     );
 }
