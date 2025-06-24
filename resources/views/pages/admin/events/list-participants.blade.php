@@ -201,10 +201,10 @@
                                         <tbody>
                                             @forelse($approveparticipants as $index => $p)
                                                 <tr>
-                                                    <td>{{ $index + 1 }}</td>
+                                                    <td style="width:2%">{{ $index + 1 }}</td>
                                                     <td>{{ $p->fullname }}</td>
                                                     <td>{{ $p->business_unit }}</td>
-                                                    <td>{{ $p->job_level }}</td>
+                                                    <td style="width:4%">{{ $p->job_level }}</td>
                                                     <td>{{ $p->location }}</td>
                                                     <td>
                                                         @if ($p->status === 'Registered')
@@ -213,7 +213,29 @@
                                                             <span class="badge bg-warning">Confirmation Needed</span>
                                                         @endif
                                                     </td>
-                                                    <td>
+                                                    <td style="width:18%">
+                                                        @if(!empty($p->employee->personal_mobile_number))
+                                                            @php
+                                                                $waNumber = preg_replace('/[^0-9]/', '', $p->employee->personal_mobile_number);
+                                                            
+                                                                // Jika nomor diawali dengan 620 (dari +620...), ubah jadi 62
+                                                                if (substr($waNumber, 0, 3) === '620') {
+                                                                    $waNumber = '62' . substr($waNumber, 3);
+                                                                }
+                                                            
+                                                                $defaultMessage = urlencode("Halo {$p->employee->fullname}, mohon konfirmasi kehadiran Anda untuk event yang akan datang.");
+                                                            @endphp
+                                                            <a href="https://wa.me/{{ $waNumber }}?text={{ $defaultMessage }}"
+                                                            target="_blank"
+                                                            class="btn btn-outline-success btn-sm">
+                                                                <i class="bi bi-whatsapp"></i> Remind
+                                                            </a>
+                                                        @else
+                                                            <button type="button"
+                                                                class="btn btn-outline-secondary btn-sm" disabled>
+                                                                No Number
+                                                            </button>
+                                                        @endif
                                                         <button type="button"
                                                             class="btn btn-outline-danger btn-sm"
                                                             data-bs-toggle="modal"

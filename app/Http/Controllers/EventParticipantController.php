@@ -26,8 +26,10 @@ class EventParticipantController extends Controller
         $waitinglists = EventParticipant::where('event_id', $id)
                         ->where('status', 'Waiting List')->get();
         
-        $approveparticipants = EventParticipant::where('event_id', $id)
-                        ->whereIn('status', ['Registered', 'Confirmation'])->get();
+        $approveparticipants = EventParticipant::with('employee')
+                        ->where('event_id', $id)
+                        ->whereIn('status', ['Registered', 'Confirmation'])
+                        ->get();
         
         $attending = EventParticipant::where('event_id', $id)
                         ->whereIn('status', ['Registered', 'Confirmation'])
