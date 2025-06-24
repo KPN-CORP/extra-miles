@@ -199,9 +199,7 @@ export default function VotingForm({ participated, eventEnded }) {
     return (
       <div className="w-full mb-8">
         <Formik
-          initialValues={{
-            [initialValues]: [], // checkbox field as array
-          }}
+          initialValues={initialValues || {}} 
           validationSchema={validationSchema}
           onSubmit={onSubmit}
           enableReinitialize
