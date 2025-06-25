@@ -140,7 +140,7 @@ export default function VoteList() {
                         <>
                             <div className="mb-2">
                             <p className="text-white font-medium text-sm">
-                                📹Before you vote, make sure to watch the video of each talent here:
+                                📹Before you vote, make sure to watch this video:
                             </p>
                             </div>
                             <YouTubePlayer videoId={data.content_link} />
