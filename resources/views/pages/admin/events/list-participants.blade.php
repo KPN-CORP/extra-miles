@@ -214,28 +214,39 @@
                                                         @endif
                                                     </td>
                                                     <td style="width:18%">
-                                                        @if(!empty($p->employee->personal_mobile_number))
-                                                            @php
-                                                                $waNumber = preg_replace('/[^0-9]/', '', $p->employee->personal_mobile_number);
-                                                            
-                                                                // Jika nomor diawali dengan 620 (dari +620...), ubah jadi 62
-                                                                if (substr($waNumber, 0, 3) === '620') {
-                                                                    $waNumber = '62' . substr($waNumber, 3);
-                                                                }
-                                                            
-                                                                $defaultMessage = urlencode("Halo {$p->employee->fullname}, mohon konfirmasi kehadiran Anda untuk event yang akan datang.");
-                                                            @endphp
-                                                            <a href="https://wa.me/{{ $waNumber }}?text={{ $defaultMessage }}"
-                                                            target="_blank"
-                                                            class="btn btn-outline-success btn-sm">
-                                                                <i class="bi bi-whatsapp"></i> Remind
-                                                            </a>
-                                                        @else
-                                                            <button type="button"
+                                                        @php
+                                                        $formData = json_decode($p->form_data, true);
+                                                        $waNumber = null;
+
+                                                        if (!empty($formData['countryCode']) && !empty($formData['whatsapp_number'])) {
+                                                            // Gabungkan kode negara dan nomor
+                                                            $rawNumber = $formData['countryCode'] . $formData['whatsapp_number'];
+
+                                                            // Hapus karakter non-digit
+                                                            $waNumber = preg_replace('/[^0-9]/', '', $rawNumber);
+
+                                                            // Normalisasi jika diawali 620 → jadi 62
+                                                            if (substr($waNumber, 0, 3) === '620') {
+                                                                $waNumber = '62' . substr($waNumber, 3);
+                                                            }
+
+                                                            // Buat pesan default
+                                                            $defaultMessage = urlencode("Halo {$p->employee->fullname}, mohon konfirmasi kehadiran Anda untuk event {$event->title} di {$event->event_location} yang akan datang.");
+                                                        }
+                                                    @endphp
+
+                                                    @if($waNumber)
+                                                        <a href="https://wa.me/{{ $waNumber }}?text={{ $defaultMessage }}"
+                                                        target="_blank"
+                                                        class="btn btn-outline-success btn-sm">
+                                                            <i class="bi bi-whatsapp"></i> Remind
+                                                        </a>
+                                                    @else
+                                                        <button type="button"
                                                                 class="btn btn-outline-secondary btn-sm" disabled>
-                                                                No Number
-                                                            </button>
-                                                        @endif
+                                                            No Number
+                                                        </button>
+                                                    @endif
                                                         <button type="button"
                                                             class="btn btn-outline-danger btn-sm"
                                                             data-bs-toggle="modal"
