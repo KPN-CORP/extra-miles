@@ -16,6 +16,7 @@ export default {
             animation: {
                 slideUp: 'slideUp 0.2s ease-out',
                 slideDown: 'slideDown 0.2s ease-in',
+                marquee: 'marquee 10s linear infinite',
             },
             keyframes: {
                 slideUp: {

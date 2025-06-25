@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { PulseLoader } from 'react-spinners';
-import { useApiUrl } from '../Context/ApiContext';
+import { useApiUrl } from '../context/ApiContext';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom'; // Import useParams to get id from endpoint
 import { showAlert } from '../Helper/alertHelper';
@@ -58,7 +58,7 @@ export function generateValidationSchema(fields) {
     return Yup.object().shape(shape);
 }
 
-export default function VotingForm({ participated }) {  
+export default function VotingForm({ participated, eventEnded }) {  
     const [formFields, setFormFields] = useState([]);
     const [initialValues, setInitialValues] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -135,7 +135,17 @@ export default function VotingForm({ participated }) {
   
     const validationSchema = formFields.length > 0 ? generateValidationSchema(formFields) : null;
   
-    const onSubmit = async (values, { setSubmitting }) => {
+    const onSubmit = async (values, { setSubmitting }, e) => {
+      if (eventEnded) {
+        showAlert({
+          icon: 'warning',
+          title: 'Voting Closed',
+          text: 'Voting time has ended. You can no longer vote.',
+          timer: 2500,
+          showConfirmButton: false,
+        });
+        return;
+      }
       try {
         const result = await showAlert({
           icon: 'question',
@@ -188,9 +198,7 @@ export default function VotingForm({ participated }) {
     return (
       <div className="w-full mb-8">
         <Formik
-          initialValues={{
-            [initialValues]: [], // checkbox field as array
-          }}
+          initialValues={initialValues || {}}
           validationSchema={validationSchema}
           onSubmit={onSubmit}
           enableReinitialize
@@ -245,7 +253,7 @@ export default function VotingForm({ participated }) {
                       </div>
                   ) : field.type === 'radio' ? (
                     <>
-                    <label className="block text-white font-medium mb-2" htmlFor={field.name}>{voteResults.total === 1 ? 'Voter' : 'Voters'}: {voteResults.total}
+                    <label className="block text-white font-medium mb-2" htmlFor={field.name}>{voteResults.total === 1 ? 'Voter' : 'Voters'} : {voteResults.total}
                     </label>
                     <div className="w-full p-3 bg-red-700 rounded-xl border border-white inline-flex flex-col justify-center items-center gap-4 mb-4">
                       <div className="self-stretch flex flex-col justify-start items-start gap-5">
@@ -255,9 +263,9 @@ export default function VotingForm({ participated }) {
                             className="w-full p-4 bg-white rounded-xl ring-1 ring-inset ring-red-700 shadow-lg flex items-center gap-3 overflow-hidden"
                           >
                             <img
-                              src={getImageUrl(apiUrl, 'assets/images/surveys/vote/candidate-img.jpg')}
+                              src={getImageUrl(apiUrl, 'assets/images/surveys/vote/vote-default-img.png')}
                               alt="Profile"
-                              className="w-12 h-12 rounded-full"
+                              className="w-12 h-12 rounded-full hidden"
                             />
                             <div className="flex-1 flex flex-col justify-center gap-2">
                               <div className="text-stone-600 text-sm font-semibold">

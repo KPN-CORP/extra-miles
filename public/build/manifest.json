@@ -1,6 +1,6 @@
 {
-  "_cloneDeep-DzRP12Gi.js": {
-    "file": "assets/cloneDeep-DzRP12Gi.js",
+  "_cloneDeep-D-Ve57l3.js": {
+    "file": "assets/cloneDeep-D-Ve57l3.js",
     "name": "cloneDeep"
   },
   "node_modules/remixicon/fonts/remixicon.eot": {
@@ -28,7 +28,7 @@
     "src": "public/images/bg-auth.jpg"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DO0s92C7.css",
+    "file": "assets/app-Cd5G0cCh.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -61,12 +61,12 @@
     "src": "resources/fonts/remixicon.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-PMb8QTHB.js",
+    "file": "assets/app-DJFTty7S.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_cloneDeep-DzRP12Gi.js"
+      "_cloneDeep-D-Ve57l3.js"
     ],
     "css": [
       "assets/app-DVNhP-d0.css"
@@ -85,15 +85,15 @@
     "isEntry": true
   },
   "resources/js/users/main.jsx": {
-    "file": "assets/main-DLqis-Tg.js",
+    "file": "assets/main-CkVLHPQs.js",
     "name": "main",
     "src": "resources/js/users/main.jsx",
     "isEntry": true,
     "imports": [
-      "_cloneDeep-DzRP12Gi.js"
+      "_cloneDeep-D-Ve57l3.js"
     ],
     "css": [
-      "assets/main-CH7yEnXz.css"
+      "assets/main-CiXS92Zv.css"
     ],
     "assets": [
       "assets/remixicon-BVJ9S1ev.eot",

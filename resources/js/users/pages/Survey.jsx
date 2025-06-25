@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import 'react-calendar/dist/Calendar.css';
 import '../../../css/calendar-custom.css';
-import { useApiUrl } from "../components/Context/ApiContext";
+import { useApiUrl } from "../components/context/ApiContext";
 import { showAlert } from "../components/Helper/alertHelper";
 import { useAuth } from "../components/context/AuthContext";
 import { dateTimeHelper } from "../components/Helper/dateTimeHelper";
@@ -25,15 +25,23 @@ const pageVariants2 = {
     exit: { opacity: 0, y: 100 },       // Keluar ke kiri
 };
 
-export default function EventCalendar() {
+export default function Survey() {
 
     const navigate = useNavigate()
     const [datas, setData] = useState([]);
+    const [dataEventParticipant, setDataEventParticipant] = useState([]);
     const [loading, setLoading] = useState(true);
     const apiUrl = useApiUrl();
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedBU, setSelectedBU] = useState("All BU");
-    const { token } = useAuth();         
+    const { token } = useAuth();  
+    
+    const mergedData = [
+        ...new Map([
+            ...datas.map(d => [d.encrypted_id, d]),
+            ...dataEventParticipant.map(d => [d.encrypted_id, d])
+        ]).values()
+    ];
 
     useEffect(() => {
         const fetchData = async () => {
@@ -42,27 +50,87 @@ export default function EventCalendar() {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                });                
-                
-                setData(res.data.map(e => ({
-                    ...e,
-                    businessUnit: Array.isArray(e.businessUnit) ? e.businessUnit : [e.businessUnit]
-                })));
-            } catch (err) {
-                showAlert({
-                    icon: 'warning',
-                    title: 'Connection Ended',
-                    text: 'Unable to connect to the server. Please try again later.',
-                    timer: 2500,
-                    showConfirmButton: false,
-                }).then(() => {
-                    console.log(err);
-                    
-                    window.location.href = "https://kpncorporation.darwinbox.com/";
                 });
+            
+                setData(
+                    res.data
+                        .filter(item =>
+                            (item.event_id === null) &&
+                            (
+                                !item.event_participant || // null/undefined
+                                (Array.isArray(item.event_participant) && item.event_participant.length === 0)
+                            )
+                        )
+                        .map(item => {
+                            let businessUnit = [];
+                            try {
+                                businessUnit = typeof item.businessUnit === 'string'
+                                    ? JSON.parse(item.businessUnit)
+                                    : Array.isArray(item.businessUnit)
+                                        ? item.businessUnit
+                                        : [];
+                            } catch (e) {
+                                businessUnit = [];
+                            }
+                
+                            return {
+                                ...item,
+                                businessUnit,
+                                event_participant: [] // dijamin kosong
+                            };
+                        })
+                );                
+            
+                setDataEventParticipant(
+                    res.data.map(item => {
+                        let businessUnit = [];
+                        try {
+                            businessUnit = typeof item.businessUnit === 'string'
+                                ? JSON.parse(item.businessUnit)
+                                : Array.isArray(item.businessUnit)
+                                    ? item.businessUnit
+                                    : [];
+                        } catch (e) {
+                            businessUnit = [];
+                        }
+
+                        // const event_participant = Array.isArray(item.event_participant)
+                        //     ? item.event_participant.filter(p => p.status === 'Registered')
+                        //     : (item.event_participant ? [item.event_participant] : []).filter(p => p.status === 'Registered');
+                
+                        // Ambil semua event_participant tanpa filter status
+                        const event_participant = Array.isArray(item.event_participant)
+                            ? item.event_participant
+                            : (item.event_participant ? [item.event_participant] : []);
+                
+                        return {
+                            ...item,
+                            businessUnit,
+                            event_participant
+                        };
+                    }).filter(e => e.event_participant.length > 0) // hanya yang punya participant
+                );                
+            
+            } catch (err) {
+                const status = err.response?.status;
+                const message = err.response?.data?.message;
+            
+                if (status === 400 && message === "Survey/Vote not found") {
+                    console.log('Empty data: Survey/Vote not found');
+                } else {
+                    showAlert({
+                        icon: 'warning',
+                        title: 'Connection Ended',
+                        text: 'Unable to connect to the server. Please try again later.',
+                        timer: 2500,
+                        showConfirmButton: false,
+                    });
+                }
+            
+                console.log(err); // Optional: keep this for debugging other cases
             } finally {
                 setLoading(false);
-            }
+            }            
         };
         if(token) {
             fetchData();
@@ -143,12 +211,12 @@ export default function EventCalendar() {
             className="flex-1 w-full bg-red-700 rounded-t-3xl p-5 overflow-auto"
             >
                 <div className="flex flex-col justify-start items-start gap-3 w-full">
-                {datas.length === 0 ? (
+                {mergedData.length === 0 ? (
                     <div className="w-full justify-center text-center text-white font-medium py-4">
                         No Survey / Vote available.
                     </div>
                     ) : (
-                        datas.map((data, index) => {    
+                        mergedData.map((data, index) => {    
                             const { daysUntil } = dateTimeHelper(data);  
                             const participated = Array.isArray(data.survey_participant) && data.survey_participant.length > 0;
                             

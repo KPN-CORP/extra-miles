@@ -265,6 +265,54 @@
                 console.error(error);
             });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        ClassicEditor
+            .create(document.querySelector('#newsHeadline'), {
+                toolbar: [
+                    'bold', 'italic', 'underline', 'strikethrough',
+                    '|',
+                    'undo', 'redo'
+                ],
+                removePlugins: ['Image', 'ImageToolbar', 'EasyImage', 'ImageUpload', 'MediaEmbed', 'CKFinder']
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+
+        if (file) {
+            const maxSize = 2 * 1024 * 1024; // 2MB
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+            // Check file type
+            if (!allowedTypes.includes(file.type)) {
+                alert("Please select a valid image file (JPG, PNG, GIF, or WEBP).");
+                event.target.value = ''; // Clear file input
+                return;
+            }
+
+            // Check file size
+            if (file.size > maxSize) {
+                alert("File size must be less than or equal to 2MB.");
+                event.target.value = ''; // Clear file input
+                return;
+            }
+
+            // Show image preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewContainer = document.getElementById('image-preview-container');
+                const previewImage = document.getElementById('image-preview');
+                previewImage.src = e.target.result;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 </script>
 
 <script>

@@ -16,10 +16,12 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class SurveyVoteController extends Controller
 {
     protected $today;
+    protected $dateNow;
 
     public function __construct()
     {
         $this->today = Carbon::today();
+        $this->dateNow = Carbon::now();
     }
 
     public function getSurveyVotes()
@@ -31,11 +33,13 @@ class SurveyVoteController extends Controller
 
             $datas = Survey::with(['surveyParticipant' => function ($query) use ($employee_id) {
                 $query->where('employee_id', $employee_id);
+            }, 'eventParticipant' => function ($query) use ($employee_id) {
+                $query->where('employee_id', $employee_id);
             }])
             ->where(function ($query) {
                 $query->where('status', '!=', 'Closed')
-                      ->whereDate('start_date', '<=', $this->today)
-                      ->whereDate('end_date', '>=', $this->today);
+                      ->whereRaw("TIMESTAMP(start_date, time_start) <= ?", [$this->dateNow])
+                      ->whereRaw("TIMESTAMP(end_date, time_end) >= ?", [$this->dateNow]);
             })
             ->get();
             

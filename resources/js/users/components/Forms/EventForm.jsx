@@ -1,77 +1,46 @@
-import React from 'react';
-import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Formik, Form, Field } from 'formik';
 import { PulseLoader } from 'react-spinners';
-import { useApiUrl } from '../Context/ApiContext';
+import { useApiUrl } from '../context/ApiContext';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom'; // Import useParams to get id from endpoint
 import { showAlert } from '../Helper/alertHelper';
 import { useAuth } from '../context/AuthContext';
 import PageLoader from '../Loader/PageLoader';
 
-function generateValidationSchema(fields) {
-    const shape = {};
+import { generateValidationSchema } from '../Helper/generateValidationSchema';
+
+function parsePhoneNumber(fullNumber) {
+    const knownCountryCodes = ['+62', '+60', '+65', '+63', '+66', '+84', '+91', '+966', '+81', '+1'];
+    for (const code of knownCountryCodes) {
+        if (fullNumber.startsWith(code)) {
+        return {
+            countryCode: code,
+            whatsapp_number: fullNumber.slice(code.length).replace(/^0+/, '')
+        };
+        }
+    }
+    
+    // Default fallback (anggap Indonesia)
+    return {
+        countryCode: '+62',
+        whatsapp_number: fullNumber?.replace(/^\+?62?0?/, '') || ''
+    };
+  }
   
-    fields.forEach(field => {
-      let schema;
-  
-      // Determine base schema type
-      switch (field.type) {
-        case 'text':
-          schema = Yup.string();
-          break;
-        case 'checkbox':
-          schema = Yup.boolean();
-          break;
-        default:
-          schema = Yup.string(); // fallback
-      }
-  
-      // Apply required
-      if (typeof field.validation === 'string' && field.validation.includes('required')) {
-        schema = schema.required(`This field is required`);
-      }
-  
-      // Apply min
-      const minMatch = typeof field.validation === 'string'
-        ? field.validation.match(/min:(\d+)/)
-        : null;
-      if (minMatch) {
-        const min = parseInt(minMatch[1]);
-        schema = schema.min(min, `This field must be at least ${min}`);
-      }
-  
-      // Apply max
-      const maxMatch = typeof field.validation === 'string'
-        ? field.validation.match(/max:(\d+)/)
-        : null;
-      if (maxMatch) {
-        const max = parseInt(maxMatch[1]);
-        schema = schema.max(max, `This field must not exceed ${max}`);
-      }
-  
-      // Set label for better error messages
-      schema = schema.label(field.label);
-  
-      shape[field.name] = schema;
-    });
-  
-    return Yup.object().shape(shape);
-}
 
 export default function EventForm() {
-    const [formFields, setFormFields] = React.useState([]);
-    const [initialValues, setInitialValues] = React.useState(null);
-    const [loading, setLoading] = React.useState(true);
-    const [showRegistrationButton, setShowRegistrationButton] = React.useState(false); // New state
+    const [formFields, setFormFields] = useState([]);
+    const [initialValues, setInitialValues] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [showRegistrationButton, setShowRegistrationButton] = useState(false); // New state
     const apiUrl = useApiUrl();
     const { id } = useParams();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const navigate = useNavigate();
-    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-
-    React.useEffect(() => {        
+    useEffect(() => {        
         
         const fetchFormSchema = async () => {
             try {
@@ -84,19 +53,29 @@ export default function EventForm() {
 
                 const formSchema = response.data;                
 
-                if (!response.data.fields) {                    
-                    setShowRegistrationButton(true); // Show only the registration button
-                } else {
                     // Set form fields
-                    setFormFields(formSchema.fields);
+                    setFormFields(Array.isArray(formSchema.fields) ? formSchema.fields : []);
 
                     // Set initial values
                     const initialValues = {};
-                    formSchema.fields.forEach(field => {
-                        initialValues[field.name] = field.type === 'checkbox' ? false : '';
-                    });
+                    if (Array.isArray(formSchema?.fields)) {
+                        formSchema.fields.forEach(field => {
+                            if (Array.isArray(field.options)) {
+                            initialValues[field.name] = field.type === 'checkbox' ? [] : '';
+                            } else {
+                            initialValues[field.name] = field.type === 'checkbox' ? false : '';
+                            }
+                        });
+                    }
+
+                    const cleanNumber = (user?.whatsapp_number ? user?.whatsapp_number : (user?.personal_mobile_number ?? '')).replace(/'/g, '');                    
+
+                    const parsedWhatsapp = parsePhoneNumber(user? cleanNumber : '');
+
+                    initialValues.countryCode = parsedWhatsapp.countryCode;
+                    initialValues.whatsapp_number = parsedWhatsapp.whatsapp_number;
+
                     setInitialValues(initialValues);
-                }
             } catch (error) {
                 console.error("Error fetching form schema:", error);
             } finally {
@@ -107,15 +86,33 @@ export default function EventForm() {
         fetchFormSchema();
     }, [apiUrl]);
 
-    const validationSchema = formFields.length > 0 ? generateValidationSchema(formFields) : null;
-
     const onSubmit = async (values, { setSubmitting }) => {
+        setIsSubmitting(true);
         try {
+            const normalizedNumber = `${values.countryCode}${values.whatsapp_number.replace(/^0+/, '')}`; // Normalisasi nomor WhatsApp
+
+            const result = await showAlert({
+                title: 'Confirmation',
+                html: `Pastikan nomor WhatsApp Anda sudah benar:<br><strong>${normalizedNumber}</strong><br><br>Lanjutkan registrasi?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, lanjutkan',
+                cancelButtonText: 'Batal',
+            });
+        
+            if (!result.isConfirmed) {
+                setSubmitting(false);
+                return; // batal submit
+            }
+        
             const payload = {
                 eventId: id,
-                formData: { ...values },
+                personalMobileNumber: normalizedNumber,
+                formData: {
+                    ...values,
+                },
             };
-
+            
             const response = await axios.post(`${apiUrl}/api/event-registration`, payload, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -150,11 +147,16 @@ export default function EventForm() {
             alert("An error occurred while submitting the form.");
         } finally {
             setSubmitting(false);
+            setIsSubmitting(false);
         }
     };
 
     if (loading) {
-        return <PulseLoader cssOverride={{}} margin={2} size={8} color="#B91C1C" speedMultiplier={0.75} />;
+        return (
+            <div className="w-full inline-flex justify-center items-center overflow-hidden">
+                <PulseLoader cssOverride={{}} margin={2} size={8} color="#B91C1C" speedMultiplier={0.75} />
+            </div>
+        )
     }
 
     if (showRegistrationButton) {
@@ -212,7 +214,11 @@ export default function EventForm() {
         };
     
         return (
-            <div style={{ width: '100%', marginBottom: '2rem' }}>
+            <>
+            <div className='w-full mb-2'>
+
+            </div>
+            <div className='w-full mb-2'>
                 <button
                     onClick={handleSimpleRegister}
                     className="w-full px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center overflow-hidden text-white text-sm font-semibold"
@@ -220,43 +226,131 @@ export default function EventForm() {
                     {isSubmitting ? (
                         <PulseLoader size={8} color="#fff" margin={2} speedMultiplier={0.75} />
                     ) : (
-                        'Register'
+                        'Submit'
                     )}
                 </button>
             </div>
+            </>
         );
-    }
+    }    
+
+    let schema;
+try {
+  schema = generateValidationSchema(formFields);
+} catch (err) {
+  console.error("Validation Schema Error:", err);
+}
 
     return (
-        <div style={{ width: '100%', marginBottom: '2rem' }}>
+        <div className='w-full mb-2'>
+            {initialValues && (
             <Formik
                 initialValues={initialValues}
-                validationSchema={validationSchema}
+                validationSchema={generateValidationSchema(formFields)}
                 onSubmit={onSubmit}
                 enableReinitialize
             >
-                {({ values, handleChange, handleBlur, isSubmitting, touched, errors }) => (
+                {({ values, handleChange, handleBlur, isSubmitting, touched, errors, setFieldValue }) => (
                     <Form>
+                        <div className="mb-6">
+                            <label className="block text-gray-700 mb-2" htmlFor="whatsapp_number">
+                                WhatsApp Number <span className="text-red-600">*</span>
+                            </label>
+                            <div className="flex">
+                                <select
+                                id="countryCode"
+                                value={values.countryCode}
+                                onChange={handleChange}
+                                className="border rounded-l p-2 me-1 bg-white"
+                                >
+                                    <option value="+62">🇮🇩 +62</option>
+                                    <option value="+60">🇲🇾 +60</option>
+                                    <option value="+65">🇸🇬 +65</option>
+                                    <option value="+63">🇵🇭 +63</option>
+                                    <option value="+66">🇹🇭 +66</option>
+                                    <option value="+84">🇻🇳 +84</option>
+                                    <option value="+91">🇮🇳 +91</option>
+                                    <option value="+966">🇸🇦 +966</option>
+                                    <option value="+81">🇯🇵 +81</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                </select>
+                                <input
+                                type="tel"
+                                name="whatsapp_number"
+                                value={values.whatsapp_number}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                placeholder="phone number"
+                                className="w-full border rounded-r p-2"
+                                />
+                            </div>
+                            {touched.whatsapp_number && errors.whatsapp_number && (
+                                <p className="text-red-700 text-sm mt-1">{errors.whatsapp_number}</p>
+                            )}
+                        </div>
+
                         {formFields.map((field) => (
                             <div key={field.name} className="mb-4">
                                 <label className="block text-gray-700 mb-2" htmlFor={field.name}>
                                     {field.label}
                                 </label>
     
-                                {field.type === 'checkbox' ? (
-                                    <label className="flex items-center">
-                                        <input
-                                            id={field.name}
-                                            name={field.name}
+                                {field.type === 'checkbox' && Array.isArray(field.options) ? (
+                                    <div className="space-y-2">
+                                        {field.options.map((option, index) => (
+                                        <label key={index} className="flex items-center">
+                                            <input
                                             type="checkbox"
-                                            checked={values[field.name]}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
+                                            name={field.name}
+                                            value={option}
+                                            checked={Array.isArray(values[field.name]) && values[field.name].includes(option)}
+                                            onChange={(e) => {
+                                                const currentValue = Array.isArray(values[field.name]) ? values[field.name] : [];
+                                                const set = new Set(currentValue);
+                                                if (e.target.checked) {
+                                                set.add(option);
+                                                } else {
+                                                set.delete(option);
+                                                }
+                                                setFieldValue(field.name, Array.from(set));
+                                            }}
                                             className="mr-2"
+                                            />
+                                            {option}
+                                        </label>
+                                        ))}
+                                    </div>
+                                    ) : field.type === 'checkbox' ? (
+                                    <label className="flex items-center">
+                                        <Field 
+                                        id={field.name}
+                                        name={field.name}
+                                        type="checkbox"
+                                        checked={values[field.name]}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        className="mr-2" 
                                         />
                                         I agree
                                     </label>
-                                ) : field.type === 'select' ? (
+                                ) : field.type === 'radio' ? (
+                                    <div className="space-y-2">
+                                      {field.options.map((option, index) => (
+                                        <label key={index} className="flex items-center">
+                                          <input
+                                            type="radio"
+                                            name={field.name}
+                                            value={option}
+                                            checked={values[field.name] === option}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            className="mr-2"
+                                          />
+                                          {option}
+                                        </label>
+                                      ))}
+                                    </div>
+                                  ) : field.type === 'select' ? (
                                     <select
                                         id={field.name}
                                         name={field.name}
@@ -300,96 +394,17 @@ export default function EventForm() {
                             </div>
                         ))}
     
-                        <button type="submit" disabled={isSubmitting} className="w-full px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center overflow-hidden text-white text-sm font-semibold">Submit
+                        <button type="submit" disabled={isSubmitting} className="w-full px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center overflow-hidden text-white text-sm font-semibold">
+                            {isSubmitting ? (
+                            <PulseLoader size={8} color="#fff" margin={2} speedMultiplier={0.75} />
+                            ) : (
+                                'Submit'
+                            )}
                         </button>
                     </Form>
                 )}
             </Formik>
+            )}
         </div>
     );
-    // return (
-    //     <div style={{ width: '100%', marginBottom: '2rem' }}>
-    //         <Formik
-    //             initialValues={initialValues}
-    //             validationSchema={validationSchema}
-    //             onSubmit={onSubmit}
-    //             enableReinitialize
-    //         >
-    //             {({ values, handleChange, handleBlur, isSubmitting, touched, errors }) => (
-    //                 <Form>
-    //                     {formFields.map((field) => (
-    //                         <div key={field.name} className="mb-4">
-    //                             <label className="block text-gray-700 mb-2" htmlFor={field.name}>
-    //                                 {field.label}
-    //                             </label>
-
-    //                             {field.type === 'checkbox' ? (
-    //                                 <label className="flex items-center">
-    //                                     <input
-    //                                         id={field.name}
-    //                                         name={field.name}
-    //                                         type="checkbox"
-    //                                         checked={values[field.name]}
-    //                                         onChange={handleChange}
-    //                                         onBlur={handleBlur}
-    //                                         className="mr-2"
-    //                                     />
-    //                                     I agree
-    //                                 </label>
-    //                             ) : field.type === 'select' ? (
-    //                                 <select
-    //                                     id={field.name}
-    //                                     name={field.name}
-    //                                     value={values[field.name]}
-    //                                     onChange={handleChange}
-    //                                     onBlur={handleBlur}
-    //                                     className="w-full border rounded p-2"
-    //                                 >
-    //                                     <option value="" label="Select an option" />
-    //                                     {field.options.map((option, index) => (
-    //                                         <option key={index} value={option} label={option}>
-    //                                             {option}
-    //                                         </option>
-    //                                     ))}
-    //                                 </select>
-    //                             ) : field.type === 'textarea' ? (
-    //                                 <textarea
-    //                                     id={field.name}
-    //                                     name={field.name}
-    //                                     type={field.type}
-    //                                     value={values[field.name]}
-    //                                     onChange={handleChange}
-    //                                     onBlur={handleBlur}
-    //                                     className="w-full border rounded p-2"
-    //                                 />
-    //                             ) : (
-    //                                 <input
-    //                                     id={field.name}
-    //                                     name={field.name}
-    //                                     type={field.type}
-    //                                     value={values[field.name]}
-    //                                     onChange={handleChange}
-    //                                     onBlur={handleBlur}
-    //                                     className="w-full border rounded p-2"
-    //                                 />
-    //                             )}
-
-    //                             {touched[field.name] && errors[field.name] && (
-    //                                 <p className="text-red-500 text-sm mt-1">{errors[field.name]}</p>
-    //                             )}
-    //                         </div>
-    //                     ))}
-
-    //                     <button
-    //                         type="submit"
-    //                         disabled={isSubmitting}
-    //                         className="w-full px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center overflow-hidden text-white text-sm font-semibold"
-    //                     >
-    //                         Register
-    //                     </button>
-    //                 </Form>
-    //             )}
-    //         </Formik>
-    //     </div>
-    // );
 }

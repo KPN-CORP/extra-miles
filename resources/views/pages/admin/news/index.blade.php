@@ -39,7 +39,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0"></h3>
-        <a href="#" class="btn btn-primary">Create News</a>
+        <a href="{{ route('news.create') }}" class="btn btn-primary">Create News</a>
     </div>
     <div class="row">
         <div class="col-md-12">
@@ -61,41 +61,38 @@
                                 <tr class="text-center">
                                     <th>No</th>
                                     <th>Category</th>
-                                    <th>Post Date</th>
-                                    <th>News Title</th>
-                                    <th>Like Count</th>
+                                    <th>News Headline</th>
+                                    <th>Views</th>
+                                    <th>Likes</th>
+                                    <th>Posted On</th>
+                                    <th>Published Date</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- Contoh data dummy --}}
-                                <tr>
-                                    <td>1</td>
-                                    <td>Event/Comunity</td>
-                                    <td>03 April 2025</td>
-                                    <td>KPN Corp gelar buka puasa dan berbagi kepedulian serta kebahagiaan</td>
-                                    <td>95</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td> 
-                                        <a href="#" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
-                                        <a href="#" class="btn btn-outline-secondary btn-sm"><i class="ri-archive-line"></i></a>
-                                        <a href="#" class="btn btn-outline-danger btn-sm"><i class="ri-delete-bin-line"></i></a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Event/Comunity</td>
-                                    <td>02 April 2025</td>
-                                    <td>Operasi pasar KPN Corp-Kemendag sediakan ribuan liter minyak</td>
-                                    <td>12</td>
-                                    <td><span class="badge bg-secondary">Archive</span></td>
-                                    <td> 
-                                        <a href="#" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
-                                        <a href="#" class="btn btn-outline-secondary btn-sm"><i class="ri-archive-line"></i></a>
-                                        <a href="#" class="btn btn-outline-danger btn-sm"><i class="ri-delete-bin-line"></i></a>
-                                    </td>
-                                </tr>
+                                @foreach ($news as $index => $row)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $row->category }}</td>
+                                        <td>{{ \Illuminate\Support\Str::limit($row->title, 35, '...') }}</td>
+                                        <td>{{ $row->news_views_count }}</td>
+                                        <td>{{ $row->news_likes_count }}</td>
+                                        <td>{{ $row->created_at->format('d M Y H:m:s') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($row->publish_date)->format('d M Y') }}</td>
+                                        <td class="text-center"><span class="badge {{ $row->status == 'Publish' ? 'bg-info' : 'bg-secondary' }}">{{ $row->status }}</span></td>
+                                        <td> 
+                                            <a href="{{ route('news.edit', $row->encrypted_id) }}" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
+                                            <form action="{{ route('news.archive', $row->encrypted_id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Archive this news?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                                    <i class="ri-archive-line"></i>
+                                                </button>
+                                            </form>                                            
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

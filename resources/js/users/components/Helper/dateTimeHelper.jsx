@@ -1,25 +1,37 @@
 export function dateTimeHelper(event) {
     const startDate = new Date(event.start_date);
+    const deadline = new Date(event.regist_deadline);
     const endDate = new Date(event.end_date);
     const today = new Date();
 
     // Normalize time to midnight for accurate date-only comparison
     startDate.setHours(0, 0, 0, 0);
+    deadline.setHours(0, 0, 0, 0);
     endDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
+    
 
     // Determine event status
-    const isClosed = startDate < today && endDate < today;
+    const isClosed = today > endDate;
     const isOngoing = startDate <= today && today <= endDate;
-    const eventStatus = isOngoing ? 'Ongoing' : 'Closed';
+    const closedRegistration = today > deadline && today < startDate ;
+
+    const eventStatus = isOngoing ? 'Ongoing' : ( closedRegistration ? 'Closed Registration' : 'Closed');
 
     // Format month (e.g., "May")
     const month = startDate.toLocaleString('en-US', { month: 'short' });
+    const endMonth = endDate.toLocaleString('en-US', { month: 'short' });
 
     // Format day (e.g., "14")
     const day = startDate.getDate();
 
+    const endDay = endDate.getDate();
+
+    const totalDay = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+
     const year = startDate.toLocaleString('en-US', { year: 'numeric' });
+    const endYear = endDate.toLocaleString('en-US', { year: 'numeric' });
 
     // Format start and end times (e.g., "09:00")
     const startTime = event.time_start?.replace(/:/g, ':').slice(0, 5) || '';
@@ -66,5 +78,10 @@ export function dateTimeHelper(event) {
         startDate,
         endDate,
         daysUntil,
+        closedRegistration,
+        endDay,
+        totalDay,
+        endYear,
+        endMonth,
     };
 }
