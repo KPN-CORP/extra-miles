@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid bg-white py-3 px-3">
-    <form method="POST" action="{{ route('survey.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('survey.store') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
         @csrf
         <div class="card bg-light shadow">
             <div class="card-header">
@@ -10,35 +10,54 @@
             </div>
             <div class="card-body row g-3">
                 <div class="col-md-12">
-                    <label for="form_name" class="form-label">Form Name</label>
-                    <input type="text" class="form-control" name="form_name" id="form_name" required>
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" class="form-control" name="title" id="title" value="{{ old('title') }}" required>
                     <input type="hidden" name="survey_type" value="{{ $type }}">
+                    @error('title')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                    <div class="invalid-feedback">
+                        This field is mandatory.
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <label for="start_date" class="form-label">Start Date</label>
                     <input type="datetime-local" class="form-control" name="start_date" id="start_date" required>
+                    <div class="invalid-feedback">
+                        This field is mandatory.
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <label for="end_date" class="form-label">End Date</label>
                     <input type="datetime-local" class="form-control" name="end_date" id="end_date" required>
+                    <div class="invalid-feedback">
+                        This field is mandatory.
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <label for="related" class="form-label">Related to Event</label>
                     <select class="form-select" id="related" name="related">
                         <option selected disabled>Please select</option>
                         @foreach($events as $event)
-                            <option value="{{ $event->id }}">{{ $event->title }}</option>
+                        <option value="{{ $event->id }}">{{ $event->title }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-12">
                     <label for="description" class="form-label">Description</label>
-                    <textarea name="description" class="form-control" rows="4" style="height:50px" id="description"></textarea>
+                    <textarea name="description" class="form-control" rows="4" style="height:50px" id="description" required>{{ old('description') }}</textarea>
+                    <div class="invalid-feedback">
+                        This field is mandatory.
+                    </div>
                 </div>
                 <div class="col-md-12">
                     <label for="banner" class="form-label">Banner</label>
                     <input type="file" name="banner" id="banner" class="form-control">
                     <small class="text-muted">Maximum file size 2MB</small>
+                </div>
+                <div class="col-md-4">
+                    <label for="content_link" class="form-label">Content Link Youtube</label>
+                    <input class="form-control" name="content_link" id="content_link" placeholder="input youtube video ID..." value="{{ old('content_link') }}">
                 </div>
             </div>
         </div>
@@ -50,7 +69,7 @@
             <div class="card-body row g-3">
                 <div class="col-md-4">
                     <label for="participants" class="form-label">Target Participants</label>
-                    <input type="number" class="form-control" name="participants" id="participants" value="0">
+                    <input type="number" class="form-control" name="participants" id="participants" value="0" value="{{ old('participants') }}">
                 </div>
                 <div class="col-md-4">
                     <label for="business_unit" class="form-label">Business Unit</label>

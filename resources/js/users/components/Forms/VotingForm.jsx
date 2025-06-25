@@ -265,7 +265,7 @@ export default function VotingForm({ participated, eventEnded }) {
                             <img
                               src={getImageUrl(apiUrl, 'assets/images/surveys/vote/vote-default-img.png')}
                               alt="Profile"
-                              className="w-12 h-12 rounded-full"
+                              className="w-12 h-12 rounded-full hidden"
                             />
                             <div className="flex-1 flex flex-col justify-center gap-2">
                               <div className="text-stone-600 text-sm font-semibold">
