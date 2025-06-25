@@ -55,9 +55,12 @@
                     <input type="file" name="banner" id="banner" class="form-control">
                     <small class="text-muted">Maximum file size 2MB</small>
                 </div>
-                <div class="col-md-4">
-                    <label for="content_link" class="form-label">Content Link Youtube</label>
-                    <input class="form-control" name="content_link" id="content_link" placeholder="input youtube video ID..." value="{{ old('content_link') }}">
+                <div class="col-md-6">
+                    <label for="content_link" class="form-label">Youtube Content link</label>
+                    <div class="input-group">
+                        <span class="input-group-text">https://www.youtube.com/watch?v=</span>
+                        <input type="text" name="content_link" id="content_link" class="form-control" placeholder="input youtube video ID..." value="{{ old('content_link') }}">
+                    </div>
                 </div>
             </div>
         </div>
