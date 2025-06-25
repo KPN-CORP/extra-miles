@@ -226,7 +226,7 @@ class SurveyController extends Controller
         $survey = survey::findOrFail($id);
 
         $request->validate([
-            'title' => 'required|unique:surveys,title',
+            'title' => 'required|unique:surveys,title,' . $survey->id,
             'end_date' => 'required|date',
             'banner' => 'nullable|image|max:2048',
             'participants' => 'nullable|integer',
