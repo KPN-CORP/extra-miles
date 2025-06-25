@@ -38,7 +38,7 @@
                         {{ old('description', $survey->description ?? '') }}
                     </textarea>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <label for="banner" class="form-label">Banner</label>
                     <input type="file" name="banner" id="banner" class="form-control">
                     <small class="text-muted">Maximum file size 2MB</small>
@@ -63,6 +63,13 @@
                             </div>
                         </div>
                     @endif
+                </div>
+                <div class="col-md-6">
+                    <label for="content_link" class="form-label">Link Youtube</label>
+                    <div class="input-group">
+                        <span class="input-group-text">https://www.youtube.com/watch?v=</span>
+                        <input type="text" name="content_link" id="content_link" class="form-control" value="{{ old('content_link', $survey->content_link) }}">
+                    </div>
                 </div>
             </div>
         </div>

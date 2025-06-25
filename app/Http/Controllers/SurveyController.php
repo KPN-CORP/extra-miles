@@ -96,6 +96,9 @@ class SurveyController extends Controller
             ->orderBy('title')
             ->get();
 
+        $surveys = survey::whereNull('deleted_at')
+            ->get();
+
         return view('pages.admin.survey.create', [
             'back' => $back,
             'link' => $link,
@@ -106,16 +109,28 @@ class SurveyController extends Controller
             'grades' => $grades,
             'type' => $type,
             'events' => $events,
+            'surveys' => $surveys,
             'formTemplates' => $formTemplates,
         ]);
     }
 
     public function store(Request $request)
     {
+        $existingTitles = Survey::whereNull('deleted_at')->pluck('title')->map(fn($t) => strtolower(trim($t)))->toArray();
+
+        $formName = strtolower(trim($request->input('form_name')));
+
+        if (in_array($formName, $existingTitles)) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['form_name' => 'Form name sudah digunakan, silakan gunakan nama lain.']);
+        }
+        
         $request->validate([
             'end_date' => 'required|date',
             'banner' => 'nullable|image|max:2048',
             'participants' => 'nullable|integer',
+            'description' => 'required'
         ]);
 
         $startDate = date('Y-m-d', strtotime($request->start_date));
@@ -152,6 +167,7 @@ class SurveyController extends Controller
             'form_schema'      => $formSchema,
             'description'      => $request->description,
             'banner'           => $imagePath,
+            'content_link'     => $request->content_link,
             'icon'             => $request->survey_type === 'vote' ? 'assets/images/surveys/vote/vote-icon.png' : 'assets/images/surveys/survey/survey-icon.png',
             'status'           => $request->action === 'draft' ? 'Draft' : 'Ongoing',
             'quota'            => $request->participants,
@@ -252,6 +268,7 @@ class SurveyController extends Controller
         $survey->title            = $request->form_name;
         $survey->description      = $request->description;
         $survey->quota            = $request->participants;
+        $survey->content_link     = $request->content_link;
         $survey->form_id          = $request->form_id;
         $survey->form_schema      = $formSchema;
         // JSON encode untuk multiple select fields
