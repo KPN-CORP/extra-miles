@@ -113,6 +113,7 @@ class SurveyController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'title' => 'required|unique:surveys,title',
             'end_date' => 'required|date',
             'banner' => 'nullable|image|max:2048',
             'participants' => 'nullable|integer',
@@ -142,7 +143,7 @@ class SurveyController extends Controller
 
         survey::create([
             'category'         => $request->survey_type,
-            'title'            => $request->form_name,
+            'title'            => $request->title,
             'start_date'       => $startDate,
             'time_start'       => $timeStart,
             'end_date'         => $endDate,
@@ -160,6 +161,7 @@ class SurveyController extends Controller
             'jobLevel'         => $request->job_level ? json_encode($request->job_level) : null,
             'location'         => $request->location ? json_encode($request->location) : null,
             'created_by'       => Auth::id(),
+            'content_link'     => $request->content_link,
         ]);
 
         return redirect()->route('admin.survey.index')->with('success', 'Survey has been created successfully.');
@@ -224,6 +226,7 @@ class SurveyController extends Controller
         $survey = survey::findOrFail($id);
 
         $request->validate([
+            'title' => 'required|unique:surveys,title',
             'end_date' => 'required|date',
             'banner' => 'nullable|image|max:2048',
             'participants' => 'nullable|integer',
@@ -249,7 +252,7 @@ class SurveyController extends Controller
         $survey->end_date         = $endDate;
         $survey->time_end         = $timeEnd;
         $survey->event_id         = $request->related;
-        $survey->title            = $request->form_name;
+        $survey->title            = $request->title;
         $survey->description      = $request->description;
         $survey->quota            = $request->participants;
         $survey->form_id          = $request->form_id;
@@ -259,6 +262,7 @@ class SurveyController extends Controller
         $survey->unit             = $request->unit ? json_encode($request->unit) : null;
         $survey->jobLevel         = $request->job_level ? json_encode($request->job_level) : null;
         $survey->location         = $request->location ? json_encode($request->location) : null;
+        $survey->content_link     = $request->content_link;
 
         // Upload banner jika ada
         if ($request->hasFile('banner')) {
