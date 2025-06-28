@@ -26,8 +26,8 @@ export default function NewsDetails({ onLike }) {
   };
   
   const pageVariants2 = {
-    initial: { opacity: 0, y: 50 },     // Masuk dari kanan
-    animate: { opacity: 1, y: 0 },       // Diam di tengah
+    initial: { opacity: 0, x: 0 },     // Masuk dari kanan
+    animate: { opacity: 1, x: 0 },       // Diam di tengah
     exit: { opacity: 0, x: "100%" },       // Keluar ke kiri
   };  
   
