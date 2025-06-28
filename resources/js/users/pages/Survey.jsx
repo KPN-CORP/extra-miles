@@ -201,7 +201,7 @@ export default function Survey() {
             y: initialStyle.offsetY,
             borderRadius: initialStyle.borderRadius,
           }}
-          transition={{ duration: 0.5, type: "tween" }}
+          transition={{ duration: 0.5, type: "tween", ease: "easeInOut" }}
           className="w-full min-h-screen flex flex-col bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto"
         >
         {
@@ -211,7 +211,7 @@ export default function Survey() {
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={{ duration: 0.5, type: "tween" }}
+            transition={{ duration: 0.5, type: "tween", ease: "easeInOut" }}
             className="p-5"
             >
                 <div className="flex items-center justify-between mb-2">
