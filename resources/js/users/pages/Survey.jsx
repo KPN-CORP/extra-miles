@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -11,7 +11,7 @@ import { useAuth } from "../components/context/AuthContext";
 import { dateTimeHelper } from "../components/Helper/dateTimeHelper";
 import { getImageUrl } from "../components/Helper/imagePath";
 import SurveyLoader from "../components/Loader/SurveyLoader";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 const pageVariants = {
     initial: { opacity: 0, x: 0 },     // Masuk dari kanan
@@ -27,14 +27,19 @@ const pageVariants2 = {
 
 export default function Survey() {
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const location = useLocation();
+    const bounds = location.state?.bounds;
+
+    const [initialStyle, setInitialStyle] = useState(null);
+  
     const [datas, setData] = useState([]);
     const [dataEventParticipant, setDataEventParticipant] = useState([]);
     const [loading, setLoading] = useState(true);
     const apiUrl = useApiUrl();
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedBU, setSelectedBU] = useState("All BU");
-    const { token } = useAuth();  
+    const { token } = useAuth();
     
     const mergedData = [
         ...new Map([
@@ -135,17 +140,24 @@ export default function Survey() {
         if(token) {
             fetchData();
         }
-    }, [token]);
-    
 
-    const handleDateChange = (date) => {
-        // Toggle: if clicked date is same as current, unselect it
-        if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
-          setSelectedDate(null); // unselect
-        } else {
-          setSelectedDate(date); // select new
-        }
-      };    
+        if (bounds) {
+            const scaleX = bounds.width / window.innerWidth;
+            const scaleY = bounds.height / window.innerHeight;
+            const offsetX = bounds.left + bounds.width / 2 - window.innerWidth / 2;
+            const offsetY = bounds.top + bounds.height / 2 - window.innerHeight / 2;
+      
+            setInitialStyle({
+              scaleX,
+              scaleY,
+              offsetX,
+              offsetY,
+              borderRadius: 16,
+            });
+          }
+    }, [token, bounds]);
+    
+    if (!initialStyle) return null; 
 
     if (!datas) {
         // No event found after loading
@@ -163,17 +175,43 @@ export default function Survey() {
     }  
   
     return (
-        <div className="w-full min-h-screen flex flex-col bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto">
-        {loading ? (
-            <SurveyLoader />
-          ) : (
+        <div className="w-full min-h-screen flex flex-col bg-gradient-to-br from-stone-50 to-orange-200">
+        <motion.div
+        initial={{
+            opacity: 0,
+            scaleX: initialStyle.scaleX,
+            scaleY: initialStyle.scaleY,
+            x: initialStyle.offsetX,
+            y: initialStyle.offsetY,
+            borderRadius: initialStyle.borderRadius,
+          }}
+          animate={{
+            opacity: 1,
+            scaleX: 1,
+            scaleY: 1,
+            x: 0,
+            y: 0,
+            borderRadius: 0,
+          }}
+          exit={{
+            opacity: 0,
+            scaleX: initialStyle.scaleX,
+            scaleY: initialStyle.scaleY,
+            x: initialStyle.offsetX,
+            y: initialStyle.offsetY,
+            borderRadius: initialStyle.borderRadius,
+          }}
+          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+          className="w-full min-h-screen flex flex-col bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto"
+        >
+        {
             <>
             <motion.div
             variants={pageVariants}
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
             className="p-5"
             >
                 <div className="flex items-center justify-between mb-2">
@@ -207,7 +245,7 @@ export default function Survey() {
             initial="initial"
             animate="animate"
             exit="exit"
-            transition={{ duration: 0.2, ease: "easeInOut" }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
             className="flex-1 w-full bg-red-700 rounded-t-3xl p-5 overflow-auto"
             >
                 <div className="flex flex-col justify-start items-start gap-3 w-full">
@@ -264,8 +302,8 @@ export default function Survey() {
                 </div>
             </motion.div>
             </>
-          )
         }
+        </motion.div>
         </div>
     );
 }

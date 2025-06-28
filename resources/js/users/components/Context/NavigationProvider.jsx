@@ -6,25 +6,31 @@ const NavigationContext = createContext();
 export const NavigationProvider = ({ children }) => {
   const location = useLocation();
   const [direction, setDirection] = useState(1);
-  const prevPath = useRef('');
+  const prevKey = useRef(location.key); // Simpan key sebelumnya
 
   useEffect(() => {
-    const currentPath = location.pathname;
+    const currentKey = location.key;
 
-    if (prevPath.current) {
-      // Deteksi apakah ini back atau forward berdasarkan urutan history
-      const isBack = sessionStorage.getItem('navHistory')?.includes(currentPath);
-      setDirection(isBack ? -1 : 1);
+    if (prevKey.current) {
+      const historyKeys = JSON.parse(sessionStorage.getItem('navHistoryKeys') || '[]');
+      const currentIndex = historyKeys.indexOf(currentKey);
+      const prevIndex = historyKeys.indexOf(prevKey.current);
+
+      if (currentIndex === -1) {
+        // Jika belum ada → forward
+        historyKeys.push(currentKey);
+        sessionStorage.setItem('navHistoryKeys', JSON.stringify(historyKeys));
+        setDirection(1);
+      } else if (currentIndex < prevIndex) {
+        // Back
+        setDirection(-1);
+      } else {
+        // Forward
+        setDirection(1);
+      }
     }
 
-    // Simpan path ini ke history session
-    let navHistory = JSON.parse(sessionStorage.getItem('navHistory') || '[]');
-    if (!navHistory.includes(currentPath)) {
-      navHistory.push(currentPath);
-      sessionStorage.setItem('navHistory', JSON.stringify(navHistory));
-    }
-
-    prevPath.current = currentPath;
+    prevKey.current = currentKey;
   }, [location]);
 
   return (

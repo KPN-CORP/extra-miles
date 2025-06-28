@@ -52,6 +52,7 @@ const Home = () => {
                     className="w-full h-full object-cover"
                     src={getImageUrl(apiUrl, 'assets/images/Element Extra Mile 1.png')}
                     alt="attribute"
+                    loading="eager" 
                     />
                 </div>
                 <img className={`w-full h-36 left-0 top-0 absolute`} src={getImageUrl(apiUrl, 'assets/images/img-banner.png')} />

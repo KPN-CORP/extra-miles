@@ -9,7 +9,7 @@ import YouTubePlayer from "../components/Helper/youtubeHelper";
 import { getImageUrl } from "../components/Helper/imagePath";
 import VotingForm from '../components/Forms/VotingForm';
 import BannerLoader from "../components/Loader/BannerLoader";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import SurveyLoader from "../components/Loader/SurveyLoader";
 import CountdownTimer from "../components/Helper/countdownTImer";
 import parse from "html-react-parser";

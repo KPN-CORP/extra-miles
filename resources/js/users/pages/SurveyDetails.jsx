@@ -12,7 +12,7 @@ import { getImageUrl } from "../components/Helper/imagePath";
 import SurveyForm from '../components/Forms/SurveyForm';
 import BannerLoader from "../components/Loader/BannerLoader";
 import SurveyLoader from "../components/Loader/SurveyLoader";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import CountdownTimer from "../components/Helper/countdownTImer";
 import parse from "html-react-parser";
 
