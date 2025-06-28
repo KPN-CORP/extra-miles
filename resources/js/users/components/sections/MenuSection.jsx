@@ -15,6 +15,17 @@ export default () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { token } = useAuth();
   const apiUrl = useApiUrl();
+
+  const handleNavigate = (e, path) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const bounds = {
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+    };
+    navigate(path, { state: { bounds } });
+  };
   
   useEffect(() => {
     
@@ -74,7 +85,7 @@ export default () => {
 return (
     <div className="self-stretch flex flex-col justify-start items-start gap-3">
         <div className="self-stretch inline-flex justify-center items-start gap-3">
-          <button onClick={() => navigate("/event")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
+          <button onClick={(e) => handleNavigate(e, "/event")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
             🎉 Upcoming Events
           </button>
           <button
@@ -93,10 +104,10 @@ return (
           </button>
         </div>
         <div className="self-stretch inline-flex justify-center items-start gap-3">
-          <button onClick={() => navigate("/survey")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
+          <button onClick={(e) => handleNavigate(e, "/survey")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
               🗳️ Your Voice Matters!
           </button>
-          <button onClick={() => navigate("/social")} className="flex-1 min-w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
+          <button onClick={(e) => handleNavigate(e, "/social")} className="flex-1 min-w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
               🔗 Social Media
           </button>
         </div>

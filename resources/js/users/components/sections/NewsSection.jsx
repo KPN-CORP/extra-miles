@@ -10,6 +10,7 @@ import { useAuth } from "../context/AuthContext";
 import { useApiUrl } from "../context/ApiContext";
 import axios from "axios";
 import { showAlert } from "../Helper/alertHelper";
+import NewsSectionLoader from "../Loader/NewsSectionLoader";
 
 export default () => {
 
@@ -18,6 +19,7 @@ export default () => {
   const { token } = useAuth();
   const [latestNews, setLatestNews] = useState([]);
   const [isImageLoaded, setIsImageLoaded] = useState(false); // State to track image load
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     const fetchNews = async () => {
@@ -57,11 +59,17 @@ export default () => {
         }).then(() => {
           console.log(err);          
         });
+      } finally {
+        setLoading(false);
       }
     };
   
     if (token) fetchNews();
   }, [apiUrl, token]);
+
+  if (loading) {
+    return <NewsSectionLoader />;
+  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -100,6 +108,7 @@ export default () => {
                         isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
                       src={getImageUrl(apiUrl, item.image)}
                       alt={item.title}
+                      decoding="async"
                       loading="lazy"
                       onLoad={() => setIsImageLoaded(true)} // Trigger when image loads
                     />
