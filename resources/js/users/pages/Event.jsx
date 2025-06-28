@@ -183,7 +183,7 @@ export default function Event() {
             y: initialStyle.offsetY,
             borderRadius: initialStyle.borderRadius,
           }}
-          transition={{ duration: 0.5, type: "tween" }}
+          transition={{ duration: 0.5, type: "tween", ease: "easeInOut" }}
         >
         <div className="flex items-center justify-between mb-2">
             <div className="flex-1">
@@ -305,7 +305,7 @@ export default function Event() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2, type: "tween" }}
+                            transition={{ duration: 0.2, type: "tween", ease: "easeInOut" }}
                             onClick={(e) => {
                                 setSkipExit(true);
                                 const bounds = e.currentTarget.getBoundingClientRect();

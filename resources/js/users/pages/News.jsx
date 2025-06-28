@@ -175,8 +175,8 @@ export default function News() {
                 variants={pageVariants2}
                 initial="initial"
                 animate="animate"
-                exit={skipExit ? {opacity: 0, x: -100} : "exit"}
-                transition={{ duration: 0.3, type: "tween", ease: "easeOut" }}
+                exit={skipExit ? {opacity: 0, x: 0} : "exit"}
+                transition={{ duration: 0.3, type: "tween", ease: "easeInOut" }}
             >
             {/* Search + Filter button */}
             <div className="w-full p-2 bg-white rounded-lg inline-flex items-center gap-2 overflow-hidden mb-4">
