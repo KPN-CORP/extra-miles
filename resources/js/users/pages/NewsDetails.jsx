@@ -26,7 +26,7 @@ export default function NewsDetails({ onLike }) {
   };
   
   const pageVariants2 = {
-    initial: { opacity: 0, x: 0 },     // Masuk dari kanan
+    initial: { opacity: 0, x: "100%" },     // Masuk dari kanan
     animate: { opacity: 1, x: 0 },       // Diam di tengah
     exit: { opacity: 0, x: "100%" },       // Keluar ke kiri
   };  
@@ -73,7 +73,7 @@ export default function NewsDetails({ onLike }) {
         initial="initial"
         animate="animate"
         exit="exit"
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{ duration: 0.3, type: "tween", ease: "easeInOut" }}
       >
         <NewsLoader />
       </motion.div>
@@ -142,7 +142,7 @@ export default function NewsDetails({ onLike }) {
         initial="initial"
         animate="animate"
         exit="exit"
-        transition={{ duration: 0.3, type: "tween", ease: "easeOut" }}
+        transition={{ duration: 0.5, type: "tween", ease: "easeInOut" }}
     >
     <div className="flex flex-col justify-between flex-1 gap-1 mb-4">
         <div className="text-sm text-gray-700">{day}</div>
