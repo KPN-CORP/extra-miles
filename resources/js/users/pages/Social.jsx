@@ -131,7 +131,7 @@ export default function Social() {
           y: initialStyle.offsetY,
           borderRadius: initialStyle.borderRadius,
         }}
-        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ duration: 0.5, type: "tween" }}
       >
       <div className="w-full h-screen relative bg-red-700 text-white overflow-auto min-h-screen p-5">
         {/* Header */}
@@ -156,7 +156,7 @@ export default function Social() {
           initial="initial"
           animate="animate"
           exit="exit"
-          transition={{ duration: 0.3, ease: "easeInOut" }}
+          transition={{ duration: 0.3, type: "tween" }}
         >
           <div className="justify-start mb-4">
             <span className="text-white text-xl font-normal">Our</span>
