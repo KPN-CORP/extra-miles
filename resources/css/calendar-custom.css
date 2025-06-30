@@ -32,12 +32,13 @@
 
 .react-calendar__tile:hover {
   background-color: transparent;
-  border: 2px solid #E6BE5C;
+  border: 2px solid #bdbdbd; 
 }
 
 .react-calendar__tile--active {
   background-color: #E6BE5C !important; /* yellow-400 */
-  color: white;
+  border: 2px solid #E6BE5C !important; 
+  color: black;
 }
 
 .react-calendar__month-view__days__day--weekend {
@@ -46,6 +47,11 @@
 
 .react-calendar__tile:enabled:hover, .react-calendar__tile:enabled:focus {
   background-color: transparent;
+}
+
+.today-tile {
+  background-color: transparent !important; /* yellow-400 */
+  border: 2px solid #E6BE5C !important; /* white */
 }
 
 .event-emoji {

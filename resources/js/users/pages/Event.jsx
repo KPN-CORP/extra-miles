@@ -6,7 +6,7 @@ import axios from 'axios';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../../../css/calendar-custom.css';
-import { useApiUrl } from "../components/Context/ApiContext";
+import { useApiUrl } from "../components/context/ApiContext";
 import { BarLoader, PuffLoader, SyncLoader } from "react-spinners";
 import { showAlert } from "../components/Helper/alertHelper";
 import { useAuth } from "../components/context/AuthContext";
@@ -23,16 +23,17 @@ const pageVariants = {
     exit: { opacity: 0, x: 0 },       // Keluar ke kiri
 };
 
-export default function EventCalendar() {
+export default function Event() {
 
     const navigate = useNavigate()
     const [events, setEvent] = useState([]);
     const [loading, setLoading] = useState(true);
     const apiUrl = useApiUrl();
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(null);
     const [activeMonth, setActiveMonth] = useState(new Date().getMonth());
     const [activeYear, setActiveYear] = useState(new Date().getFullYear());
-    const [selectedBU, setSelectedBU] = useState("All BU");
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [categories, setCategories] = useState([]);
     const { token } = useAuth(); 
     const handleSwipeLeft = () => {
         const newMonth = new Date(activeYear, activeMonth + 1, 1);
@@ -59,10 +60,24 @@ export default function EventCalendar() {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                setEvent(res.data.map(e => ({
-                    ...e,
-                    businessUnit: Array.isArray(e.businessUnit) ? e.businessUnit : [e.businessUnit]
-                })));
+
+                const allEvents = res.data;
+                setEvent(allEvents);
+
+                // Ambil semua kategori dan flatten jika nested
+                const allCategories = allEvents.flatMap((event) => {
+                    try {
+                    const parsed = JSON.parse(event.category);
+                    return Array.isArray(parsed) ? parsed : [parsed];
+                    } catch {
+                    return event.category ? [event.category] : [];
+                    }
+                });
+
+                 // Ambil yang unik
+                const uniqueCategories = [...new Set(allCategories)];
+                setCategories(["All", ...uniqueCategories]);
+
             } catch (err) {
                 showAlert({
                     icon: 'warning',
@@ -71,7 +86,9 @@ export default function EventCalendar() {
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
-                    window.location.href = "https://kpncorporation.darwinbox.com/";
+                    console.log(err);
+                    
+                    // window.location.href = "https://kpncorporation.darwinbox.com/";
                 });
             } finally {
                 setLoading(false);
@@ -80,7 +97,7 @@ export default function EventCalendar() {
         if(token) {
             fetchEvent();
         }
-    }, [token]);
+    }, [apiUrl, token]);
     
 
     const handleDateChange = (date) => {
@@ -93,20 +110,29 @@ export default function EventCalendar() {
       };
 
     const filteredEvents = events.filter((event) => {
-        const matchBU =
-            selectedBU === "All BU" ||
-            (Array.isArray(event.businessUnit ?? []) && event.businessUnit.some(bu => JSON.parse(bu).includes(selectedBU)));
-
         const eventDate = new Date(event.start_date);
+        
+        const matchCategory =
+        selectedCategory === "All" ||
+        (() => {
+            try {
+            const parsed = JSON.parse(event.category);
+            return Array.isArray(parsed)
+                ? parsed.includes(selectedCategory)
+                : parsed === selectedCategory;
+            } catch {
+            return event.category === selectedCategory;
+            }
+        })();
+
         const matchDate =
             !selectedDate || eventDate.toDateString() === selectedDate.toDateString();
         
-        const matchMonth =
+        const matchYear =
             selectedDate !== null ? true : // only apply month filter if date is unselected
-            eventDate.getMonth() === activeMonth &&
             eventDate.getFullYear() === activeYear;
         
-        return matchBU && matchDate && matchMonth;
+        return matchCategory && matchDate && matchYear;
     });    
   
     return (
@@ -150,6 +176,19 @@ export default function EventCalendar() {
                                 setActiveMonth(activeStartDate.getMonth());
                                 setActiveYear(activeStartDate.getFullYear());
                             }}
+                            tileClassName={({ date }) => {
+                                const today = new Date();
+                                const isToday = date.toDateString() === today.toDateString();
+                                
+                                const isSelected =
+                                  selectedDate && date.toDateString() === today.toDateString();
+                            
+                                if (isToday && !isSelected) {
+                                  return "today-tile";
+                                }
+                            
+                                return null;
+                            }}
                             tileContent={({ date, view }) => {
                                 const found = events.find(
                                 (e) => new Date(e.start_date).toDateString() === date.toDateString()
@@ -165,27 +204,27 @@ export default function EventCalendar() {
 
                     {/* Right Column: Filters and Event Cards */}
                     <div className="flex flex-wrap gap-2">
-                        {["All BU", "KPN Corporation", "Property", "Cement", "Downstream", "Plantations"].map((bu) => (
-                            <button
-                            key={bu}
-                            onClick={() => setSelectedBU(bu)}
-                            className={`px-2 py-1 rounded-full ${
-                                selectedBU === bu
-                                ? "bg-red-700 text-white text-sm"
-                                : "bg-transparent outline outline-1 text-sm outline-stone-400 text-gray-600"
-                            }`}
-                            >
-                            {bu}
-                            </button>
-                        ))}
+                    {categories.map((item) => (
+                        <button
+                        key={item}
+                        onClick={() => setSelectedCategory(item)}
+                        className={`px-2 py-1 rounded-full ${
+                            selectedCategory === item
+                            ? "bg-red-700 text-white text-sm"
+                            : "bg-transparent outline outline-1 text-sm outline-stone-400 text-gray-600"
+                        }`}
+                        >
+                        {item}
+                        </button>
+                    ))}
                     </div>
                     <div className="space-y-3">
                         {filteredEvents.map((event, index) => {      
                             const registeredStatus = event.event_participant?.[0]?.status || null;   
-                            const { month, startTime, endTime, eventStatus, isClosed, isOngoing  } = dateTimeHelper(event);   
+                            const { month, startTime, endTime, eventStatus, isClosed, isOngoing, closedRegistration  } = dateTimeHelper(event);   
                             
                             const getStatusColors = (status) => {
-                                if (isClosed) {
+                                if (isClosed || closedRegistration) {
                                     return { text: "text-black", bg: "bg-gray-100" };
                                 } else if (isOngoing) {
                                     return { text: "text-white", bg: "bg-blue-500" };
@@ -217,17 +256,17 @@ export default function EventCalendar() {
                             };
                             const statusColors = getStatusColors(event.status);
                             return (
-                                <div onClick={() => navigate(`/event/${event.encrypted_id}`)} key={index} className="w-full bg-white rounded-lg shadow-md inline-flex justify-start items-center overflow-hidden cursor-pointer">
+                                <div onClick={() => navigate(`/event/${event.encrypted_id}`)} key={index} className="w-full min-h-20 bg-white rounded-lg shadow-md inline-flex justify-start items-center overflow-hidden cursor-pointer">
                                     <div className="flex-1 ps-2 flex justify-start items-center gap-3 overflow-hidden">
                                         <div className="w-16 px-2.5 py-2 bg-stone-400 rounded-lg inline-flex flex-col justify-center items-center">
                                             <div className="self-stretch text-center justify-start text-white text-base font-medium ">{event.start_date.split("-")[2]}<br/>{month}</div>
                                         </div>
                 
                                         {/* Content */}
-                                        <div className="w-24 flex-1">
-                                            <div data-color="primary" data-size="H6" data-type="normal" className="bg-white/0 inline-flex flex-col justify-center items-center">
-                                                <div className={`px-2 py-1 ${statusColors.bg} rounded inline-flex justify-center items-center overflow-hidden`}>
-                                                    <div className={`text-center justify-center ${statusColors.text} text-[10px] font-medium  leading-[10px]`}>{isClosed || isOngoing ? eventStatus : (registeredStatus ?? event.status) }
+                                        <div className="w-24 flex-1 flex flex-col justify-start gap-0.5 py-0.5">
+                                            <div data-color="primary" data-type="normal" className="bg-white/0 inline-flex flex-col justify-start items-start">
+                                                <div className={`px-2 py-0.5 ${statusColors.bg} rounded inline-flex justify-center items-center overflow-hidden`}>
+                                                    <div className={`text-center justify-center ${statusColors.text} text-[8px] font-medium leading-[10px]`}>{isClosed || isOngoing || closedRegistration ? eventStatus : (registeredStatus ?? event.status) }
                                                     </div>
                                                     {(event.status === "Ongoing" && isOngoing) && (
                                                         <div className="ms-1">
@@ -243,22 +282,22 @@ export default function EventCalendar() {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="text-sm font-bold text-gray-800 truncate">{event.title}</div>
-                                            <div className="flex items-center text-sm text-gray-600 gap-2">
+                                            <div className="text-xs font-bold text-gray-800 truncate">{event.title}</div>
+                                            <div className="flex-row items-center text-[10px] text-gray-600 gap-2">
                                                 <div className="flex justify-start items-center gap-0.5">
                                                     <i className="ri-time-line"></i>
-                                                    <div className="justify-start text-xs font-normal leading-none truncate">{`${startTime}-${endTime}`}</div>
+                                                    <div className="justify-start font-normal leading-none">{`${startTime}-${endTime}`}</div>
                                                 </div>
                                                 <div className="flex justify-start items-center gap-0.5">
                                                     <i className="ri-map-pin-line"></i>
-                                                    <div className="justify-start text-xs font-normal leading-none">{event.event_location}</div>
+                                                    <div className="justify-start font-normal leading-none truncate">{event.event_location}</div>
                                                 </div>
                                             </div>
                                         </div>
                                         <img
                                             src={getImageUrl(apiUrl, event.image)}
                                             alt="Event Thumbnail"
-                                            className="object-cover w-20"
+                                            className="object-cover w-20 h-20"
                                         />
                                     </div>
                                 </div>

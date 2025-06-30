@@ -1,7 +1,7 @@
 // App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { ApiProvider } from './components/Context/ApiContext';
+import { ApiProvider } from './components/context/ApiContext';
 import { AnimatePresence } from "framer-motion";
 import { NavigationProvider } from './components/Context/NavigationProvider'; // sesuaikan path
 
@@ -15,6 +15,10 @@ import Survey from './pages/Survey';
 import SurveyDetails from './pages/SurveyDetails';
 import VoteDetails from './pages/VoteDetails';
 import { AuthProvider } from './components/context/AuthContext';
+import News from './pages/News';
+import NewsDetails from './pages/NewsDetails';
+import Social from './pages/Social';
+import LoginFailed from './pages/LoginFailed';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -23,6 +27,7 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/login-success" element={<ConfirmLogin />} />
+        <Route path="/login-failed" element={<LoginFailed />} />
         <Route path="/" element={<Home />} />
         <Route path="/event" element={<Event />} />
         <Route path="/event/:id" element={<EventDetails />} />
@@ -30,6 +35,9 @@ const AnimatedRoutes = () => {
         <Route path="/survey" element={<Survey />} />
         <Route path="/survey/:id" element={<SurveyDetails />} />
         <Route path="/vote/:id" element={<VoteDetails />} />
+        <Route path="/news" element={<News />} />
+        <Route path="/news/:id" element={<NewsDetails />} />
+        <Route path="/social" element={<Social />} />
       </Routes>
     </AnimatePresence>
   );
@@ -83,11 +91,11 @@ const AppContent = () => {
 };
 
 const AppWrapper = () => (
-  <AuthProvider>
     <ApiProvider>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ApiProvider>
-  </AuthProvider>
 );
 
 export default AppWrapper;

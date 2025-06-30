@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
 use App\Models\Event;
 use App\Models\EventParticipant;
 use App\Models\FormTemplate;
@@ -21,25 +22,52 @@ class EventController extends Controller
 {
 
     protected $today;
+    protected $dateNow;
 
     public function __construct()
     {
         $this->today = Carbon::today();
+        $this->dateNow = Carbon::now();
     }
 
     public function getEvents()
     {
       $payload = JWTAuth::parseToken()->getPayload();
-      $userId = $payload->get('sub');
       $employee_id = $payload->get('employee_id');
 
+      $employee = Employee::select('group_company', 'unit', 'office_area', 'job_level')->where('employee_id', $employee_id)->first();
+
       $events = Event::with(['eventParticipant' => function ($query) use ($employee_id) {
-          $query->where('employee_id', $employee_id);
+        $query->where('employee_id', $employee_id);
       }])
       ->where(function ($query) {
-          $query->whereDate('start_date', '>=', $this->today)
-                ->orWhere('status', '!=', 'Closed');
+        $query->whereRaw("TIMESTAMP(start_date, time_start) <= ?", [$this->dateNow])
+              ->whereRaw("TIMESTAMP(end_date, time_end) >= ?", [$this->dateNow])
+              ->orWhere('status', '!=', 'Closed');;
       })
+      ->where(function ($query) use ($employee) {
+          $query->where(function ($q) use ($employee) {
+              $q->whereNull('businessUnit')
+                ->orWhereJsonLength('businessUnit', 0)
+                ->orWhereJsonContains('businessUnit', $employee->group_company);
+          })
+          ->where(function ($q) use ($employee) {
+              $q->whereNull('unit')
+                ->orWhereJsonLength('unit', 0)
+                ->orWhereJsonContains('unit', $employee->unit);
+          })
+          ->where(function ($q) use ($employee) {
+              $q->whereNull('location')
+                ->orWhereJsonLength('location', 0)
+                ->orWhereJsonContains('location', $employee->office_area);
+          })
+          ->where(function ($q) use ($employee) {
+              $q->whereNull('jobLevel')
+                ->orWhereJsonLength('jobLevel', 0)
+                ->orWhereJsonContains('jobLevel', $employee->job_level);
+          });
+      })
+      ->orderBy('start_date', 'asc')
       ->get();
 
       return response()->json($events);
@@ -251,51 +279,80 @@ class EventController extends Controller
     public function store(Request $request)
     {
       try {
-        // Log untuk memeriksa token dan employee_id
-        $payload = JWTAuth::parseToken()->getPayload();
-        $userId = $payload->get('sub');
-        $employee_id = $payload->get('employee_id');
-        $fullname = $payload->get('fullname');
-        $eventId = Crypt::decryptString($request->eventId);
-        
-        $cekEvent = Event::where(function ($query) {
-          $query->whereDate('start_date', '>=', $this->today)
-                ->orWhere('status', '!=', 'Closed');
-        })->findOrFail($eventId);
-        
-        $formId = $cekEvent->form_id;
+          // Parse JWT payload
+          $payload = JWTAuth::parseToken()->getPayload();
+          $userId = $payload->get('sub');
+          $employee_id = $payload->get('employee_id');
+          $fullname = $payload->get('fullname');
 
-        if ($formId) {
-          $validatedData = $request->validate([
-            'formData' => 'required|array',
-          ]);
-          $formData = json_encode($validatedData['formData']);
-        } else {
-          $formData = json_encode([]);
-        }
+          // Decrypt event ID
+          $eventId = Crypt::decryptString($request->eventId);
 
-        // Create a new event (assuming you have an Event model)
-        $event = new EventParticipant();
-        $event->event_id = $eventId;
-        $event->fullname = $fullname;
-        $event->employee_id = $employee_id;
-        $event->form_id = $formId;
-        $event->form_data = $formData;
-        $event->created_by = $userId;
-      
-        // Save the event to the database
-        $event->save();
-      
-        // Return a success response
-        return response()->json([
-          'success' => true,
-          'message' => 'Event registered successfully',
-        ], 201);
+          $cekUser = Employee::where('employee_id', $employee_id)->first();
+
+          // Validate event: must be active or not closed
+          $cekEvent = Event::where(function ($query) {
+                  $query->whereDate('start_date', '>=', now()->today())
+                        ->orWhere('status', '!=', 'Closed');
+              })
+              ->findOrFail($eventId);
+
+          $formId = $cekEvent->form_id;
+
+          // Handle form data only if form is present
+          if ($formId) {
+              $validatedData = $request->validate([
+                  'formData' => 'required|array',
+                  'personalMobileNumber' => 'required|string',
+              ]);
+
+              $formData = json_encode($validatedData['formData']);
+              $personalMobileNumber = "'" . $validatedData['personalMobileNumber'];
+          } else {
+              $formData = json_encode([]);
+              $personalMobileNumber = '';
+          }
+
+          // Update employee mobile number
+          $employee = Employee::where('employee_id', $employee_id)->first();
+          
+          $employee->whatsapp_number = $personalMobileNumber;
+          $employee->save();
+
+          // Register event participation
+          $eventParticipant = new EventParticipant();
+          $eventParticipant->event_id = $eventId;
+          $eventParticipant->fullname = $fullname;
+          $eventParticipant->employee_id = $employee_id;
+          $eventParticipant->form_id = $formId;
+          $eventParticipant->form_data = $formData;
+          $eventParticipant->job_level = $cekUser->job_level;
+          $eventParticipant->unit = $cekUser->unit;
+          $eventParticipant->business_unit = $cekUser->group_company;
+          $eventParticipant->location = $cekUser->office_area;
+          $eventParticipant->created_by = $userId;
+          $eventParticipant->save();
+
+          // Success response
+          return response()->json([
+              'success' => true,
+              'message' => 'Event registered successfully.',
+          ], 201);
+
+      } catch (ValidationException $e) {
+          return response()->json([
+              'success' => false,
+              'message' => 'Validation failed.',
+              'errors' => $e->validator->errors(),
+          ], 422);
       } catch (\Exception $e) {
-          Log::error('Error submit event: ' . $e->getMessage());
-          return response()->json(['error' => 'Something went wrong', 'message' => $e->getMessage()], 500);
+          Log::error('Error submitting event: ' . $e->getMessage());
+          return response()->json([
+              'success' => false,
+              'message' => 'Something went wrong.',
+              'error' => $e->getMessage(),
+          ], 500);
       }
-
     }
 
     public function checkRegistration($id)

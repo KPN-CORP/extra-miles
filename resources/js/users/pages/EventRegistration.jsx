@@ -2,13 +2,12 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useApiUrl } from '../components/Context/ApiContext';
-import { SyncLoader } from 'react-spinners';
+import { useApiUrl } from '../components/context/ApiContext';
 import EventForm from '../components/Forms/EventForm';
 import { useAuth } from '../components/context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
-import PageLoader from '../components/Loader/PageLoader';
 import { getImageUrl } from '../components/Helper/imagePath';
+import EventLoader from '../components/Loader/EventLoader';
 
 
 export default function EventDetails() {
@@ -17,7 +16,7 @@ export default function EventDetails() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [hasRegistered, setHasRegistered] = useState(false);
   
   useEffect(() => {
@@ -68,7 +67,7 @@ export default function EventDetails() {
   }, [id, apiUrl, token, navigate]);
 
   if (loading) {
-    return <PageLoader />;
+    return <EventLoader />;
   }
   
   if (!event) {
@@ -109,7 +108,7 @@ export default function EventDetails() {
             <div className="flex-2 text-center text-red-700 text-lg font-bold">Registration Form</div>
             <div className="flex-1" /> {/* Spacer to balance layout */}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <img className="w-full object-cover rounded-lg" src={getImageUrl(apiUrl, event.image)} />
             <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
                 <div className="self-stretch justify-start text-red-700 text-lg font-semibold">{event.title}</div>
@@ -140,6 +139,27 @@ export default function EventDetails() {
                     </div>
                   </div>
                 </div>
+            </div>
+            <div className="w-full mb-4">
+              <div className="flex flex-col gap-3 text-stone-700">
+                {/* Name */}
+                <div className="grid grid-cols-5 gap-2 items-center">
+                  <p className="font-semibold col-span-1">Name</p>
+                  <p className="col-span-4">{user?.fullname || '-'}</p>
+                </div>
+
+                {/* ID */}
+                <div className="grid grid-cols-5 gap-2 items-center">
+                  <p className="font-semibold col-span-1">ID</p>
+                  <p className="col-span-4">{user?.employee_id || '-'}</p>
+                </div>
+
+                {/* Email */}
+                <div className="grid grid-cols-5 gap-2 items-center">
+                  <p className="font-semibold col-span-1">Email</p>
+                  <p className="col-span-4">{user?.email || '-'}</p>
+                </div>
+              </div>
             </div>
             <div>
               {/* Form */}

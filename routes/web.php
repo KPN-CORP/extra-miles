@@ -58,6 +58,11 @@ Route::prefix('admin')->group(function () {
         
         // News
         Route::get('/news', [NewsController::class, 'index'])->name('admin.news.index');
+        Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
+        Route::post('/news/store', [NewsController::class, 'store'])->name('news.store');
+        Route::get('/news/edit/{id}', [NewsController::class, 'edit'])->name('news.edit');
+        Route::put('/news/{id}', [NewsController::class, 'update'])->name('news.update');
+        Route::delete('/news/{id}/archive', [NewsController::class, 'archive'])->name('news.archive');
 
         // Event
         Route::get('/events', [EventController::class, 'index'])->name('admin.events.index');
