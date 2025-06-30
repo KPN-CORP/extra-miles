@@ -73,7 +73,6 @@
                         <div class="tab-content" id="participantTabContent">
                             {{-- =============================== Detail tabel request =============================== --}}
                             <div class="tab-pane fade show active" id="request" role="tabpanel">
-                                {{-- <p class="text-muted fs-14">Snow is a clean, flat toolbar theme.</p> --}}
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="card-title">
                                         Participants Approved: 
@@ -99,73 +98,82 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-sm" id="scheduleTable" width="100%"
-                                        cellspacing="0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Participant</th>
-                                                <th>Business Unit</th>
-                                                <th>Job Level</th>
-                                                <th>Location</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($participants as $index => $p)
+                                <form action="{{ route('participants.bulkApprove') }}" method="POST" id="bulkApproveForm">
+                                    @csrf
+                                    <!-- alert + tombol approve tetap di sini -->
+                                    <div class="alert alert-secondary mt-3 d-flex justify-content-between align-items-center" role="alert">
+                                        <div>
+                                            <input type="checkbox" class="form-check-input me-1" id="selectAll">
+                                            <label for="selectAll" class="form-check-label">Select All Participants</label>
+                                        </div>
+                                        <button type="submit" id="approveSelectedBtn" class="btn btn-success btn-sm" disabled>
+                                            Approve Selected (0)
+                                        </button>
+                                    </div>
+                                
+                                    <!-- tabel -->
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-sm" id="scheduleTable" width="100%" cellspacing="0">
+                                            <thead class="table-light">
                                                 <tr>
-                                                    <td>{{ $index + 1 }}</td>
-                                                    <td>{{ $p->fullname }}</td>
-                                                    <td>{{ $p->business_unit }}</td>
-                                                    <td>{{ $p->job_level }}</td>
-                                                    <td>{{ $p->location }}</td>
-                                                    <td>
-                                                        <span class="badge 
-                                                            @if($p->status === 'Canceled')
-                                                                bg-dark
-                                                            @elseif($p->status === 'Registered')
-                                                                bg-success
-                                                            @elseif($p->status === 'Confirmation')
-                                                                bg-warning
-                                                            @else
-                                                                bg-danger
+                                                    <th>No</th>
+                                                    <th></th>
+                                                    <th>Participant</th>
+                                                    <th>Business Unit</th>
+                                                    <th>Job Level</th>
+                                                    <th>Location</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($participants as $index => $p)
+                                                    <tr>
+                                                        <td>{{ $index + 1 }}</td>
+                                                        <td>
+                                                            @if ($p->status == 'Waiting List')
+                                                                <input type="checkbox" class="form-check-input row-checkbox" name="selected_ids[]" value="{{ $p->id }}">
                                                             @endif
-                                                        ">{{ $p->status }}</span>
-                                                    </td>
-                                                    <td>
-                                                        @if ($p->status == 'Waiting List')
-                                                            <form action="{{ route('participants.approve', $p->id) }}"
-                                                                method="POST" class="d-inline">
-                                                                @csrf
-                                                                {{-- <button type="submit"
-                                                                    class="btn btn-outline-success btn-sm">Approve</button> --}}
-                                                                <button type="submit"
+                                                        </td>
+                                                        <td>{{ $p->fullname }}</td>
+                                                        <td>{{ $p->business_unit }}</td>
+                                                        <td>{{ $p->job_level }}</td>
+                                                        <td>{{ $p->location }}</td>
+                                                        <td>
+                                                            <span class="badge 
+                                                                @if($p->status === 'Canceled') bg-dark
+                                                                @elseif($p->status === 'Registered') bg-success
+                                                                @elseif($p->status === 'Confirmation') bg-warning
+                                                                @else bg-danger
+                                                                @endif
+                                                            ">{{ $p->status }}</span>
+                                                        </td>
+                                                        <td>
+                                                            @if ($p->status == 'Waiting List')
+                                                                {{-- <form action="{{ route('participants.approve', $p->id) }}" method="POST" class="d-inline">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                            class="btn btn-sm {{ $countApproved >= $event->quota ? 'btn-secondary' : 'btn-outline-success' }}"
+                                                                            {{ $countApproved >= $event->quota ? 'disabled' : '' }}
+                                                                            title="{{ $countApproved >= $event->quota ? 'Full Quota' : 'Approve participant' }}">
+                                                                        Approve
+                                                                    </button>
+                                                                </form> --}}
+                                                                <button type="button"
+                                                                    onclick="submitApproveParticipant('{{ route('participants.approve', $p->id) }}')"
                                                                     class="btn btn-sm {{ $countApproved >= $event->quota ? 'btn-secondary' : 'btn-outline-success' }}"
                                                                     {{ $countApproved >= $event->quota ? 'disabled' : '' }}
                                                                     title="{{ $countApproved >= $event->quota ? 'Full Quota' : 'Approve participant' }}">
                                                                     Approve
                                                                 </button>
-                                                            </form>
-                                                            {{-- <form action="{{ route('participants.reject', $p->id) }}"
-                                                                method="POST" class="d-inline">
-                                                                @csrf
-                                                                <button type="submit"
-                                                                    class="btn btn-outline-danger btn-sm">Reject</button>
-                                                            </form> --}}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                    {{-- <div class="mt-3">
-                                    {{ $participants->links() }}
-                                </div> --}}
-                                </div>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </form>
                             </div>
 
                             {{-- =============================== Detail tabel approved =============================== --}}
@@ -280,15 +288,9 @@
                                                     </div>
                                                 </div>
                                             @empty
-                                                {{-- <tr>
-                                            <td colspan="7" class="text-center">No data found.</td> --}}
-                                                {{-- </tr> --}}
                                             @endforelse
                                         </tbody>
                                     </table>
-                                    {{-- <div class="mt-3">
-                                    {{ $approveparticipants->links() }}
-                                </div> --}}
                                 </div>
                             </div>
 
@@ -334,18 +336,11 @@
                                                     <td>{{ $p->attending_at }}</td>
                                                 </tr>
                                             @empty
-                                                {{-- <tr>
-                                            <td colspan="7" class="text-center">No data found.</td> --}}
-                                                {{-- </tr> --}}
                                             @endforelse
                                         </tbody>
                                     </table>
-                                    {{-- <div class="mt-3">
-                                    {{ $waitinglists->links() }}
-                                </div> --}}
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>

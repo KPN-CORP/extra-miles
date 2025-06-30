@@ -108,4 +108,40 @@ class EventParticipantController extends Controller
     {
         return Excel::download(new ParticipantsExport($event_id), 'participants_event_'.$event_id.'.xlsx');
     }
+    
+    public function bulkApprove(Request $request)
+    {
+        $participantIds = $request->input('selected_ids', []);
+
+        if (empty($participantIds)) {
+            return back()->with('error', 'No participants selected.');
+        }
+
+        // Ambil peserta pertama untuk dapatkan event_id
+        $firstParticipant = EventParticipant::findOrFail($participantIds[0]);
+        $event = Event::findOrFail($firstParticipant->event_id);
+
+        // Hitung jumlah yang sudah di-approve
+        $approvedCount = EventParticipant::where('event_id', $event->id)
+                        ->whereIn('status', ['Registered', 'Confirmation'])
+                        ->count();
+
+        $quota = $event->quota;
+        $availableSlots = $quota - $approvedCount;
+
+        if ($availableSlots <= 0) {
+            $encryptedId = Crypt::encryptString($event->id);
+            return redirect()->route('events.participants', $encryptedId)->with('error', 'Full Quota.');
+        }
+
+        // Ambil ID yang masih bisa di-approve sesuai slot
+        $toApprove = array_slice($participantIds, 0, $availableSlots);
+
+        EventParticipant::whereIn('id', $toApprove)
+            ->update(['status' => 'Confirmation']);
+
+        $encryptedId = Crypt::encryptString($event->id);
+        return redirect()->route('events.participants', $encryptedId)
+            ->with('success', count($toApprove) . ' participants approved.');
+    }
 }

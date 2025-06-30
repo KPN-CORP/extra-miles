@@ -557,4 +557,91 @@
             formSelect.dispatchEvent(new Event('change'));
         }
     });
+
+    const eventSelectAllCheckbox = document.getElementById('selectAll');
+    const eventRowCheckboxes = document.querySelectorAll('.row-checkbox');
+    const eventApproveSelectedBtn = document.getElementById('approveSelectedBtn');
+    const eventQuotaMax = {{ isset($event) ? $event->quota : 0 }};
+    const eventApprovedCount = {{ isset($countApproved) ? $countApproved : 0 }};
+    const eventRemainingQuota = eventQuotaMax - eventApprovedCount;
+
+    function updateEventApproveButton() {
+        const selectedCount = document.querySelectorAll('.row-checkbox:checked').length;
+        eventApproveSelectedBtn.textContent = `Approve Selected (${selectedCount})`;
+        eventApproveSelectedBtn.disabled = selectedCount === 0;
+    }
+
+    if (eventSelectAllCheckbox) {
+        eventSelectAllCheckbox.addEventListener('change', function () {
+            eventRowCheckboxes.forEach(cb => {
+                cb.checked = this.checked;
+            });
+            updateEventApproveButton();
+        });
+    }
+
+    eventRowCheckboxes.forEach(cb => {
+        cb.addEventListener('change', function () {
+            if (!this.checked) {
+                eventSelectAllCheckbox.checked = false;
+            }
+            updateEventApproveButton();
+        });
+    });
+
+    // Tombol Approve Selected
+    eventApproveSelectedBtn.addEventListener('click', function (e) {
+        const selectedCount = document.querySelectorAll('.row-checkbox:checked').length;
+
+        if (selectedCount > eventRemainingQuota) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Quota Exceeded',
+                html: `Kuota tersisa hanya <b>${eventRemainingQuota}</b> peserta.<br>
+                       Kamu memilih <b>${selectedCount}</b> peserta.`,
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        // Jika valid: lanjutkan
+        // Contoh (ganti sesuai kebutuhan):
+        // Swal.fire({
+        //     icon: 'success',
+        //     title: 'Valid!',
+        //     text: 'Peserta dapat diproses.',
+        //     showConfirmButton: false,
+        //     timer: 1500
+        // });
+
+        // TODO: submit form atau trigger aksi lainnya
+    });
+
+    function submitApproveParticipant(actionUrl) {
+        Swal.fire({
+            title: 'Approve This Participant?',
+            text: "The participant will be moved to the 'Confirmation' status.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Approve'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = actionUrl;
+
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = '{{ csrf_token() }}';
+
+                form.appendChild(csrf);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
 </script>
