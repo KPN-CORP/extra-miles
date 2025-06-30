@@ -78,6 +78,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/participants/{id}/reject', [EventParticipantController::class, 'reject'])->name('participants.reject');
         Route::get('/ticket/qr-png/{encryptedId}', [EventController::class, 'showQRPNG'])->name('event.qrpng');
         Route::get('/participants/export/{event_id}', [EventParticipantController::class, 'export'])->name('participants.export');
+        Route::post('/participants/bulk-approve', [EventParticipantController::class, 'bulkApprove'])->name('participants.bulkApprove');
 
         // Survey
         Route::get('/survey', [SurveyController::class, 'index'])->name('admin.survey.index');
