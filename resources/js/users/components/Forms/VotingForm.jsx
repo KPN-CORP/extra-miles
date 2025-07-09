@@ -70,6 +70,7 @@ export default function VotingForm({ participated, eventEnded }) {
     const [voteResults, setVoteResults] = useState([]);
 
     const getVotePercentage = (option) => {
+      
       if (!voteResults || voteResults.length === 0) return 0;
     
       const result = voteResults; // Gunakan data survei pertama (atau satu-satunya)
@@ -183,7 +184,7 @@ export default function VotingForm({ participated, eventEnded }) {
             : 'Please try again later.',
           timer: 2500,
           showConfirmButton: false,
-        }).then(() => navigate(`/survey`, { replace: true }));
+        }).then(() => navigate(`/`, { replace: true }));
       } catch (error) {
         console.error('Submission error:', error);
       } finally {
@@ -257,7 +258,7 @@ export default function VotingForm({ participated, eventEnded }) {
                     </label>
                     <div className="w-full p-3 bg-red-700 rounded-xl border border-white inline-flex flex-col justify-center items-center gap-4 mb-4">
                       <div className="self-stretch flex flex-col justify-start items-start gap-5">
-                        {field.options.map((option, index) => (
+                        {field.options.map((option, index) => (                          
                           <div
                             key={index}
                             className="w-full p-4 bg-white rounded-xl ring-1 ring-inset ring-red-700 shadow-lg flex items-center gap-3 overflow-hidden"

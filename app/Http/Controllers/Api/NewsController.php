@@ -29,7 +29,7 @@ class NewsController extends Controller
             $employee_id = $payload->get('employee_id');
             Log::info('Token payload employee_id: ' . $employee_id);
 
-            $news = News::all();
+            $news = News::orderBy('publish_date', 'desc')->get();
 
             if (!$news) {
                 return response()->json(['error' => 'News not found'], 404);

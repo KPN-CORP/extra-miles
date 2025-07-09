@@ -146,6 +146,20 @@ export default function VoteList() {
                             <YouTubePlayer videoId={data.content_link} />
                         </>
                         )}
+                        {data.other_link && (
+                        <>
+                            <div className="mb-2">
+                            <a
+                                href={data.other_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-white underline font-medium text-sm"
+                            >
+                                📎 Click here for more information
+                            </a>
+                            </div>
+                        </>
+                        )}
                     </div>
                     )}
 

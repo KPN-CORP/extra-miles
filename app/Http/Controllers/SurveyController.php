@@ -162,6 +162,7 @@ class SurveyController extends Controller
             'location'         => $request->location ? json_encode($request->location) : null,
             'created_by'       => Auth::id(),
             'content_link'     => $request->content_link,
+            'other_link'     => $request->other_link,
         ]);
 
         return redirect()->route('admin.survey.index')->with('success', 'Survey has been created successfully.');
@@ -263,6 +264,7 @@ class SurveyController extends Controller
         $survey->jobLevel         = $request->job_level ? json_encode($request->job_level) : null;
         $survey->location         = $request->location ? json_encode($request->location) : null;
         $survey->content_link     = $request->content_link;
+        $survey->other_link       = $request->other_link;
 
         // Upload banner jika ada
         if ($request->hasFile('banner')) {
