@@ -147,6 +147,7 @@ class NewsController extends Controller
         $news->category     = $request->category;
         $news->title        = $request->title;
         $news->publish_date  = $publishDate;
+        $news->content      = $request->content;
         $news->status       = $request->action === 'draft' ? 'Draft' : 'Publish';
         $news->hashtag      = $request->hashtag;
         $news->businessUnit = $request->business_unit ? json_encode($request->business_unit) : null;

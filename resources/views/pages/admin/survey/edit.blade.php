@@ -86,6 +86,11 @@
                         <input type="text" name="content_link" id="content_link" class="form-control" placeholder="input youtube video ID..." value="{{ $survey->content_link }}">
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <label for="other_link" class="form-label">Other link</label>
+                        <input type="text" name="other_link" id="other_link" class="form-control" placeholder="input link url..." value="{{ $survey->other_link }}">
+                    </div>
+                </div>
             </div>
         </div>
         {{-- Filter --}}
