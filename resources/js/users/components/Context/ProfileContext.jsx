@@ -30,7 +30,9 @@ export const ProfileProvider = ({ children }) => {
         timer: 2500,
         showConfirmButton: false,
       }).then(() => {
-        window.location.href = 'https://kpncorporation.darwinbox.com/';
+        // window.location.href = 'https://kpncorporation.darwinbox.com/';
+        window.history.back();
+
       });
     } finally {
       setLoading(false);
