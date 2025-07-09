@@ -62,7 +62,8 @@ class TokenCheckMiddleware
                 Alert::success('Your session has expired. Please login again.')->showConfirmButton('OK');
                 Auth::logout();
                 // return redirect('/');
-                return redirect('https://kpncorporation.darwinbox.com/');
+                // return redirect('https://kpncorporation.darwinbox.com/');
+                return redirect()->back();
                 //return redirect('/login')->with('error', 'Your session has expired. Please login again.');
 
                 // $user = Auth::user();
