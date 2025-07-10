@@ -28,9 +28,11 @@ const Home = () => {
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => {
-                // window.location.href = "https://kpncorporation.darwinbox.com/";
+                if (document.referrer) {
                 window.history.back();
-
+                } else {
+                window.location.href = 'https://kpncorporation.darwinbox.com/';
+                }
             });
             return;
         } else {

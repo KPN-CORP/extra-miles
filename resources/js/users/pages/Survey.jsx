@@ -254,10 +254,10 @@ export default function Survey() {
                         No Survey / Vote available.
                     </div>
                     ) : (
-                        mergedData.map((data, index) => {    
+                        mergedData.map((data, index) => {                                
                             const { daysUntil } = dateTimeHelper(data);  
                             const participated = Array.isArray(data.survey_participant) && data.survey_participant.length > 0;
-                            
+                                                        
                             return (
                                 <div onClick={() => navigate(`/${data.category}/${data.encrypted_id}`, {
                                     state: { participated }

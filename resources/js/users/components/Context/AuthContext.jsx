@@ -43,8 +43,11 @@ export const AuthProvider = ({ children }) => {
         timer: 2500,
         showConfirmButton: false,
       }).then(() => {
-        // window.location.href = 'https://kpncorporation.darwinbox.com/';
-        window.history.back();
+        if (document.referrer) {
+          window.history.back();
+        } else {
+          window.location.href = 'https://kpncorporation.darwinbox.com/';
+        }
 
       });
     }

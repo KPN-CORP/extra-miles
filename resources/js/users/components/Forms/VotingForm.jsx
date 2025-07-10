@@ -58,7 +58,7 @@ export function generateValidationSchema(fields) {
     return Yup.object().shape(shape);
 }
 
-export default function VotingForm({ participated, eventEnded }) {  
+export default function VotingForm({ participated, setParticipated, eventEnded }) {  
     const [formFields, setFormFields] = useState([]);
     const [initialValues, setInitialValues] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -68,6 +68,8 @@ export default function VotingForm({ participated, eventEnded }) {
     const { token } = useAuth();
     const navigate = useNavigate();
     const [voteResults, setVoteResults] = useState([]);
+    
+    const [hasParticipated, setHasParticipated] = useState(participated); // inisialisasi dari props jika perlu    
 
     const getVotePercentage = (option) => {
       
@@ -184,13 +186,28 @@ export default function VotingForm({ participated, eventEnded }) {
             : 'Please try again later.',
           timer: 2500,
           showConfirmButton: false,
-        }).then(() => navigate(`/`, { replace: true }));
+        });
+        if (success) {
+          setHasParticipated(true);
+          setParticipated(true);    // update parent VoteList
+          localStorage.setItem(`voted-${id}`, 'true');
+          const res = await axios.get(`${apiUrl}/api/voting-result/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setVoteResults(res.data); // Update hasil vote terbaru
+        }
       } catch (error) {
         console.error('Submission error:', error);
       } finally {
         setSubmitting(false);
       }
     };    
+
+    
+    useEffect(() => {
+      setHasParticipated(hasParticipated);
+    }, [hasParticipated]);
+    
   
     if (loading) {
       return <PulseLoader className='w-full justify-center text-center' margin={2} size={8} color="#FFF" speedMultiplier={0.75} />;
@@ -223,7 +240,7 @@ export default function VotingForm({ participated, eventEnded }) {
             >
               {formFields.map((field, index) => (
                 <div key={index}>
-                  {field.type === 'checkbox' && field.options && !participated ? (
+                  {field.type === 'checkbox' && field.options && !hasParticipated ? (
                     <div key={field.name} className="w-full px-5 py-4 bg-stone-50 rounded-xl mb-4">
                       <label className="block text-gray-700 mb-2" htmlFor={field.name}>{field.label}</label>
                       <div className="flex flex-col gap-2">
@@ -236,7 +253,7 @@ export default function VotingForm({ participated, eventEnded }) {
                       </div>
                       <ErrorMessage name={field.name} component="div" className="text-red-700 text-sm mt-1" />
                     </div>
-                  ) : field.type === 'textarea' && !participated ? (
+                  ) : field.type === 'textarea' && !hasParticipated ? (
                     <div key={field.name} className="w-full px-5 py-4 bg-stone-50 rounded-xl mb-4">
                       <label className="block text-gray-700 mb-2" htmlFor={field.name}>{field.label}</label>
                       <Field 
@@ -272,9 +289,9 @@ export default function VotingForm({ participated, eventEnded }) {
                               <div className="text-stone-600 text-sm font-semibold">
                                 {option}
                               </div>
-                              {participated && <VoteProgressBar percentage={getVotePercentage(option)} />}
+                              { hasParticipated && <VoteProgressBar percentage={getVotePercentage(option)} />}
                             </div>
-                            {!participated && 
+                            { !hasParticipated &&
                               <label className="inline-flex items-center cursor-pointer">
                                 <Field
                                   type="radio"
@@ -301,12 +318,12 @@ export default function VotingForm({ participated, eventEnded }) {
                       )}
                     />
                     </>
-                  ) : field.type === 'rating' && !participated ? (
+                  ) : field.type === 'rating' && !hasParticipated ? (
                       <StarRatingField name={field.name} label={field.label} />
                   ) : null}
                 </div>
               ))}
-              {!participated && 
+              {!hasParticipated &&
                 <button type="submit" disabled={isSubmitting} className="w-full px-5 py-2.5 rounded-lg shadow-md text-sm font-semibold text-red-700" style={{ backgroundColor: '#DEBD69' }}>
                   Submit
                 </button>

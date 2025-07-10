@@ -33,8 +33,10 @@ export default function VoteList() {
     const { token } = useAuth(); 
     const [animatedWidth, setAnimatedWidth] = useState("0%");
     const [loadingBanner, setLoadingBanner] = useState(true);
-    const location = useLocation();
-    const participated = location.state?.participated ?? false;
+    const location = useLocation();    
+    const participate = location.state?.participated ?? false;
+    const [participated, setParticipated] = useState(participate);
+    
     const [eventEnded, setEventEnded] = useState(false);
 
     useEffect(() => {
@@ -54,8 +56,11 @@ export default function VoteList() {
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
-                    // window.location.href = "https://kpncorporation.darwinbox.com/";
+                    if (document.referrer) {
                     window.history.back();
+                    } else {
+                    window.location.href = 'https://kpncorporation.darwinbox.com/';
+                    }
 
                 });
             } finally {
@@ -65,8 +70,11 @@ export default function VoteList() {
         if(token) {
             fetchEvent();
         }
-    }, [token]);
-    
+
+        const localStatus = localStorage.getItem(`voted-${id}`) ?? participate;
+        setParticipated(localStatus);
+    }, [token, id]);
+
     if (loading) {
         return (
             <div className="w-full h-screen relative bg-red-700 overflow-auto min-h-screen">
@@ -167,7 +175,7 @@ export default function VoteList() {
 
                     <div>
                         {/* Form */}
-                        {!eventEnded ? <VotingForm participated={participated} eventEnded={eventEnded} /> 
+                        {!eventEnded ? <VotingForm participated={participated} setParticipated={setParticipated} eventEnded={eventEnded} /> 
                         : (
                             <div className="flex flex-col items-center justify-center">
                                 <button
