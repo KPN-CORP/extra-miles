@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { useApiUrl } from "../context/ApiContext";
 import { showAlert } from "../Helper/alertHelper";
 import { useNavigate } from "react-router-dom";
@@ -19,11 +19,40 @@ const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
   const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());  
   const eventDay =  eventDateOnly <= todayOnly;  
 
+  const bounds = location.state?.bounds;
+
+
+  useEffect(() => {
+          if (bounds) {
+              const scaleX = bounds.width / window.innerWidth;
+              const scaleY = bounds.height / window.innerHeight;
+              const offsetX = bounds.left + bounds.width / 2 - window.innerWidth / 2;
+              const offsetY = bounds.top + bounds.height / 2 - window.innerHeight / 2;
+        
+              setInitialStyle({
+                scaleX,
+                scaleY,
+                offsetX,
+                offsetY,
+                borderRadius: 16,
+              });
+            }
+  }, [bounds]);
+
   return (
     <div className="w-full h-14 p-3 bg-white rounded-lg flex items-center gap-1">
       <div
         className="flex-1 flex flex-col gap-1 overflow-hidden"
-        onClick={() => navigate(`/event/${event.encrypted_id}`)}
+        onClick={() => navigate(`/event/${event.encrypted_id}`, {
+          state: {
+            bounds: {
+              width: bounds?.width ?? null,
+              height: bounds?.height ?? null,
+              top: bounds?.top ?? null,
+              left: bounds?.left ?? null
+            }
+          }
+        })}
       >
         <div className="flex items-center gap-1">
           <img
