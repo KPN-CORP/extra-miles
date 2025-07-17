@@ -15,7 +15,7 @@ class ModelHasRole extends Model
         'model_id',
     ];
     
-    protected $connection = 'kpncorp';
+    // protected $connection = 'kpncorp';
     protected $table = 'model_has_roles';
 
     public function role()

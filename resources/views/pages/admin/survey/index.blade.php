@@ -129,7 +129,9 @@
                                                     <a href="{{ route('survey.edit', $survey->id) }}" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
                                                 @endif
                                                 @if($survey->status != 'Draft' && $survey->category === 'survey')
-                                                    <a href="{{ route('survey.participants', \Illuminate\Support\Facades\Crypt::encryptString($survey->id)) }}" class="btn btn-outline-info btn-sm"><i class="ri-eye-line"></i></a>
+                                                    @can('viewdetailsurvey')
+                                                        <a href="{{ route('survey.participants', \Illuminate\Support\Facades\Crypt::encryptString($survey->id)) }}" class="btn btn-outline-info btn-sm"><i class="ri-eye-line"></i></a>
+                                                    @endcan
                                                 @elseif($survey->status != 'Draft' && $survey->category === 'vote')
                                                     <a href="{{ route('vote.participants', \Illuminate\Support\Facades\Crypt::encryptString($survey->id)) }}" class="btn btn-outline-info btn-sm"><i class="ri-eye-line"></i></a>
                                                 @endif
@@ -205,7 +207,9 @@
                                                     <a href="{{ route('survey.edit', $survey->id) }}" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
                                                 @endif
                                                 @if($survey->status != 'Draft' && $survey->category === 'survey')
-                                                    <a href="{{ route('survey.participants', \Illuminate\Support\Facades\Crypt::encryptString($survey->id)) }}" class="btn btn-outline-info btn-sm"><i class="ri-eye-line"></i></a>
+                                                    @can('viewdetailsurvey')
+                                                        <a href="{{ route('survey.participants', \Illuminate\Support\Facades\Crypt::encryptString($survey->id)) }}" class="btn btn-outline-info btn-sm"><i class="ri-eye-line"></i></a>
+                                                    @endcan
                                                 @elseif($survey->status != 'Draft' && $survey->category === 'vote')
                                                     <a href="{{ route('vote.participants', \Illuminate\Support\Facades\Crypt::encryptString($survey->id)) }}" class="btn btn-outline-info btn-sm"><i class="ri-eye-line"></i></a>
                                                 @endif

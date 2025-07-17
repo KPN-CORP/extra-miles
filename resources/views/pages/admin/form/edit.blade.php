@@ -35,7 +35,7 @@
             @foreach($formSchema['fields'] as $index => $field)
                 @if (!str_contains($field['name'], 'reason'))
                     <div class="card bg-light shadow mb-4 border-0 position-relative form-row-item">
-                        <button type="button" class="btn btn-danger btn-sm remove-row position-absolute" style="top: 10px; right: 10px; {{ $loop->first ? 'display:none;' : '' }}">{{ $index }} X</button>
+                        <button type="button" class="btn btn-danger btn-sm remove-row position-absolute" style="top: 10px; right: 10px; {{ $loop->first ? 'display:none;' : '' }}">X</button>
 
                         <div class="card-body row g-3">
                             <div class="col-md-2">

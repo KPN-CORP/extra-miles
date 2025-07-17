@@ -9,7 +9,7 @@ class Role extends Model
 {
     use HasFactory;
 
-    protected $connection = 'kpncorp';
+    // protected $connection = 'kpncorp';
 
     public function modelHasRole()
     {
