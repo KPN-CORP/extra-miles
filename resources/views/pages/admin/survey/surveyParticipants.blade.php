@@ -35,7 +35,7 @@
                   <option value="Not Yet">Not Yet</option>
               </select>
               <input type="text" id="searchInput" class="form-control" placeholder="Search..." />
-              <a href="{{ route('survey.export', ['survey_id' => $survey->id]) }}" class="btn btn-outline-success" title="Download Report"><i class="ri-file-excel-line"></i></a>
+              <a href="{{ route('survey.export', ['survey_id' => $survey->id]) }}" class="btn btn-outline-success" title="Download Report" style="display: none;"><i class="ri-file-excel-line"></i></a>
           </div>
         </div>
       </div>
