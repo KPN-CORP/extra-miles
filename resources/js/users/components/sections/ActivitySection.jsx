@@ -17,6 +17,7 @@ const ActivitySection = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const { token } = useAuth();
   const navigate = useNavigate();
+  const bounds = location.state?.bounds;
 
   // Fungsi fetch dipisah agar bisa dipanggil ulang
   const fetchEvent = async () => {
@@ -44,12 +45,35 @@ const ActivitySection = () => {
   };
 
   useEffect(() => {
-    fetchEvent();
-  }, []);
+    if (bounds) {
+        const scaleX = bounds.width / window.innerWidth;
+        const scaleY = bounds.height / window.innerHeight;
+        const offsetX = bounds.left + bounds.width / 2 - window.innerWidth / 2;
+        const offsetY = bounds.top + bounds.height / 2 - window.innerHeight / 2;
+  
+        setInitialStyle({
+          scaleX,
+          scaleY,
+          offsetX,
+          offsetY,
+          borderRadius: 16,
+        });
+      }
+      fetchEvent();
+  }, [bounds]);
 
   const handleConfirm = async (event) => {
 
-    navigate(`/event/${event.encrypted_id}`);
+    navigate(`/event/${event.encrypted_id}`, {
+          state: {
+            bounds: {
+              width: bounds?.width ?? null,
+              height: bounds?.height ?? null,
+              top: bounds?.top ?? null,
+              left: bounds?.left ?? null
+            }
+          }
+        });
     
   };
   

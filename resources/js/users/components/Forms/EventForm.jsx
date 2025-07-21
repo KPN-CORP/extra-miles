@@ -129,7 +129,7 @@ export default function EventForm() {
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
-                    navigate(`/event`, { replace: true });
+                    navigate(`/`, { replace: true });
                 });
             } else {
                 showAlert({
@@ -139,7 +139,7 @@ export default function EventForm() {
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
-                    navigate(`/event`, { replace: true });
+                    navigate(`/`, { replace: true });
                 });
             }
         } catch (error) {
