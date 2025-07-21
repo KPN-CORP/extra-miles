@@ -51,6 +51,7 @@ export default function Survey() {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                setLoading(true);
                 const res = await axios.get(`${apiUrl}/api/survey-vote`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -246,14 +247,10 @@ export default function Survey() {
             animate="animate"
             exit="exit"
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="flex-1 w-full bg-red-700 rounded-t-3xl p-5 overflow-auto"
+            className={`flex-1 w-full bg-red-700 rounded-t-3xl p-5 overflow-auto ${loading ? 'hidden' : ''}`}
             >
                 <div className="flex flex-col justify-start items-start gap-3 w-full">
-                {mergedData.length === 0 ? (
-                    <div className="w-full justify-center text-center text-white font-medium py-4">
-                        No Survey / Vote available.
-                    </div>
-                    ) : (
+                    {mergedData && mergedData.length > 0 ? (
                         mergedData.map((data, index) => {                                
                             const { daysUntil } = dateTimeHelper(data);  
                             const participated = Array.isArray(data.survey_participant) && data.survey_participant.length > 0;
@@ -298,6 +295,11 @@ export default function Survey() {
                                 </div>
                             )
                         })
+                        )
+                     : (
+                        <div className="w-full justify-center text-center text-white font-medium py-4">
+                            No Survey / Vote available.
+                        </div>
                     )}
                 </div>
             </motion.div>

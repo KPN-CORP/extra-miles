@@ -4,9 +4,12 @@ import { showAlert } from "../Helper/alertHelper";
 import { useNavigate } from "react-router-dom";
 import { dateTimeHelper } from "../Helper/dateTimeHelper";
 import { getImageUrl } from "../Helper/imagePath";
+import { useLocation } from "react-router-dom";
 
 const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
   const apiUrl = useApiUrl();
+  const location = useLocation();
+
   const { day, month, year, startTime, endTime, isOngoing, totalDay, endDay, endMonth, endYear } = dateTimeHelper(event); 
   
   const date = new Date(event.start_date);
