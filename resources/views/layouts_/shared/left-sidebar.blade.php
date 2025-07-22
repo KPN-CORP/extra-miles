@@ -109,7 +109,7 @@
                 </li>
                 @endcan
 
-                @can('viewsetting')
+                @can('viewsettingem')
                     <li class="side-nav-title">Admin</li>
                     <li class="side-nav-item">
                         <a data-bs-toggle="collapse" href="#sidebarCharts" aria-expanded="false" aria-controls="sidebarCharts" class="side-nav-link">
@@ -119,7 +119,7 @@
                         </a>
                         <div class="collapse" id="sidebarCharts">
                             <ul class="side-nav-second-level">
-                                @can('viewrole')
+                                @can('viewroleem')
                                 <li class="side-nav-item">
                                     <a href="{{ route('roles') }}">Role</a>
                                 </li>

@@ -26,7 +26,7 @@ class SurveyReminderMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reminder: Please complete your Survey/Voting',
+            subject: 'Reminder: Please Complete the Evaluation',
         );
     }
 
