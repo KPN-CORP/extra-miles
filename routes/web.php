@@ -132,7 +132,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/forms/{id}/schema', [FormTemplateController::class, 'getSchema']);
         });
 
-        Route::middleware(['permission:viewrole'])->group(function () {
+        Route::middleware(['permission:viewroleem'])->group(function () {
             // Roles
             Route::get('/roles', [RoleController::class, 'index'])->name('roles');
             Route::post('/roles/submit', [RoleController::class, 'store'])->name('roles.store');
