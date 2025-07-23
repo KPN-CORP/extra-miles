@@ -36,7 +36,24 @@
 
         <!--- Sidemenu -->
         <ul class="side-nav">
+            {{-- @if(auth()->check())
+                <p><strong>User Role(s):</strong> {{ auth()->user()->getRoleNames()->implode(', ') }}</p>
 
+                <p><strong>Permissions from Role(s):</strong></p>
+                <ul>
+                    @php
+                        $permissions = auth()->user()->getPermissionsViaRoles()->pluck('name')->unique();
+                    @endphp
+
+                    @forelse ($permissions as $permission)
+                        <li>{{ $permission }}</li>
+                    @empty
+                        <li>No permissions assigned via roles.</li>
+                    @endforelse
+                </ul>
+                <br>
+                <pre>{{ auth()->user()->getAllPermissions()->pluck('name') }}</pre>
+            @endif --}}
             <li class="side-nav-title">Menu</li>
             <li class="side-nav-item">
                 <a href="{{ url('/admin/dashboard') }}" class="side-nav-link">
