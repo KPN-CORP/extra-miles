@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Models\Role as SpatieRole;
 
-class Role extends Model
+class Role extends SpatieRole
 {
     use HasFactory;
 
@@ -20,8 +20,8 @@ class Role extends Model
         return $this->hasMany(RoleHasPermission::class, 'role_id', 'id');
     }
 
-    public function permissions()
-    {
-        return $this->hasManyThrough(Permission::class, RoleHasPermission::class, 'role_id', 'id', 'id', 'permission_id');
-    }
+    // public function permissions()
+    // {
+    //     return $this->hasManyThrough(Permission::class, RoleHasPermission::class, 'role_id', 'id', 'id', 'permission_id');
+    // }
 }
