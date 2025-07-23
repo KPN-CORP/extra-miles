@@ -23,6 +23,8 @@ class SendSurveyReminderEmails extends Command
         $surveys = Survey::whereDate('start_date', '<', $today)
             ->whereDate('end_date', '>=', $today)
             ->whereNotNull('event_id')
+            ->whereNull('deleted_at')
+            ->where('status', 'Ongoing')
             ->with(['eventParticipant', 'surveyParticipant'])
             ->get();
 
@@ -32,8 +34,8 @@ class SendSurveyReminderEmails extends Command
             $eventParticipants = $survey->eventParticipant;
 
             foreach ($eventParticipants as $participant) {
-                // $employeeEmail = $participant->employee->email ?? null;
-                $employeeEmail = "eriton.dewa@kpn-corp.com";
+                $employeeEmail = $participant->employee->email ?? null;
+                // $employeeEmail = "eriton.dewa@kpn-corp.com";
 
                 if ($employeeEmail && $participant->attending_status === "Attending" && !in_array($participant->employee_id, $filledEmails)) {
 
