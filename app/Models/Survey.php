@@ -29,6 +29,11 @@ class Survey extends Model
         return $this->hasMany(EventParticipant::class, 'event_id', 'event_id');
     }
 
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
     public function getEncryptedIdAttribute()
     {
         return Crypt::encryptString($this->id);

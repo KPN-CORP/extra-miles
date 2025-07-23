@@ -35,7 +35,7 @@ class SendSurveyReminderEmails extends Command
                 // $employeeEmail = $participant->employee->email ?? null;
                 $employeeEmail = "eriton.dewa@kpn-corp.com";
 
-                if ($employeeEmail && !in_array($participant->employee_id, $filledEmails)) {
+                if ($employeeEmail && $participant->attending_status === "Attending" && !in_array($participant->employee_id, $filledEmails)) {
 
                     // Kirim email reminder
                     Mail::to($employeeEmail)->send(new \App\Mail\SurveyReminderMail($survey));
