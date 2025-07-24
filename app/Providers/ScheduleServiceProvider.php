@@ -20,7 +20,7 @@ class ScheduleServiceProvider extends ServiceProvider
      */
     public function boot(Schedule $schedule)
     {
-        // $schedule->command('reminder:survey')->dailyAt('08:00');
-        $schedule->command('reminder:survey')->everyMinute();
+        $schedule->command('reminder:survey')->dailyAt('08:00');
+        // $schedule->command('reminder:survey')->everyMinute();
     }
 }
