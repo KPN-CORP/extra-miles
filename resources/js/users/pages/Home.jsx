@@ -28,7 +28,11 @@ const Home = () => {
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => {
-                window.location.href = "https://kpncorporation.darwinbox.com/";
+                if (document.referrer) {
+                window.history.back();
+                } else {
+                window.location.href = 'https://kpncorporation.darwinbox.com/';
+                }
             });
             return;
         } else {
@@ -52,6 +56,7 @@ const Home = () => {
                     className="w-full h-full object-cover"
                     src={getImageUrl(apiUrl, 'assets/images/Element Extra Mile 1.png')}
                     alt="attribute"
+                    loading="eager" 
                     />
                 </div>
                 <img className={`w-full h-36 left-0 top-0 absolute`} src={getImageUrl(apiUrl, 'assets/images/img-banner.png')} />

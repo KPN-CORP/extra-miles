@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { PulseLoader } from 'react-spinners';
@@ -55,7 +55,7 @@ export function generateValidationSchema(fields) {
     return Yup.object().shape(shape);
 }
 
-export default function SurveyForm() {
+export default function SurveyForm({participated, setParticipated}) {
     const [formFields, setFormFields] = React.useState([]);
     const [initialValues, setInitialValues] = React.useState(null);
     const [loading, setLoading] = React.useState(true);
@@ -63,6 +63,7 @@ export default function SurveyForm() {
     const apiUrl = useApiUrl();
     const { id } = useParams();
     const { token } = useAuth();
+    const [hasParticipated, setHasParticipated] = useState(participated);
     const navigate = useNavigate();
   
     React.useEffect(() => {
@@ -126,7 +127,15 @@ export default function SurveyForm() {
           text: success ? 'Your response has been recorded. Thanks a bunch for joining the survey!' : 'Please try again later.',
           timer: 2500,
           showConfirmButton: false,
-        }).then(() => navigate(`/survey`, { replace: true }));
+        });
+        if (success) {
+          setHasParticipated(true);
+          setParticipated(true);    // update parent VoteList
+          localStorage.setItem(`voted-${id}`, 'true');
+          const res = await axios.get(`${apiUrl}/api/voting-result/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        }
       } catch (error) {
         console.error('Submission error:', error);
       } finally {

@@ -65,6 +65,10 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         // return redirect('/');
-        return redirect('https://kpncorporation.darwinbox.com/');
+        if (url()->previous()) {
+            return redirect()->back();
+        } else {
+            return redirect('https://kpncorporation.darwinbox.com/');
+        }
     }
 }

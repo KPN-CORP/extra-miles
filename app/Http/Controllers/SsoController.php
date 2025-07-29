@@ -68,11 +68,19 @@ class SsoController extends Controller
                 return redirect()->intended($redirectRoute);
             } else {
                 Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-                return redirect('https://kpncorporation.darwinbox.com/');
+                if (url()->previous()) {
+                    return redirect()->back();
+                } else {
+                    return redirect('https://kpncorporation.darwinbox.com/');
+                }
             }
         } else {
             Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-            return redirect('https://kpncorporation.darwinbox.com/');
+            if (url()->previous()) {
+                return redirect()->back();
+            } else {
+                return redirect('https://kpncorporation.darwinbox.com/');
+            }
         }
     }
 

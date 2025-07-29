@@ -15,25 +15,34 @@ import { showAlert } from "../components/Helper/alertHelper";
 import { useAuth } from "../components/context/AuthContext";
 import { getImageUrl } from "../components/Helper/imagePath";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import NewsLoader from "../components/Loader/NewsLoader";
-
-const pageVariants = {
-  initial: { opacity: 0, x: 0 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: 0 },
-};
-
-const modalVariants = {
-    hidden: { y: "-100%", opacity: 0 },
-    visible: { y: "50px", opacity: 1 },
-    exit: { y: "-100%", opacity: 0 },
-};
+import { useNavigationDirection } from "../components/Context/NavigationProvider";
 
 export default function News() {
   const navigate = useNavigate();
   const apiUrl = useApiUrl();
   const { token } = useAuth();
+  const { direction } = useNavigationDirection();  
+  const [skipExit, setSkipExit] = useState(false);
+  
+  const pageVariants = {
+    initial: { opacity: 0, x: direction > 0 ? "100%" : "-100%" },     // Masuk dari kanan
+    animate: { opacity: 1, x: 0 },       // Diam di tengah
+    exit: { opacity: 0, x: direction < 0 ? "100%" : "-100%" },       // Keluar ke kiri
+  };
+  
+  const pageVariants2 = {
+    initial: { opacity: 0, x: 0 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: "100%" },
+  };
+  
+  const modalVariants = {
+      hidden: { y: "-100%", opacity: 0 },
+      visible: { y: "50px", opacity: 1 },
+      exit: { y: "-100%", opacity: 0 },
+  };
 
   const [allNews, setNews] = useState([]);
   const [latestNews, setLatestNews] = useState([]);
@@ -93,7 +102,12 @@ export default function News() {
           timer: 2500,
           showConfirmButton: false,
         }).then(() => {
-          window.location.href = "https://kpncorporation.darwinbox.com/";
+          if (document.referrer) {
+            window.history.back();
+          } else {
+            window.location.href = 'https://kpncorporation.darwinbox.com/';
+          }
+
         });
       } finally {
         setLoading(false);
@@ -132,11 +146,21 @@ export default function News() {
     setLoadedImages((prev) => ({ ...prev, [id]: true }));
   };
 
-  return (
-    <>
-      {loading ? (
+  if (loading) return (
+    <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen">
+      <motion.div
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.3, type: "tween", ease: "easeOut" }}
+      >
         <NewsLoader />
-      ) : (
+      </motion.div>
+    </div>
+  ) 
+
+  return (
         <>
           <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
             {/* Header */}
@@ -153,11 +177,11 @@ export default function News() {
               <div style={{ flexBasis: "40px" }} /> {/* placeholder for symmetry */}
             </div>
             <motion.div
-                variants={pageVariants}
+                variants={pageVariants2}
                 initial="initial"
                 animate="animate"
-                exit="exit"
-                transition={{ duration: 0.3, ease: "easeInOut" }}
+                exit={skipExit ? {opacity: 0, x: 0} : "exit"}
+                transition={{ duration: 0.3, type: "tween", ease: "easeInOut" }}
             >
             {/* Search + Filter button */}
             <div className="w-full p-2 bg-white rounded-lg inline-flex items-center gap-2 overflow-hidden mb-4">
@@ -203,7 +227,10 @@ export default function News() {
                     });
                     return (
                     <SwiperSlide key={item.encrypted_id}>
-                        <div onClick={() => navigate(`/news/${item.encrypted_id}`)} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 aspect-[4/3] relative rounded-lg overflow-hidden">
+                        <div onClick={() => {
+                          setSkipExit(true);
+                          navigate(`/news/${item.encrypted_id}`)
+                        }} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 aspect-[4/3] relative rounded-lg overflow-hidden">
                         {/* Image + loader */}
                         <div className="absolute inset-0 flex items-center justify-center">
                             <img
@@ -294,7 +321,10 @@ export default function News() {
 
                 return (
                   <div
-                    onClick={() => navigate(`/news/${news.encrypted_id}`)}
+                    onClick={() => {
+                      setSkipExit(true);
+                      navigate(`/news/${news.encrypted_id}`)
+                    }}
                     key={news.encrypted_id}
                     className="cursor-pointer"
                   >
@@ -375,7 +405,5 @@ export default function News() {
             </>
           )}
         </>
-      )}
-    </>
   );
 }

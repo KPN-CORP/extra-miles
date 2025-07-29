@@ -12,7 +12,7 @@ import { getImageUrl } from "../components/Helper/imagePath";
 import SurveyForm from '../components/Forms/SurveyForm';
 import BannerLoader from "../components/Loader/BannerLoader";
 import SurveyLoader from "../components/Loader/SurveyLoader";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import CountdownTimer from "../components/Helper/countdownTImer";
 import parse from "html-react-parser";
 
@@ -35,7 +35,9 @@ export default function VoteList() {
     const { id } = useParams();
     const { token } = useAuth(); 
     const location = useLocation();
-    const participated = location.state?.participated ?? false;  
+    const participate = location.state?.participated ?? false;  
+    const [participated, setParticipated] = useState(participate);
+    
     const [eventEnded, setEventEnded] = useState(false);
       
 
@@ -72,7 +74,12 @@ export default function VoteList() {
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
-                    window.location.href = "https://kpncorporation.darwinbox.com/";
+                    if (document.referrer) {
+                    window.history.back();
+                    } else {
+                    window.location.href = 'https://kpncorporation.darwinbox.com/';
+                    }
+
                 });
             } finally {
                 setLoading(false);
@@ -81,7 +88,9 @@ export default function VoteList() {
         if(token) {
             fetchEvent();
         }
-    }, [token]);
+        const localStatus = localStorage.getItem(`voted-${id}`) ?? participate;
+        setParticipated(localStatus);
+    }, [token, id]);
     
     if (loading) {
         return (
@@ -173,7 +182,7 @@ export default function VoteList() {
                         { participated || eventEnded ? (
                             <button onClick={() => window.history.back()} className="w-full flex flex-col text-center text-red-700 font-medium shadow-lg px-3 py-2 rounded-lg" style={{ backgroundColor: '#DEBD69' }}>Go Back</button>
                         ) : (
-                            <SurveyForm />
+                            <SurveyForm participated={participated} setParticipated={setParticipated} />
                         )}
                     </div>
                 </div>
