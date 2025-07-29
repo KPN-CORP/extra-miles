@@ -151,7 +151,7 @@
                         @endphp
                         <option value="" disabled>Please select</option>
                         @foreach($locations as $loc)
-                            <option value="{{ $loc->work_area }}" {{ in_array($loc->work_area, (array) $selectedlocation) ? 'selected' : '' }}>{{ $loc->area." (".$loc->company_name.")" }}</option>
+                            <option value="{{ $loc->office_area }}" {{ in_array($loc->office_area, (array) $selectedlocation) ? 'selected' : '' }}>{{ $loc->office_area." (".$loc->group_company.")" }}</option>
                         @endforeach
                     </select>
                     <small class="text-muted">Blank means it applies to every Location.</small>

@@ -114,7 +114,7 @@
                     <select class="select2 form-control select2-multiple" name="location[]" id="location" data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
                         <option value="" disabled>Please select</option>
                         @foreach($locations as $location)
-                            <option value="{{ $location->work_area }}">{{ $location->area }}</option>
+                            <option value="{{ $location->office_area }}">{{ $location->office_area." (".$location->group_company.")" }}</option>
                         @endforeach
                     </select>
                     <small class="text-muted">Blank means it applies to every Location.</small>
