@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid bg-white py-3 px-3">
-    <form method="POST" action="{{ route('survey.update', $survey->id) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('survey.update', $survey->id) }}" enctype="multipart/form-data" class="needs-validation" novalidate>
         @csrf
         @method('PUT')
 
@@ -12,16 +12,28 @@
             </div>
             <div class="card-body row g-3">
                 <div class="col-md-12">
-                    <label for="form_name" class="form-label">Form Name</label>
-                    <input type="text" class="form-control" value="{{ old('form_name', $survey->title) }}" name="form_name" id="form_name" required>
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" class="form-control" value="{{ old('title', $survey->title) }}" name="title" id="title" required>
+                    @error('title')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                    <div class="invalid-feedback">
+                        This field is mandatory.
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <label for="start_date" class="form-label">Start Date</label>
                     <input type="datetime-local" class="form-control" value="{{ old('start_date', $survey->start_date." ".$survey->time_start) }}" name="start_date" id="start_date" required>
+                    <div class="invalid-feedback">
+                        This field is mandatory.
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <label for="end_date" class="form-label">End Date</label>
                     <input type="datetime-local" class="form-control" value="{{ old('end_date', $survey->end_date." ".$survey->time_end) }}" name="end_date" id="end_date" required>
+                    <div class="invalid-feedback">
+                        This field is mandatory.
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <label for="related" class="form-label">Related to Event</label>
@@ -34,11 +46,14 @@
                 </div>
                 <div class="col-md-12">
                     <label for="description" class="form-label">Description</label>
-                    <textarea name="description" class="form-control" rows="4" style="height:50px" id="description">
+                    <textarea name="description" class="form-control" rows="4" style="height:50px" id="description" required>
                         {{ old('description', $survey->description ?? '') }}
                     </textarea>
+                    <div class="invalid-feedback">
+                        This field is mandatory.
+                    </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <label for="banner" class="form-label">Banner</label>
                     <input type="file" name="banner" id="banner" class="form-control">
                     <small class="text-muted">Maximum file size 2MB</small>
@@ -65,10 +80,15 @@
                     @endif
                 </div>
                 <div class="col-md-6">
-                    <label for="content_link" class="form-label">Link Youtube</label>
+                    <label for="content_link" class="form-label">Youtube Content link</label>
                     <div class="input-group">
                         <span class="input-group-text">https://www.youtube.com/watch?v=</span>
-                        <input type="text" name="content_link" id="content_link" class="form-control" value="{{ old('content_link', $survey->content_link) }}">
+                        <input type="text" name="content_link" id="content_link" class="form-control" placeholder="input youtube video ID..." value="{{ $survey->content_link }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label for="other_link" class="form-label">Other link</label>
+                        <input type="text" name="other_link" id="other_link" class="form-control" placeholder="input link url..." value="{{ $survey->other_link }}">
                     </div>
                 </div>
             </div>
