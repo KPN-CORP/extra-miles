@@ -72,8 +72,9 @@ class SurveyController extends Controller
             ->orderBy('nama_bisnis')
             ->pluck('nama_bisnis');
         
-        $locations = Location::select('company_name', 'area', 'work_area')
-            ->orderBy('area')
+        $locations = Employee::select('group_company', 'office_area')
+            ->groupBy('group_company', 'office_area')
+            ->orderBy('office_area')
             ->get();
 
         $departments = Employee::select('group_company', 'unit', 'office_area')
@@ -199,8 +200,9 @@ class SurveyController extends Controller
             ->orderBy('nama_bisnis')
             ->pluck('nama_bisnis');
         
-        $locations = Location::select('company_name', 'area', 'work_area')
-            ->orderBy('area')
+        $locations = Employee::select('group_company', 'office_area')
+            ->groupBy('group_company', 'office_area')
+            ->orderBy('office_area')
             ->get();
 
         $departments = Employee::select('group_company', 'unit', 'office_area')

@@ -39,7 +39,7 @@
                 </div>
                 <div class="col-md-12">
                     <label for="banner" class="form-label">Event Banner</label>
-                    <input type="file" name="banner" id="banner" class="form-control">
+                    <input type="file" name="banner" id="banner" class="form-control" required>
                     <small class="text-muted">Maximum file size 2MB</small>
                 </div>
             </div>
@@ -101,7 +101,7 @@
                     <select class="select2 form-control select2-multiple" name="location[]" id="location" data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
                         <option value="" disabled>Please select</option>
                         @foreach($locations as $location)
-                            <option value="{{ $location->work_area }}">{{ $location->area }}</option>
+                            <option value="{{ $location->office_area }}">{{ $location->office_area." (".$location->group_company.")" }}</option>
                         @endforeach
                     </select>
                     <small class="text-muted">Blank means it applies to every Location.</small>
