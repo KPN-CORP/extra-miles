@@ -27,6 +27,7 @@ function LoginFailed() {
         if (document.referrer) {
           window.history.back();
         } else {
+          
           window.location.href = 'https://kpncorporation.darwinbox.com/';
         }
 
