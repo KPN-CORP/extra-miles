@@ -305,13 +305,9 @@ class EventController extends Controller
               'personalMobileNumber' => 'required|string',
           ]);
 
-          if ($formId) {
-              $formData = json_encode($validatedData['formData']);
-              $personalMobileNumber = "'" . $validatedData['personalMobileNumber'];
-          } else {
-              $formData = json_encode([]);
-              $personalMobileNumber = "'" . $validatedData['personalMobileNumber'];
-          }
+          // Encode the default object into a JSON string
+          $formData = json_encode($validatedData['formData']);
+          $personalMobileNumber = "'" . $validatedData['personalMobileNumber'];
 
           // Update employee mobile number
           $employee = Employee::where('employee_id', $employee_id)->first();
