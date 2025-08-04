@@ -300,17 +300,17 @@ class EventController extends Controller
           $formId = $cekEvent->form_id;
 
           // Handle form data only if form is present
-          if ($formId) {
-              $validatedData = $request->validate([
-                  'formData' => 'required|array',
-                  'personalMobileNumber' => 'required|string',
-              ]);
+          $validatedData = $request->validate([
+              'formData' => 'required|array',
+              'personalMobileNumber' => 'required|string',
+          ]);
 
+          if ($formId) {
               $formData = json_encode($validatedData['formData']);
               $personalMobileNumber = "'" . $validatedData['personalMobileNumber'];
           } else {
               $formData = json_encode([]);
-              $personalMobileNumber = '';
+              $personalMobileNumber = "'" . $validatedData['personalMobileNumber'];
           }
 
           // Update employee mobile number
