@@ -24,6 +24,7 @@ Route::middleware('auth.token')->group(function () {
     Route::get('/profile', [EmployeeController::class, 'profile']);
     Route::get('/events', [EventController::class, 'getEvents']);
     Route::get('/my-event', [EventController::class, 'myEvents']);
+    Route::get('/get-evo', [EventController::class, 'getEvo']);
     Route::get('/events/{id}', [EventController::class, 'getEventDetails']);
     Route::post('/event-confirmation', [EventController::class, 'eventConfirmation']);
     Route::post('/event-attendance', [EventController::class, 'eventAttendance']);
