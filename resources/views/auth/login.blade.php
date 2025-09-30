@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/ico" href="{{ asset('storage/img/favicon.ico') }}" />
-    <title>Extra Mile</title>
+    <title>News & Events</title>
     <!-- Fonts and icons -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
     <!-- Font Awesome Icons -->
@@ -28,7 +28,7 @@
           <!-- Navbar -->
           <nav class="absolute top-0 left-0 right-0 z-30 flex flex-wrap items-center px-4 py-2 mx-6 my-4 shadow-soft-2xl rounded-blur bg-white/80 backdrop-blur-2xl backdrop-saturate-200 lg:flex-nowrap lg:justify-start">
             <div class="flex items-center lg:justify-between justify-center w-full p-0 pl-6 mx-auto flex-wrap-inherit">
-                    <span class="text-sm overflow-hidden lg-max:max-h-0 basis-full flex lg:basis-auto whitespace-nowrap font-bold text-slate-700" > Extra Mile </span>
+                    <span class="text-sm overflow-hidden lg-max:max-h-0 basis-full flex lg:basis-auto whitespace-nowrap font-bold text-slate-700" > News & Events </span>
                     <div class="py-2.375 mr-4 items-center flex">
                         <img src="{{ asset('storage/img/logos/logokpn.png') }}" alt="" class="h-6">
                     </div>
@@ -102,7 +102,7 @@
               <script>
                 document.write(new Date().getFullYear());
               </script>
-              Extra Mile by HCIS.
+              News & Events by HCIS.
             </p>
           </div>
         </div>

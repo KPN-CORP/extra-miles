@@ -86,6 +86,7 @@
   },
   "resources/js/users/main.jsx": {
     "file": "assets/main-BVYWj_Lv.js",
+
     "name": "main",
     "src": "resources/js/users/main.jsx",
     "isEntry": true,
