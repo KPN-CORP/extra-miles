@@ -170,8 +170,13 @@ class SurveyVoteController extends Controller
 
             foreach ($survey->surveyParticipant as $participant) {
                 $formData = json_decode($participant->form_data, true);
+                $answer = null;
                 if (isset($formData['question_1'])) {
                     $answer = $formData['question_1'];
+                } elseif (isset($formData['confirmation_1'])) {
+                    $answer = $formData['confirmation_1'];
+                }
+                if ($answer !== null) {
                     $voteCounts[$answer] = ($voteCounts[$answer] ?? 0) + 1;
                     $totalVotes++;
                 }

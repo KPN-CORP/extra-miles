@@ -24,7 +24,12 @@ function LoginFailed() {
       if (window.history.length > 1) {
         window.history.back();
       } else {
-        window.location.href = "https://kpncorporation.darwinbox.com/";
+        if (document.referrer) {
+          window.history.back();
+        } else {
+          window.location.href = 'https://kpncorporation.darwinbox.com/';
+        }
+
       }      
     });
   }, [searchParams]);

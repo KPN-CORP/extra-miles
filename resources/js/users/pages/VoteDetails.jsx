@@ -9,7 +9,7 @@ import YouTubePlayer from "../components/Helper/youtubeHelper";
 import { getImageUrl } from "../components/Helper/imagePath";
 import VotingForm from '../components/Forms/VotingForm';
 import BannerLoader from "../components/Loader/BannerLoader";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import SurveyLoader from "../components/Loader/SurveyLoader";
 import CountdownTimer from "../components/Helper/countdownTImer";
 import parse from "html-react-parser";
@@ -33,8 +33,10 @@ export default function VoteList() {
     const { token } = useAuth(); 
     const [animatedWidth, setAnimatedWidth] = useState("0%");
     const [loadingBanner, setLoadingBanner] = useState(true);
-    const location = useLocation();
-    const participated = location.state?.participated ?? false;
+    const location = useLocation();    
+    const participate = location.state?.participated ?? false;
+    const [participated, setParticipated] = useState(participate);
+    
     const [eventEnded, setEventEnded] = useState(false);
 
     useEffect(() => {
@@ -54,7 +56,12 @@ export default function VoteList() {
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
-                    window.location.href = "https://kpncorporation.darwinbox.com/";
+                    if (document.referrer) {
+                    window.history.back();
+                    } else {
+                    window.location.href = 'https://kpncorporation.darwinbox.com/';
+                    }
+
                 });
             } finally {
                 setLoading(false);
@@ -63,8 +70,11 @@ export default function VoteList() {
         if(token) {
             fetchEvent();
         }
-    }, [token]);
-    
+
+        const localStatus = localStorage.getItem(`voted-${id}`) ?? participate;
+        setParticipated(localStatus);
+    }, [token, id]);
+
     if (loading) {
         return (
             <div className="w-full h-screen relative bg-red-700 overflow-auto min-h-screen">
@@ -146,12 +156,26 @@ export default function VoteList() {
                             <YouTubePlayer videoId={data.content_link} />
                         </>
                         )}
+                        {data.other_link && (
+                        <>
+                            <div className="mb-2">
+                            <a
+                                href={data.other_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-white underline font-medium text-sm"
+                            >
+                                📎 Click here for more information
+                            </a>
+                            </div>
+                        </>
+                        )}
                     </div>
                     )}
 
                     <div>
                         {/* Form */}
-                        {!eventEnded ? <VotingForm participated={participated} eventEnded={eventEnded} /> 
+                        {!eventEnded ? <VotingForm participated={participated} setParticipated={setParticipated} eventEnded={eventEnded} /> 
                         : (
                             <div className="flex flex-col items-center justify-center">
                                 <button
