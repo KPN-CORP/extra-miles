@@ -13,8 +13,9 @@
                     <label for="category" class="form-label">Category</label>
                     <select class="form-select" id="category" name="category" required>
                         <option selected disabled>Please select</option>
-                        <option value="Sport">Sport</option>
                         <option value="Event">Event</option>
+                        <option value="Sport">Sport</option>
+                        <option value="Training">Training</option>
                     </select>
                 </div>
                 <div class="col-md-4">

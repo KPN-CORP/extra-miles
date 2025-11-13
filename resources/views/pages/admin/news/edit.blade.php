@@ -50,8 +50,10 @@
                                 <label for="category" class="form-label">Category</label>
                                 <select class="form-select" id="category" name="category" required>
                                     <option value="" selected disabled>Please select</option>
-                                    <option value="Sport" {{ $news->category == 'Sport' ? 'selected' : '' }} >Sport</option>
+                                    <option value="CSR" {{ $news->category == 'CSR' ? 'selected' : '' }}>CSR</option>
                                     <option value="Event" {{ $news->category == 'Event' ? 'selected' : '' }}>Event</option>
+                                    <option value="Sport" {{ $news->category == 'Sport' ? 'selected' : '' }} >Sport</option>
+                                    <option value="Training" {{ $news->category == 'Training' ? 'selected' : '' }} >Training</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     {{ $invalidFeedback }}

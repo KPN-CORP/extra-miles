@@ -12,6 +12,7 @@ use App\Models\Event;
 use App\Models\FormTemplate;
 use App\Models\survey;
 use App\Models\SurveyParticipant;
+use App\Models\ModelHasRole;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt;
@@ -23,6 +24,12 @@ class SurveyController extends Controller
     {
         $parentLink = 'Dashboard';
         $link = 'Survey/Voting';
+
+        $user = Auth::user();
+        $userRoleIds = $user->roles->pluck('id');
+
+        $modelIds = ModelHasRole::whereIn('role_id', $userRoleIds)
+        ->pluck('model_id');
 
         $surveyToUpdate = survey::whereIn('status', ['Ongoing'])->whereNull('deleted_at')->get();
         $now = Carbon::now();
@@ -39,16 +46,19 @@ class SurveyController extends Controller
 
         $surveyList = survey::withCount('surveyParticipant')
         ->whereIn('status', ['Ongoing', 'Draft'])
+        ->whereIn('created_by', $modelIds)
         ->orderBy('created_at', 'desc')
         ->get();
 
         $surveyClosed = survey::withCount('surveyParticipant')
         ->whereIn('status', ['Closed'])
+        ->whereIn('created_by', $modelIds)
         ->orderBy('created_at', 'desc')
         ->get();
 
         $surveyArchive = survey::onlyTrashed()
         ->withCount('surveyParticipant')
+        ->whereIn('created_by', $modelIds)
         ->orderBy('created_at', 'desc')
         ->get();
 
