@@ -94,7 +94,17 @@
                               $label = $field['label'] ?? $field['name'];
                               $answer = $formData[$field['name']] ?? '-';
                           @endphp
-                          <p><strong>{{ $label }}</strong><br>{{ $answer }}</p>
+                          <p><strong>{{ $label }}</strong>
+                            <br>@if (is_array($answer))
+                                <ul>
+                                    @foreach ($answer as $item)
+                                        <li>{{ $item }}</li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                {{ $answer }}
+                            @endif
+                          </p>
                       @endforeach
                   @else
                       <p class="text-muted fst-italic">Belum mengisi form.</p>

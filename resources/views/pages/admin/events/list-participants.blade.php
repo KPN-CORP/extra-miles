@@ -51,6 +51,10 @@
                     <i class="ri-file-excel-2-line"></i> Export Participants
                 </button>
             </form>
+            <button type="button" class="btn btn-primary fs-4 p-1 align-middle" style="line-height: 1.2; height: 30px;"
+                data-bs-toggle="modal" data-bs-target="#addParticipantModal">
+                <i class="ri-user-add-line"></i> Add Participant
+            </button>
         </div>
 
         <!-- Tab Content -->
@@ -347,4 +351,81 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="addParticipantModal" tabindex="-1" aria-labelledby="addParticipantModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <form action="{{ route('participants.store', $event->id) }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                <h5 class="modal-title" id="addParticipantModalLabel">Add Participant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body">
+                <!-- Search Employee -->
+                <div class="col-md-12">
+                    <label for="employeeSearch" class="form-label">Search Employee</label>
+                    <input type="text" class="form-control" id="employeeSearch" placeholder="Type employee name...">
+                    <input type="hidden" name="employee_id" id="employeeId">
+                    <div id="employeeList" class="list-group mt-1" style="max-height: 150px; overflow-y: auto; display: none;"></div>
+                </div>
+
+                <!-- Status Select -->
+                <div class="col-md-12">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="nextstatus" id="nextstatus" class="form-control" required>
+                        <option value="">-- Select Status --</option>
+                        <option value="Registered">Registered</option>
+                        <option value="Confirmation">Confirmation</option>
+                        <option value="Waiting List">Waiting List</option>
+                    </select>
+                </div>
+                </div>
+
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Participant</button>
+                </div>
+            </form>
+            </div>
+        </div>
+        </div>
 @endsection
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('employeeSearch');
+    const employeeList = document.getElementById('employeeList');
+    const employeeIdInput = document.getElementById('employeeId');
+
+    searchInput.addEventListener('keyup', function() {
+        const query = this.value;
+        if (query.length < 2) {
+            employeeList.style.display = 'none';
+            return;
+        }
+
+        fetch(`{{ route('employees.search') }}?q=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                employeeList.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(emp => {
+                        const item = document.createElement('a');
+                        item.classList.add('list-group-item', 'list-group-item-action');
+                        item.textContent = `${emp.fullname} (${emp.employee_id})`;
+                        item.addEventListener('click', () => {
+                            searchInput.value = emp.fullname;
+                            employeeIdInput.value = emp.employee_id;
+                            employeeList.style.display = 'none';
+                        });
+                        employeeList.appendChild(item);
+                    });
+                    employeeList.style.display = 'block';
+                } else {
+                    employeeList.innerHTML = '<div class="list-group-item">No results found</div>';
+                    employeeList.style.display = 'block';
+                }
+            });
+    });
+});
+</script>

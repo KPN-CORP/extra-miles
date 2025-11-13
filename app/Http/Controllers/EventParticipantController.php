@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\EventParticipant;
 use App\Models\Event;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Crypt;
 use App\Exports\ParticipantsExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -143,5 +144,39 @@ class EventParticipantController extends Controller
         $encryptedId = Crypt::encryptString($event->id);
         return redirect()->route('events.participants', $encryptedId)
             ->with('success', count($toApprove) . ' participants approved.');
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('q');
+        $employees = Employee::where('fullname', 'like', "%{$query}%")
+            ->select('employee_id', 'fullname')
+            ->limit(10)
+            ->get();
+
+        return response()->json($employees);
+    }
+
+    public function store(Request $request, $eventId)
+    {
+        $request->validate([
+            'employee_id' => 'required',
+            'status' => 'required',
+        ]);
+
+        $employees = Employee::where('employee_id', $request->employee_id)->first();
+
+        EventParticipant::create([
+            'event_id' => $eventId,
+            'employee_id' => $request->employee_id,
+            'fullname' => $employees->fullname,
+            'business_unit' => $employees->group_company,
+            'job_level' => $employees->job_level,
+            'location' => $employees->office_area,
+            'unit' => $employees->unit ?? '-',
+            'status' => $request->nextstatus,
+        ]);
+
+        return redirect()->back()->with('success', 'Participant added successfully.');
     }
 }

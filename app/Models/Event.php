@@ -36,4 +36,9 @@ class Event extends Model
     {
         return $this->hasMany(EventParticipant::class);
     }
+
+    public function creator()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by', 'id');
+    }
 }

@@ -18,6 +18,7 @@ class EventParticipant extends Model
         'business_unit',
         'job_level',
         'location',
+        'unit',
         'status',
         'status',
         'attending_status',

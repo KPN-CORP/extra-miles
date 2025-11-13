@@ -78,6 +78,10 @@ Route::prefix('admin')->group(function () {
             Route::get('/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
             Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
             Route::get('/events/{encryptedId}/participants', [EventParticipantController::class, 'listParticipants'])->name('events.participants');
+
+            Route::get('/employees/search', [EventParticipantController::class, 'search'])->name('employees.search');
+            Route::post('/events/{event}/participants', [EventParticipantController::class, 'store'])->name('participants.store');
+
             Route::post('/participants/{id}/approve', [EventParticipantController::class, 'approve'])->name('participants.approve');
             Route::post('/participants/{id}/reject', [EventParticipantController::class, 'reject'])->name('participants.reject');
             Route::get('/ticket/qr-png/{encryptedId}', [EventController::class, 'showQRPNG'])->name('event.qrpng');
