@@ -373,7 +373,7 @@
                 <!-- Status Select -->
                 <div class="col-md-12">
                     <label for="status" class="form-label">Status</label>
-                    <select name="nextstatus" id="nextstatus" class="form-control" required>
+                    <select name="status" id="nextstatus" class="form-control" required>
                         <option value="">-- Select Status --</option>
                         <option value="Registered">Registered</option>
                         <option value="Confirmation">Confirmation</option>

@@ -163,10 +163,11 @@ class EventParticipantController extends Controller
             'employee_id' => 'required',
             'status' => 'required',
         ]);
-
+        
         $employees = Employee::where('employee_id', $request->employee_id)->first();
-
-        EventParticipant::create([
+        $formId = Event::where('id', $eventId)->pluck('form_id')->first();
+        
+        $participant = EventParticipant::create([
             'event_id' => $eventId,
             'employee_id' => $request->employee_id,
             'fullname' => $employees->fullname,
@@ -174,7 +175,9 @@ class EventParticipantController extends Controller
             'job_level' => $employees->job_level,
             'location' => $employees->office_area,
             'unit' => $employees->unit ?? '-',
-            'status' => $request->nextstatus,
+            'form_id' => $formId,
+            'attending_status' => null,
+            'status' => $request->status,
         ]);
 
         return redirect()->back()->with('success', 'Participant added successfully.');
