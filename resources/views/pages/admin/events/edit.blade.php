@@ -15,8 +15,9 @@
                     <label for="category" class="form-label">Category</label>
                     <select class="form-select" id="category" name="category" required>
                         <option selected disabled>Please select</option>
-                        <option value="Sport" {{ $event->category == 'Sport' ? 'selected' : '' }}>Sport</option>
                         <option value="Event" {{ $event->category == 'Event' ? 'selected' : '' }}>Event</option>
+                        <option value="Sport" {{ $event->category == 'Sport' ? 'selected' : '' }}>Sport</option>
+                        <option value="Training" {{ $event->category == 'Training' ? 'selected' : '' }}>Training</option>
                         {{-- Populate options --}}
                     </select>
                 </div>

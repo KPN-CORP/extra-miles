@@ -82,6 +82,10 @@ Route::prefix('admin')->group(function () {
             Route::get('/evo/{id}/manage', [EventController::class, 'evoManage'])->name('admin.evo.manage');
             Route::put('/evo/{id}', [EventController::class, 'evoUpdate'])->name('evo.update');
             Route::get('/evo/{option}/export', [EventController::class, 'exportEvoParticipants'])->name('evo.export');
+
+            Route::get('/employees/search', [EventParticipantController::class, 'search'])->name('employees.search');
+            Route::post('/events/{event}/participants', [EventParticipantController::class, 'store'])->name('participants.store');
+
             Route::post('/participants/{id}/approve', [EventParticipantController::class, 'approve'])->name('participants.approve');
             Route::post('/participants/{id}/reject', [EventParticipantController::class, 'reject'])->name('participants.reject');
             Route::get('/ticket/qr-png/{encryptedId}', [EventController::class, 'showQRPNG'])->name('event.qrpng');

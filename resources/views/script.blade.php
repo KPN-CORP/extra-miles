@@ -258,6 +258,8 @@
                     '|',
                     'bulletedList', 'numberedList',
                     '|',
+                    'link',
+                    '|',
                     'undo', 'redo'
                 ],
                 removePlugins: ['Image', 'ImageToolbar', 'EasyImage', 'ImageUpload', 'MediaEmbed', 'CKFinder']

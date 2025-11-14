@@ -12,19 +12,27 @@ use App\Models\Grade;
 use App\Models\Event;
 use App\Models\FormTemplate;
 use App\Models\EventParticipant;
+use App\Models\ModelHasRole;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
     public function index()
     {
         $parentLink = 'Event Management';
-        $link = 'Events';        
+        $link = 'Events';
+        
+        $user = Auth::user();
+        $userRoleIds = $user->roles->pluck('id');
+
+        $modelIds = ModelHasRole::whereIn('role_id', $userRoleIds)
+        ->pluck('model_id');
 
         $eventsToUpdate = Event::whereIn('status', ['Open Registration', 'Full Booked'])->whereNull('deleted_at')->get();
         $now = Carbon::now();
@@ -44,18 +52,21 @@ class EventController extends Controller
 
         $events = Event::withCount('participants')
         ->whereIn('status', ['Open Registration', 'Full Booked', 'Draft', 'Ongoing'])
+        ->whereIn('created_by', $modelIds)
         ->orderBy('created_at', 'desc')
         ->where('category', '!=', 'EVO')
         ->get();
 
         $eventClosed = Event::withCount('participants')
         ->whereIn('status', ['Closed'])
+        ->whereIn('created_by', $modelIds)
         ->orderBy('created_at', 'desc')
         ->where('category', '!=', 'EVO')
         ->get();
 
         $eventArchive = Event::onlyTrashed()
         ->withCount('participants')
+        ->whereIn('created_by', $modelIds)
         ->orderBy('created_at', 'desc')
         ->where('category', '!=', 'EVO')
         ->get();
