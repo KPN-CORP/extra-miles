@@ -76,7 +76,7 @@ export default function EvoRegistration() {
   const date = new Date(event.start_date);
   const month = date.toLocaleString('en-US', { month: 'short' });
   const day = date.getDate();
-  const year = date.getFullYear();
+  const year = date.getFullYear();  
 
   return (
     <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
@@ -119,7 +119,7 @@ export default function EvoRegistration() {
             </div>
             <div>
               {/* Form */}
-              <EvoForm registered={hasRegistered} />
+              <EvoForm encryptedID={event.encrypted_id} registered={hasRegistered} />
             </div>
         </div>
     </div>

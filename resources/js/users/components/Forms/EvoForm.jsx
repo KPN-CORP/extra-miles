@@ -29,13 +29,13 @@ function parsePhoneNumber(fullNumber) {
   }
   
 
-export default function EvoForm({ registered }) {    
+export default function EvoForm({ encryptedID, registered }) {    
     const [formFields, setFormFields] = useState([]);
     const [initialValues, setInitialValues] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showRegistrationButton, setShowRegistrationButton] = useState(false); // New state
     const apiUrl = useApiUrl();
-    const id = registered.event.encrypted_id; // Get event ID from registered prop
+    const id = encryptedID; // Get event ID from registered prop
     const { token, user } = useAuth();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
