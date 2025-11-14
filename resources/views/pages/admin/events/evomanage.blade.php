@@ -1,8 +1,8 @@
-@extends('layouts_.vertical', ['page_title' => 'Events'])
+@extends('layouts_.vertical', ['page_title' => 'EVO'])
 
 @section('content')
 <div class="container-fluid bg-white py-3 px-3">
-    <form method="POST" action="{{ route('events.update', $event->id) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('evo.update', $event->id) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -15,18 +15,17 @@
                     <label for="category" class="form-label">Category</label>
                     <select class="form-select" id="category" name="category" required>
                         <option selected disabled>Please select</option>
-                        <option value="Sport" {{ $event->category == 'Sport' ? 'selected' : '' }}>Sport</option>
-                        <option value="Event" {{ $event->category == 'Event' ? 'selected' : '' }}>Event</option>
+                        <option value="EVO" {{ $event->category == 'EVO' ? 'selected' : '' }}>EVO</option>
                         {{-- Populate options --}}
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label for="start_date" class="form-label">Start Date</label>
-                    <input type="datetime-local" class="form-control {{$event->status === 'Draft' ? '' : 'bg-light'}}" name="start_date" id="start_date" value="{{ old('start_date', $event->start_date." ".$event->time_start) }}" {{$event->status === 'Draft' ? 'required' : 'readonly'}}>
+                    <input type="datetime-local" class="form-control" name="start_date" id="start_date" value="{{ old('start_date', $event->start_date." ".$event->time_start) }}" required>
                 </div>
                 <div class="col-md-4">
                     <label for="end_date" class="form-label">End Date</label>
-                    <input type="datetime-local" class="form-control {{$event->status === 'Draft' ? '' : 'bg-light'}}" name="end_date" id="end_date" value="{{ old('end_date', $event->end_date." ".$event->time_end) }}" {{$event->status === 'Draft' ? 'required' : 'readonly'}}>
+                    <input type="datetime-local" class="form-control" name="end_date" id="end_date" value="{{ old('end_date', $event->end_date." ".$event->time_end) }}" required>
                     {{-- <small class="text-muted">Leave blank for one-day event</small> --}}
                 </div>
                 <div class="col-md-12">
@@ -77,11 +76,11 @@
                 <h5 class="mb-0">Filter</h5>
             </div>
             <div class="card-body row g-3">
-                <div class="col-md-3">
+                <div class="col-md-3 d-none">
                     <input type="checkbox" class="form-check-input" id="need_survey" name="need_survey" {{ $event->status_survey ? 'checked' : '' }}>
                     <label class="form-check-label" for="need_survey">Does this event need a survey?</label>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 d-none">
                     <input type="checkbox" class="form-check-input" id="need_voting" name="need_voting" {{ $event->status_voting ? 'checked' : '' }}>
                     <label class="form-check-label" for="need_voting">Does this event need a voting?</label>
                 </div>
@@ -200,69 +199,3 @@
     </form>
 </div>
 @endsection
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const checkbox = document.getElementById('custom_form');
-        const formSelectWrapper = document.getElementById('form-select-wrapper');
-        const formPreviewWrapper = document.getElementById('form-preview-wrapper');
-        const formSelect = document.getElementById('form_id');
-        const formPreview = document.getElementById('form-preview');
-    
-        checkbox.addEventListener('change', function () {
-            if (checkbox.checked) {
-                formSelectWrapper.classList.remove('d-none');
-                formPreviewWrapper.classList.remove('d-none');
-            } else {
-                formSelectWrapper.classList.add('d-none');
-                formPreviewWrapper.classList.add('d-none');
-                formPreview.innerHTML = '';
-                formSelect.value = '';
-            }
-        });
-    
-        document.getElementById('form_id').addEventListener('change', function () {
-            const formId = this.value;
-            if (!formId) return;
-    
-            fetch(`/admin/forms/${formId}/schema`)
-                .then(response => {
-                    console.log('Raw response:', response);
-                    if (!response.ok) throw new Error("Fetch error: " + response.status);
-                    return response.json();
-                })
-                .then(data => {
-                    const previewDiv = document.getElementById('form-preview');
-                    previewDiv.innerHTML = '';
-    
-                    data.fields.forEach(field => {
-                        const fieldWrapper = document.createElement('div');
-                        fieldWrapper.className = 'mb-3';
-    
-                        const label = document.createElement('label');
-                        label.className = 'form-label';
-                        label.textContent = field.label;
-                        fieldWrapper.appendChild(label);
-    
-                        let input;
-                        if (field.type === 'textarea') {
-                            input = document.createElement('textarea');
-                            input.className = 'form-control';
-                        } else {
-                            input = document.createElement('input');
-                            input.type = field.type;
-                            input.className = 'form-control';
-                        }
-    
-                        input.name = field.name;
-                        //input.required = field.required || false;
-                        fieldWrapper.appendChild(input);
-    
-                        previewDiv.appendChild(fieldWrapper);
-                    });
-                })
-                .catch(error => {
-                    console.error('Gagal load schema:', error);
-                });
-        });
-    });
-</script>

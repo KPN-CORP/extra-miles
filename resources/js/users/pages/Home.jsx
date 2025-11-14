@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom"
 import { useApiUrl } from "../components/context/ApiContext"; // Assuming you have a context for API URL
+import EvoSection from '../components/sections/EvoSection'; // Assuming you have a NewsCard component
 import NewsSection from '../components/sections/NewsSection'; // Assuming you have a NewsCard component
 import MenuSection from '../components/sections/MenuSection'; // Assuming you have a NewsCard component
 import axios from 'axios';
@@ -17,7 +18,7 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const { token, user } = useAuth(); 
-    const [loadingBanner, setLoadingBanner] = useState(true);    
+    const [loadingBanner, setLoadingBanner] = useState(true);        
 
     useEffect(() => {        
         if (!token) {
@@ -69,6 +70,7 @@ const Home = () => {
                             )}
                         </div>
                     </div>
+                    {user?.roles?.includes("superadmin") && <EvoSection />}
                     <NewsSection />
                     <MenuSection />
                     <ActivitySection />

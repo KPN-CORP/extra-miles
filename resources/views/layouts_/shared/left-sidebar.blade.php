@@ -2,7 +2,7 @@
 <div class="leftside-menu">
     {{-- @if(session('system') == 'kpnpm') --}}
     <!-- Brand Logo Light -->
-    <a href="{{ Url('/') }}" class="logo logo-light">
+    <a href="#" class="logo logo-light">
         <span class="logo-lg">
             <img src="{{ asset('storage/img/extra_mile.png') }}" alt="logo">
         </span>
@@ -12,7 +12,7 @@
     </a>
 
     <!-- Brand Logo Dark -->
-    <a href="{{ Url('/') }}" class="logo logo-dark">
+    <a href="#" class="logo logo-dark">
         <span class="logo-lg">
             <img src="{{ asset('storage/img/extra_mile.png') }}" alt="logo">
         </span>
@@ -74,10 +74,21 @@
 
                 @can('viewmenuevent')
                 <li class="side-nav-item">
-                    <a href="{{ url('/admin/events') }}" class="side-nav-link">
+                    <a data-bs-toggle="collapse" href="#sidebarEvent" aria-expanded="false" aria-controls="sidebarEvent" class="side-nav-link">
                         <i class="ri-settings-5-line"></i>
-                        <span> Event Management </span>
+                        <span>Event Management</span>
+                        <span class="menu-arrow"></span>  
                     </a>
+                    <div class="collapse" id="sidebarEvent">
+                        <ul class="side-nav-second-level">
+                            <li>
+                                <a href="{{ url('/admin/events') }}"> Events </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('/admin/evo') }}"> EVO </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
                 @endcan
 

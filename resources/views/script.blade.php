@@ -233,6 +233,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
       const startInput = document.getElementById('start_date');
+      if (!startInput) return;
       const endInput = document.getElementById('end_date');
   
       startInput.addEventListener('change', function () {
@@ -318,6 +319,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const statusFilter = document.getElementById('statusFilter');
+        if (!statusFilter) return;
         const searchInput = document.getElementById('searchInput');
         const participantButtons = document.querySelectorAll('#v-tabs button[data-status]');
 
@@ -370,7 +372,7 @@
         const title = $(this).data('title');
         
         const schema = $(this).data('schema');
-        console.log($(this).data('schema'));
+        // console.log($(this).data('schema'));
         $('#schemaModalLabel').text(title);
         let content = '';
     
@@ -534,6 +536,8 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         const checkbox = document.getElementById('custom_form');
+        if (!checkbox) return;
+
         const formSelectWrapper = document.getElementById('form-select-wrapper');
         const formPreviewWrapper = document.getElementById('form-preview-wrapper');
         const formSelect = document.getElementById('form_id');
@@ -554,46 +558,69 @@
         formSelect.addEventListener('change', function () {
             const formId = this.value;
             if (!formId) return;
-    
+
             fetch(`/admin/forms/${formId}/schema`)
                 .then(response => {
-                    console.log('Raw response:', response);
-                    if (!response.ok) throw new Error("Fetch error: " + response.status);
-                    return response.json();
+                if (!response.ok) throw new Error("Fetch error: " + response.status);
+                return response.json();
                 })
                 .then(data => {
-                    const previewDiv = document.getElementById('form-preview');
-                    previewDiv.innerHTML = '';
-    
-                    data.fields.forEach(field => {
-                        const fieldWrapper = document.createElement('div');
-                        fieldWrapper.className = 'mb-3';
-    
-                        const label = document.createElement('label');
-                        label.className = 'form-label';
-                        label.textContent = field.label;
-                        fieldWrapper.appendChild(label);
-    
-                        let input;
-                        if (field.type === 'textarea') {
-                            input = document.createElement('textarea');
-                            input.className = 'form-control';
-                        } else {
-                            input = document.createElement('input');
-                            input.type = field.type;
-                            input.className = 'form-control';
-                        }
-    
-                        input.name = field.name;
-                        // Abaikan required agar bisa submit tanpa isian
-                        // input.required = field.required || false;
-    
-                        fieldWrapper.appendChild(input);
-                        previewDiv.appendChild(fieldWrapper);
+                const previewDiv = document.getElementById('form-preview');
+                previewDiv.innerHTML = '';
+
+                data.fields.forEach(field => {
+                    const fieldWrapper = document.createElement('div');
+                    fieldWrapper.className = 'mb-4';
+
+                    const label = document.createElement('label');
+                    label.className = 'form-label fw-semibold mb-2 d-block';
+                    label.textContent = field.label;
+                    fieldWrapper.appendChild(label);
+
+                    // ✅ Tampilkan list checkbox dari field.options
+                    if (field.type === 'checkbox' && Array.isArray(field.options)) {
+                    field.options.forEach(opt => {
+                        const checkWrapper = document.createElement('div');
+                        checkWrapper.className = 'form-check';
+
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'form-check-input';
+                        checkbox.name = `${field.name}[]`;
+                        checkbox.value = opt;
+                        checkbox.id = `${field.name}-${opt.replace(/\s+/g, '-')}`;
+
+                        const optLabel = document.createElement('label');
+                        optLabel.className = 'form-check-label';
+                        optLabel.setAttribute('for', checkbox.id);
+                        optLabel.textContent = opt;
+
+                        checkWrapper.appendChild(checkbox);
+                        checkWrapper.appendChild(optLabel);
+                        fieldWrapper.appendChild(checkWrapper);
                     });
+                    } 
+                    // 📝 Textarea
+                    else if (field.type === 'textarea') {
+                    const textarea = document.createElement('textarea');
+                    textarea.className = 'form-control';
+                    textarea.name = field.name;
+                    fieldWrapper.appendChild(textarea);
+                    } 
+                    // 🔤 Input default (text, number, dll.)
+                    else {
+                    const input = document.createElement('input');
+                    input.type = field.type || 'text';
+                    input.className = 'form-control';
+                    input.name = field.name;
+                    fieldWrapper.appendChild(input);
+                    }
+
+                    previewDiv.appendChild(fieldWrapper);
+                });
                 })
                 .catch(error => {
-                    console.error('Gagal load schema:', error);
+                console.error('Gagal load schema:', error);
                 });
         });
     
@@ -606,65 +633,69 @@
         }
     });
 
-    const eventSelectAllCheckbox = document.getElementById('selectAll');
-    const eventRowCheckboxes = document.querySelectorAll('.row-checkbox');
-    const eventApproveSelectedBtn = document.getElementById('approveSelectedBtn');
-    const eventQuotaMax = {{ isset($event) ? $event->quota : 0 }};
-    const eventApprovedCount = {{ isset($countApproved) ? $countApproved : 0 }};
-    const eventRemainingQuota = eventQuotaMax - eventApprovedCount;
-
-    function updateEventApproveButton() {
-        const selectedCount = document.querySelectorAll('.row-checkbox:checked').length;
-        eventApproveSelectedBtn.textContent = `Approve Selected (${selectedCount})`;
-        eventApproveSelectedBtn.disabled = selectedCount === 0;
-    }
-
-    if (eventSelectAllCheckbox) {
-        eventSelectAllCheckbox.addEventListener('change', function () {
-            eventRowCheckboxes.forEach(cb => {
-                cb.checked = this.checked;
-            });
-            updateEventApproveButton();
-        });
-    }
-
-    eventRowCheckboxes.forEach(cb => {
-        cb.addEventListener('change', function () {
-            if (!this.checked) {
-                eventSelectAllCheckbox.checked = false;
-            }
-            updateEventApproveButton();
-        });
-    });
-
-    // Tombol Approve Selected
-    eventApproveSelectedBtn.addEventListener('click', function (e) {
-        const selectedCount = document.querySelectorAll('.row-checkbox:checked').length;
-
-        if (selectedCount > eventRemainingQuota) {
-            e.preventDefault();
-            Swal.fire({
-                icon: 'warning',
-                title: 'Quota Exceeded',
-                html: `Kuota tersisa hanya <b>${eventRemainingQuota}</b> peserta.<br>
-                       Kamu memilih <b>${selectedCount}</b> peserta.`,
-                confirmButtonText: 'OK'
-            });
-            return false;
+    document.addEventListener("DOMContentLoaded", function () {
+        const eventSelectAllCheckbox = document.getElementById('selectAll');
+        const eventRowCheckboxes = document.querySelectorAll('.row-checkbox');
+        const eventApproveSelectedBtn = document.getElementById('approveSelectedBtn');
+        if (!eventApproveSelectedBtn) return;
+        const eventQuotaMax = {{ isset($event) ? $event->quota : 0 }};
+        const eventApprovedCount = {{ isset($countApproved) ? $countApproved : 0 }};
+        const eventRemainingQuota = eventQuotaMax - eventApprovedCount;
+    
+        function updateEventApproveButton() {
+            const selectedCount = document.querySelectorAll('.row-checkbox:checked').length;
+            eventApproveSelectedBtn.textContent = `Approve Selected (${selectedCount})`;
+            eventApproveSelectedBtn.disabled = selectedCount === 0;
         }
-
-        // Jika valid: lanjutkan
-        // Contoh (ganti sesuai kebutuhan):
-        // Swal.fire({
-        //     icon: 'success',
-        //     title: 'Valid!',
-        //     text: 'Peserta dapat diproses.',
-        //     showConfirmButton: false,
-        //     timer: 1500
-        // });
-
-        // TODO: submit form atau trigger aksi lainnya
+    
+        if (eventSelectAllCheckbox) {
+            eventSelectAllCheckbox.addEventListener('change', function () {
+                eventRowCheckboxes.forEach(cb => {
+                    cb.checked = this.checked;
+                });
+                updateEventApproveButton();
+            });
+        }
+    
+        eventRowCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                if (!this.checked) {
+                    eventSelectAllCheckbox.checked = false;
+                }
+                updateEventApproveButton();
+            });
+        });
+    
+        // Tombol Approve Selected
+        eventApproveSelectedBtn.addEventListener('click', function (e) {
+            const selectedCount = document.querySelectorAll('.row-checkbox:checked').length;
+    
+            if (selectedCount > eventRemainingQuota) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Quota Exceeded',
+                    html: `Kuota tersisa hanya <b>${eventRemainingQuota}</b> peserta.<br>
+                           Kamu memilih <b>${selectedCount}</b> peserta.`,
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+    
+            // Jika valid: lanjutkan
+            // Contoh (ganti sesuai kebutuhan):
+            // Swal.fire({
+            //     icon: 'success',
+            //     title: 'Valid!',
+            //     text: 'Peserta dapat diproses.',
+            //     showConfirmButton: false,
+            //     timer: 1500
+            // });
+    
+            // TODO: submit form atau trigger aksi lainnya
+        });
     });
+
 
     function submitApproveParticipant(actionUrl) {
         Swal.fire({
@@ -692,4 +723,24 @@
             }
         });
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const formSelect = document.getElementById('form_id');
+        const manageLink = document.getElementById('manage-form');
+
+        if (!formSelect || !manageLink) return;
+
+        // Update href setiap kali form dipilih
+        formSelect.addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const url = selectedOption.getAttribute('data-url');
+            manageLink.href = url ?? '#';
+        });
+
+        // Auto set href saat load (misal edit page)
+        const selected = formSelect.options[formSelect.selectedIndex];
+        if (selected && selected.getAttribute('data-url')) {
+            manageLink.href = selected.getAttribute('data-url');
+        }
+    });
 </script>

@@ -29,19 +29,19 @@ function parsePhoneNumber(fullNumber) {
   }
   
 
-export default function EvoForm({ registered }) {
+export default function EvoForm({ registered }) {    
     const [formFields, setFormFields] = useState([]);
     const [initialValues, setInitialValues] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showRegistrationButton, setShowRegistrationButton] = useState(false); // New state
     const apiUrl = useApiUrl();
-    const { id } = useParams();
+    const id = registered.event.encrypted_id; // Get event ID from registered prop
     const { token, user } = useAuth();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    useEffect(() => {        
-        
+    useEffect(() => {                     
+                   
         const fetchFormSchema = async () => {
             try {
                 const response = await axios.get(`${apiUrl}/api/event-form/${id}`, {
@@ -49,29 +49,34 @@ export default function EvoForm({ registered }) {
                         'Accept': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
-                });                   
+                });                                   
 
                 const formSchema = response.data;                
 
                     // Set form fields
                     setFormFields(Array.isArray(formSchema.fields) ? formSchema.fields : []);
 
-                    // Set initial values
-                    const initialValues = {};
+                    // Base initial values dari schema
+                    let initialValues = {};
                     if (Array.isArray(formSchema?.fields)) {
-                        formSchema.fields.forEach(field => {
-                            if (Array.isArray(field.options)) {
-                            initialValues[field.name] = field.type === 'checkbox' ? [] : '';
-                            } else {
-                            initialValues[field.name] = field.type === 'checkbox' ? false : '';
-                            }
-                        });
+                    formSchema.fields.forEach(field => {
+                        if (Array.isArray(field.options)) {
+                        initialValues[field.name] = field.type === 'checkbox' ? [] : '';
+                        } else {
+                        initialValues[field.name] = field.type === 'checkbox' ? false : '';
+                        }
+                    });
                     }
 
-                    const cleanNumber = (user?.whatsapp_number ? user?.whatsapp_number : (user?.personal_mobile_number ?? '')).replace(/'/g, '');                    
+                    // ✅ Merge data lama (jika ada)
+                    if (registered?.form_data) {
+                    const parsedData = JSON.parse(registered.form_data);
+                    initialValues = { ...initialValues, ...parsedData };
+                    }
 
-                    const parsedWhatsapp = parsePhoneNumber(user? cleanNumber : '');
-
+                    // ✅ Set nomor WA
+                    const cleanNumber = (user?.whatsapp_number ? user?.whatsapp_number : (user?.personal_mobile_number ?? '')).replace(/'/g, '');
+                    const parsedWhatsapp = parsePhoneNumber(user ? cleanNumber : '');
                     initialValues.countryCode = parsedWhatsapp.countryCode;
                     initialValues.whatsapp_number = parsedWhatsapp.whatsapp_number;
 
@@ -113,15 +118,17 @@ export default function EvoForm({ registered }) {
                 },
             };
             
-            const response = await axios.post(`${apiUrl}/api/event-registration`, payload, {
+            const url = registered ? `${apiUrl}/api/event-registration-update` : `${apiUrl}/api/event-registration`;
+            
+            const response = await axios.post(url, payload, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-            });            
+            });                       
 
-            if (response.status === 201) {
+            if (response.status === 201 || response.status === 200) {
                 showAlert({
                     icon: 'success',
                     title: 'Registration Successful',
@@ -183,7 +190,7 @@ export default function EvoForm({ registered }) {
                     showAlert({
                         icon: 'success',
                         title: 'Registration Successful',
-                        text: response.data.message || 'You have successfully registered for the event.',
+                        text: response.data.message || 'You have successfully registered for EVO.',
                         timer: 2500,
                         showConfirmButton: false,
                     }).then(() => {
@@ -289,82 +296,85 @@ try {
                             )}
                         </div>
 
+                        <div className="bg-red-700 p-4 mb-6 shadow-md">
+                        <div className="bg-white rounded-lg p-5">
+                            <h3 className="text-red-700 font-bold text-lg mb-4">Registration Form</h3>
+
                         {formFields.map((field) => (
-                            <div key={field.name} className="mb-4">
-                                <label className="block text-gray-700 mb-2" htmlFor={field.name}>
-                                    {field.label}
-                                </label>
-    
-                                {field.type === 'checkbox' && Array.isArray(field.options) ? (
+                            <div key={field.name} className="mb-5">
+                            <label
+                                className="block text-gray-800 font-semibold mb-2"
+                                htmlFor={field.name}
+                            >
+                                {field.label}
+                            </label>
+
+                            {field.type === "checkbox" && Array.isArray(field.options) ? (
                                 <div className="space-y-2">
-                                    {field.options.map((option, index) => {
+                                {field.options.map((option) => {
                                     const registeredData = registered?.form_data
-                                        ? JSON.parse(registered.form_data)
-                                        : {};
+                                    ? JSON.parse(registered.form_data)
+                                    : {};
                                     const alreadySelected = Array.isArray(registeredData[field.name])
-                                        ? registeredData[field.name].includes(option)
-                                        : false;
+                                    ? registeredData[field.name].includes(option)
+                                    : false;
+
+                                    const optionKey = `${field.name}-${option}`; // ✅ unique key
 
                                     return (
-                                        <label key={index} className="flex items-center">
+                                    <label key={optionKey} className="flex items-center space-x-2">
                                         <input
-                                            type="checkbox"
-                                            name={field.name}
-                                            value={option}
-                                            checked={
-                                            alreadySelected ||
-                                            (Array.isArray(values[field.name]) && values[field.name].includes(option))
-                                            }
-                                            disabled={alreadySelected} // jika sudah terdaftar, disable
-                                            onChange={(e) => {
-                                            if (alreadySelected) return; // cegah perubahan
+                                        type="checkbox"
+                                        name={field.name}
+                                        value={option}
+                                        checked={Array.isArray(values[field.name]) && values[field.name].includes(option)}
+                                        onChange={(e) => {
                                             const currentValue = Array.isArray(values[field.name]) ? values[field.name] : [];
                                             const set = new Set(currentValue);
-                                            if (e.target.checked) {
-                                                set.add(option);
-                                            } else {
-                                                set.delete(option);
-                                            }
+                                            if (e.target.checked) set.add(option);
+                                            else set.delete(option);
                                             setFieldValue(field.name, Array.from(set));
-                                            }}
-                                            className="mr-2"
+                                        }}
+                                        className="accent-red-700 w-4 h-4 rounded"
                                         />
+                                        <span
+                                        className={`text-gray-800 ${alreadySelected ? 'text-gray-500 italic' : ''}`}
+                                        >
                                         {option}
-                                        {alreadySelected && (
-                                            <span className="ml-2 text-sm text-gray-500">(registered)</span>
-                                        )}
-                                        </label>
+                                        {alreadySelected && <span className="ml-1 text-xs text-gray-400">(registered)</span>}
+                                        </span>
+                                    </label>
                                     );
-                                    })}
+                                })}
                                 </div>
-                                )  : (field.type === 'textarea' ? (
-                                    <textarea
-                                        id={field.name}
-                                        name={field.name}
-                                        type={field.type}
-                                        value={values[field.name]}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        className="w-full border rounded p-2"
-                                    />
-                                ) : (
-                                    <input
-                                        id={field.name}
-                                        name={field.name}
-                                        type={field.type}
-                                        value={values[field.name]}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        className="w-full border rounded p-2"
-                                    />
-                                ))}
-    
-                                {touched[field.name] && errors[field.name] && (
-                                    <p className="text-red-700 text-sm mt-1">{errors[field.name]}</p>
-                                )}
+                            ) : field.type === "textarea" ? (
+                                <textarea
+                                id={field.name}
+                                name={field.name}
+                                value={values[field.name]}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className="w-full border rounded p-2"
+                                />
+                            ) : (
+                                <input
+                                id={field.name}
+                                name={field.name}
+                                type={field.type}
+                                value={values[field.name]}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className="w-full border rounded p-2"
+                                />
+                            )}
+
+                            {touched[field.name] && errors[field.name] && (
+                                <p className="text-red-700 text-sm mt-1">{errors[field.name]}</p>
+                            )}
                             </div>
                         ))}
-    
+                        </div>
+                        </div>
                         <button type="submit" disabled={isSubmitting} className="w-full px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center overflow-hidden text-white text-sm font-semibold">
                             {isSubmitting ? (
                             <PulseLoader size={8} color="#fff" margin={2} speedMultiplier={0.75} />
