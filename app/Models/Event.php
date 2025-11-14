@@ -36,7 +36,10 @@ class Event extends Model
     {
         return $this->hasMany(EventParticipant::class);
     }
-
+    public function formTemplates()
+    {
+        return $this->belongsTo(FormTemplate::class, 'form_id', 'id');
+    }
     public function creator()
     {
         return $this->belongsTo(\App\Models\User::class, 'created_by', 'id');

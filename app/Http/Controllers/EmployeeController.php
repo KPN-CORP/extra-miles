@@ -15,23 +15,39 @@ class EmployeeController extends Controller
     public function profile()
     {
         try {
-            // Log untuk memeriksa token dan employee_id
             $payload = JWTAuth::parseToken()->getPayload();
             $employee_id = $payload->get('employee_id');
-            Log::info('Token payload employee_id: ' . $employee_id);
 
-            $employee = Employee::select('employee_id', 'fullname', 'gender', 'email', 'group_company', 'designation_name', 'job_level', 'company_name', 'office_area', 'employee_type', 'unit', 'personal_mobile_number', 'religion', 'marital_status', 'whatsapp_number')->where('employee_id', $employee_id)->first();
+            $employee = Employee::with('user') // include user + roles
+                ->select(
+                    'id','employee_id','fullname','gender','email','group_company',
+                    'designation_name','job_level','company_name','office_area',
+                    'employee_type','unit','personal_mobile_number','religion',
+                    'marital_status','whatsapp_number'
+                )
+                ->where('employee_id', $employee_id)
+                ->first();
 
             if (!$employee) {
                 return response()->json(['error' => 'Employee not found'], 404);
             }
 
+            // Ambil roles user
+            $roles = $employee->user
+                ? $employee->user->getRoleNames()  // collection
+                : collect();
+
+            // Tambahkan roles ke response
+            $employee->roles = $roles;
+
             return response()->json($employee);
+
         } catch (\Exception $e) {
-            Log::error('Error getting employees: ' . $e->getMessage());
-            return response()->json(['error' => 'Something went wrong', 'message' => $e->getMessage()], 500);
+            Log::error('Error getting profile: ' . $e->getMessage());
+            return response()->json(['error' => 'Something went wrong'], 500);
         }
     }
+
 
     /**
      * Store a newly created resource in storage.

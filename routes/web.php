@@ -78,6 +78,10 @@ Route::prefix('admin')->group(function () {
             Route::get('/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
             Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
             Route::get('/events/{encryptedId}/participants', [EventParticipantController::class, 'listParticipants'])->name('events.participants');
+            Route::get('/evo', [EventController::class, 'evoIndex'])->name('admin.evo.index');
+            Route::get('/evo/{id}/manage', [EventController::class, 'evoManage'])->name('admin.evo.manage');
+            Route::put('/evo/{id}', [EventController::class, 'evoUpdate'])->name('evo.update');
+            Route::get('/evo/{option}/export', [EventController::class, 'exportEvoParticipants'])->name('evo.export');
 
             Route::get('/employees/search', [EventParticipantController::class, 'search'])->name('employees.search');
             Route::post('/events/{event}/participants', [EventParticipantController::class, 'store'])->name('participants.store');

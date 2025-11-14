@@ -24,13 +24,15 @@ Route::middleware('auth.token')->group(function () {
     Route::get('/profile', [EmployeeController::class, 'profile']);
     Route::get('/events', [EventController::class, 'getEvents']);
     Route::get('/my-event', [EventController::class, 'myEvents']);
-    Route::get('/get-evo', [EventController::class, 'getEvo']);
+    Route::get('/evo', [EventController::class, 'getEvo']);
+    Route::get('/evo/check-registration', [EventController::class, 'checkEvo']);
     Route::get('/events/{id}', [EventController::class, 'getEventDetails']);
     Route::post('/event-confirmation', [EventController::class, 'eventConfirmation']);
     Route::post('/event-attendance', [EventController::class, 'eventAttendance']);
     Route::get('/event-form/{id}', [EventController::class, 'getEventForm']);
     Route::get('/events/check-registration/{id}', [EventController::class, 'checkRegistration']);
     Route::post('/event-registration', [EventController::class, 'store']);
+    Route::post('/event-registration-update', [EventController::class, 'update']);
     Route::get('/survey-vote', [SurveyVoteController::class, 'getSurveyVotes']);
     Route::get('/survey-vote/{id}', [SurveyVoteController::class, 'getSurveyVotesDetails']);
     Route::get('/survey-form/{id}', [SurveyVoteController::class, 'getSurveyForm']);

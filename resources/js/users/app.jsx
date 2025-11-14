@@ -19,6 +19,7 @@ import News from './pages/News';
 import NewsDetails from './pages/NewsDetails';
 import Social from './pages/Social';
 import LoginFailed from './pages/LoginFailed';
+import EvoRegistration from './pages/EvoRegistration';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -38,6 +39,7 @@ const AnimatedRoutes = () => {
         <Route path="/news" element={<News />} />
         <Route path="/news/:id" element={<NewsDetails />} />
         <Route path="/social" element={<Social />} />
+        <Route path="/evo" element={<EvoRegistration />} />
       </Routes>
     </AnimatePresence>
   );
