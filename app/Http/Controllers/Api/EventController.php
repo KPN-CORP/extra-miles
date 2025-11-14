@@ -69,6 +69,7 @@ class EventController extends Controller
           });
       })
       ->orderBy('start_date', 'asc')
+      ->where('category' ,'!=' ,'EVO')
       ->get();
 
       return response()->json($events);
@@ -99,6 +100,7 @@ class EventController extends Controller
         $query->whereDate('start_date', '>=', $this->today)
               ->orWhere('status', '!=', 'Closed');
       })
+      ->where('category' ,'!=' ,'EVO')
       ->get();
 
       return response()->json($events);
