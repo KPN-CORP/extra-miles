@@ -38,7 +38,13 @@ class EmployeeController extends Controller
                 : collect();
 
             // Tambahkan roles ke response
-            $employee->roles = $roles;
+            // $employee->roles = $roles;
+
+            $employee->hasEvoPermission = $roles->intersect([
+                'EM - Tim Corcom',
+                'Admin HCIS',
+                'superadmin'
+            ])->isNotEmpty();
 
             return response()->json($employee);
 

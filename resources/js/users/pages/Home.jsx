@@ -47,7 +47,7 @@ const Home = () => {
 
     const handleImageLoad = () => {
         setLoadingBanner(false);
-    };
+    };    
 
     return (
         <>
@@ -70,7 +70,7 @@ const Home = () => {
                             )}
                         </div>
                     </div>
-                    {user?.roles?.includes("superadmin") && <EvoSection />}
+                    {user?.hasEvoPermission && <EvoSection />}
                     <NewsSection />
                     <MenuSection />
                     <ActivitySection />

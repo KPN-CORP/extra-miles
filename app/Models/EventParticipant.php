@@ -20,6 +20,7 @@ class EventParticipant extends Model
         'location',
         'unit',
         'form_id',
+        'form_data',
         'status',
         'attending_status',
         'created_by',
