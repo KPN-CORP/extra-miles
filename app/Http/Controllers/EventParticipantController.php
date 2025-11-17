@@ -9,6 +9,7 @@ use App\Models\Employee;
 use Illuminate\Support\Facades\Crypt;
 use App\Exports\ParticipantsExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 
 class EventParticipantController extends Controller
 {
@@ -159,6 +160,8 @@ class EventParticipantController extends Controller
 
     public function store(Request $request, $eventId)
     {
+        $user = Auth::user();
+        
         $request->validate([
             'employee_id' => 'required',
             'status' => 'required',
@@ -178,6 +181,7 @@ class EventParticipantController extends Controller
             'form_id' => $formId,
             'attending_status' => null,
             'status' => $request->status,
+            'created_by' => Auth::id(),
         ]);
 
         return redirect()->back()->with('success', 'Participant added successfully.');
