@@ -5,9 +5,7 @@ import { useNavigate } from "react-router-dom";
 export default function EvoBanner() {
 
   const apiUrl = useApiUrl();
-  const navigate = useNavigate();
-  // console.log(apiUrl);
-  
+  const navigate = useNavigate();  
 
   return (
     <div className="flex items-center justify-between bg-white rounded-xl px-3 py-2 shadow w-full">
