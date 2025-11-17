@@ -22,6 +22,7 @@ class EventParticipant extends Model
         'form_id',
         'status',
         'attending_status',
+        'created_by',
     ];
 
     public function event()
