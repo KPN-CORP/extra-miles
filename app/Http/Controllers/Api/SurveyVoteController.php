@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\FormTemplate;
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
 use App\Models\Survey;
 use App\Models\SurveyParticipant;
 use App\Models\SurveyVote;
@@ -31,6 +32,8 @@ class SurveyVoteController extends Controller
             $userId = $payload->get('sub');
             $employee_id = $payload->get('employee_id');
 
+            $employee = Employee::select('group_company', 'unit', 'office_area', 'job_level')->where('employee_id', $employee_id)->first();
+
             $datas = Survey::with(['surveyParticipant' => function ($query) use ($employee_id) {
                 $query->where('employee_id', $employee_id);
             }, 'eventParticipant' => function ($query) use ($employee_id) {
@@ -40,6 +43,28 @@ class SurveyVoteController extends Controller
                 $query->where('status', '!=', 'Closed')
                       ->whereRaw("TIMESTAMP(start_date, time_start) <= ?", [$this->dateNow])
                       ->whereRaw("TIMESTAMP(end_date, time_end) >= ?", [$this->dateNow]);
+            })
+            ->where(function ($query) use ($employee) {
+                $query->where(function ($q) use ($employee) {
+                    $q->whereNull('businessUnit')
+                        ->orWhereJsonLength('businessUnit', 0)
+                        ->orWhereJsonContains('businessUnit', $employee->group_company);
+                })
+                ->where(function ($q) use ($employee) {
+                    $q->whereNull('unit')
+                        ->orWhereJsonLength('unit', 0)
+                        ->orWhereJsonContains('unit', $employee->unit);
+                })
+                ->where(function ($q) use ($employee) {
+                    $q->whereNull('location')
+                        ->orWhereJsonLength('location', 0)
+                        ->orWhereJsonContains('location', $employee->office_area);
+                })
+                ->where(function ($q) use ($employee) {
+                    $q->whereNull('jobLevel')
+                        ->orWhereJsonLength('jobLevel', 0)
+                        ->orWhereJsonContains('jobLevel', $employee->job_level);
+                });
             })
             ->get();
             
