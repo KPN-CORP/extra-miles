@@ -290,54 +290,53 @@ export default function News() {
             </div>
 
             {/* News List */}
-            <div className="space-y-3">
-              {filteredNews.map((news) => {
-                const newsDate = new Date(news.publish_date);
-                const day = newsDate.toLocaleDateString("id-ID", {
-                  weekday: "long",
-                  day: "2-digit",
-                  month: "long",
-                  year: "numeric",
-                });
+            <div className="max-h-screen overflow-y-auto pr-1">
+              <div className="space-y-3">
+                  {filteredNews.map((news) => {
+                      const newsDate = new Date(news.publish_date);
+                      const day = newsDate.toLocaleDateString("id-ID", {
+                          weekday: "long",
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                      });
 
-                let businessUnit = "";
+                      let businessUnit = "";
+                      try {
+                          const raw = news.businessUnit;
+                          const arr = JSON.parse(raw);
+                          businessUnit = Array.isArray(arr) ? arr.join(", ") : String(arr);
+                      } catch (e) {
+                          console.error("Invalid JSON in businessUnit:", e);
+                          businessUnit = "";
+                      }
 
-                try {
-                    const raw = news.businessUnit;
-                    const arr = JSON.parse(raw); // ubah string JSON jadi array
-                    businessUnit = Array.isArray(arr) ? arr.join(", ") : String(arr);
-                } catch (e) {
-                    console.error("Invalid JSON in businessUnit:", e);
-                    businessUnit = ""; // fallback kalau JSON parse gagal
-                }
+                      const hashtag = news?.hashtag || "";
+                      const tags = hashtag
+                          .split(",")
+                          .map(t => t.trim())
+                          .filter(Boolean);
 
-                const year = newsDate.getFullYear();
-
-                const hashtag = news?.hashtag || "";
-                const tags = hashtag
-                .split(',')
-                .map(tag => tag.trim())
-                .filter(tag => tag); // remove empty strings
-
-                return (
-                  <div
-                    onClick={() => {
-                      setSkipExit(true);
-                      navigate(`/news/${news.encrypted_id}`)
-                    }}
-                    key={news.encrypted_id}
-                    className="cursor-pointer"
-                  >
-                    <NewsCard
-                      image={getImageUrl(apiUrl, news.image)}
-                      date={day}
-                      title={news.title}
-                      tags={tags}
-                    />
-                  </div>
-                );
-              })}
-            </div>
+                      return (
+                          <div
+                              onClick={() => {
+                                  setSkipExit(true);
+                                  navigate(`/news/${news.encrypted_id}`);
+                              }}
+                              key={news.encrypted_id}
+                              className="cursor-pointer"
+                          >
+                              <NewsCard
+                                  image={getImageUrl(apiUrl, news.image)}
+                                  date={day}
+                                  title={news.title}
+                                  tags={tags}
+                              />
+                          </div>
+                      );
+                  })}
+              </div>
+          </div>
         </motion.div>
           </div>
 

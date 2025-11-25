@@ -120,6 +120,8 @@
                                 <tr>
                                 <th>No</th>
                                 <th>Participant</th>
+                                <th>Job Level</th>
+                                <th>Department</th>
                                 <th>BU</th>
                                 <th>Location</th>
                                 <th>Submitted At</th>
@@ -149,6 +151,8 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $p->fullname .' ('.$p->employee_id.')' }}</td>
+                                    <td>{{ $p->job_level }}</td>
+                                    <td>{{ $p->unit }}</td>
                                     <td>{{ $p->business_unit }}</td>
                                     <td>{{ $p->location }}</td>
                                     <td>{{ $p->created_at->format('d M Y H:i') }}</td>
