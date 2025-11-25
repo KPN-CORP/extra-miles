@@ -28,7 +28,7 @@
     "src": "public/images/bg-auth.jpg"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DQSpZEdO.css",
+    "file": "assets/app-DRRCK_rb.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -85,7 +85,7 @@
     "isEntry": true
   },
   "resources/js/users/main.jsx": {
-    "file": "assets/main-DQ3XbIPI.js",
+    "file": "assets/main-DLjp5OCS.js",
     "name": "main",
     "src": "resources/js/users/main.jsx",
     "isEntry": true,

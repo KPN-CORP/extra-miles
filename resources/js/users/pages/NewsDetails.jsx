@@ -149,13 +149,13 @@ export default function NewsDetails({ onLike }) {
         <div className="text-lg font-semibold text-red-700">
             {news.title}
         </div>
-        <div className="flex gap-1 mt-1 whitespace-nowrap">
+        <div className="flex flex-wrap gap-2 mt-1">
             {tags.map((tag, idx) => (
                 <span
-                key={idx}
-                className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-md inline-block"
+                    key={idx}
+                    className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-md"
                 >
-                {tag}
+                    {tag}
                 </span>
             ))}
         </div>
