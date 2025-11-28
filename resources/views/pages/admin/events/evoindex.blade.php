@@ -40,15 +40,30 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <div class="text-muted small">
-                <span class="me-3 fs-5"><i
-                        class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}</span>
-                <span class="me-3"><i class="ri-time-line me-1"></i><span
-                        id="currentTime"></span>
-                    WIB</span>
+                <span class="me-3 fs-5">
+                    <i class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}
+                </span>
+                <span class="me-3">
+                    <i class="ri-time-line me-1"></i><span id="currentTime"></span> WIB
+                </span>
             </div>
         </div>
-        <a href="{{ route('admin.evo.manage', $data->id) }}" class="btn btn-primary">Manage Event</a>
+
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.evo.manage', $data->id) }}" class="btn btn-primary">
+                Manage Event
+            </a>
+
+            {{-- 🔽 NEW: tombol buka modal export --}}
+            <button type="button"
+                    class="btn btn-outline-success"
+                    data-bs-toggle="modal"
+                    data-bs-target="#evoExportModal">
+                <i class="ri-file-excel-2-line"></i> Export Report
+            </button>
+        </div>
     </div>
+
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow mb-4">
@@ -76,8 +91,16 @@
                         $tabId = \Illuminate\Support\Str::slug($option, '-');
                         $participants = $data->participants->filter(function ($p) use ($option) {
                             $formData = json_decode($p->form_data, true);
-                            return in_array($option, $formData['question_1'] ?? []);
+
+                            // Normalisasi untuk checkbox / radio
+                            $selected = $formData['question_1'] ?? [];
+
+                            // jika radio → jadikan array
+                            $selected = is_array($selected) ? $selected : [$selected];
+
+                            return in_array($option, $selected);
                         });
+
                         @endphp
 
                         <div class="tab-pane fade @if ($loop->first) show active @endif" id="{{ $tabId }}" role="tabpanel">
@@ -104,13 +127,6 @@
                                                 placeholder="Search.." aria-label="search">
                                         </div>
                                     </div>
-
-                                    <div class="col-md-auto text-end mt-2 mt-md-0">
-                                        <a href="{{ route('evo.export', $option) }}"
-                                        class="btn btn-sm btn-outline-success">
-                                        <i class="ri-file-excel-2-line"></i> Export
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -126,7 +142,7 @@
                                 <th>Location</th>
                                 <th>Submitted At</th>
                                 <th>WhatsApp</th>
-                                <th>#</th>
+                                {{-- <th>#</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
@@ -167,7 +183,7 @@
                                         <span class="text-muted">-</span>
                                     @endif
                                     </td>
-                                    <td>{{ $questionList ?: '-' }}</td>
+                                    {{-- <td>{{ $questionList ?: '-' }}</td> --}}
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -182,3 +198,34 @@
     </div>
 </div>
 @endsection
+<!-- Modal Export EVO -->
+<div class="modal fade" id="evoExportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <form method="GET" action="{{ route('evo.export') }}">
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Pilih Program</label>
+                    <select name="option" class="form-select mb-1" required>
+                        <option value="all">All Programs</option>
+                        @foreach($programs as $program)
+                            <option value="{{ urlencode($program) }}">{{ $program }}</option>
+                        @endforeach
+                    </select>
+                    <small class="text-muted">
+                        * List berdasarkan seluruh program EVO, termasuk program lama.
+                    </small>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="ri-file-excel-2-line"></i> Export
+                </button>
+            </div>
+        </form>
+      </div>
+  </div>
+</div>

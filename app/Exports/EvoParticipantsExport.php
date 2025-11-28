@@ -21,10 +21,22 @@ class EvoParticipantsExport implements FromView
 
     public function view(): View
     {
-        // filter participants berdasarkan option (program/tab aktif)
         $participants = $this->data->participants->filter(function ($p) {
             $formData = json_decode($p->form_data, true);
-            return in_array($this->option, $formData['question_1'] ?? []);
+
+            $value = $formData['question_1'] ?? null;
+
+            // EVO baru: question_1 berupa string
+            if (is_string($value)) {
+                return $value === $this->option;
+            }
+
+            // Data lama (checkbox array)
+            if (is_array($value)) {
+                return in_array($this->option, $value);
+            }
+
+            return false;
         });
 
         return view('exports.evoparticipants', [
@@ -33,4 +45,5 @@ class EvoParticipantsExport implements FromView
             'username' => $this->username,
         ]);
     }
+
 }

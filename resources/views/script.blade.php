@@ -601,6 +601,28 @@
                         checkWrapper.appendChild(optLabel);
                         fieldWrapper.appendChild(checkWrapper);
                     });
+                    }
+                    else if (field.type === 'radio' && Array.isArray(field.options)) {
+                        field.options.forEach(opt => {
+                            const radioWrapper = document.createElement('div');
+                            radioWrapper.className = 'form-check';
+
+                            const radio = document.createElement('input');
+                            radio.type = 'radio';
+                            radio.className = 'form-check-input';
+                            radio.name = field.name; // radio → single value
+                            radio.value = opt;
+                            radio.id = `${field.name}-${opt.replace(/\s+/g, '-')}`;
+
+                            const optLabel = document.createElement('label');
+                            optLabel.className = 'form-check-label';
+                            optLabel.setAttribute('for', radio.id);
+                            optLabel.textContent = opt;
+
+                            radioWrapper.appendChild(radio);
+                            radioWrapper.appendChild(optLabel);
+                            fieldWrapper.appendChild(radioWrapper);
+                        });
                     } 
                     // 📝 Textarea
                     else if (field.type === 'textarea') {

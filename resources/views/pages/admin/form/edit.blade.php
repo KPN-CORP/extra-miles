@@ -74,10 +74,6 @@
                                     $isConfirmationRadio = str_contains($field['name'], 'confirmation') && $field['type'] == 'radio';
                                     $nextLabel = $isConfirmationRadio && isset($formSchema['fields'][$index + 1]) ? $formSchema['fields'][$index + 1]['label'] : '';
                                 @endphp
-                                {{-- <input type="text" class="form-control label-confirm"
-                                    name="label_confirmation[{{ $isConfirmationRadio ? $index+1 : '' }}]"
-                                    placeholder="Label"
-                                    value="{{ $nextLabel }}"> --}}
                                 <input type="text" class="form-control label-confirm"
                                     name="label_confirmation[{{ $isConfirmationRadio ? $index : '' }}]"
                                     placeholder="Label"
