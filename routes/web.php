@@ -79,10 +79,6 @@ Route::prefix('admin')->group(function () {
             Route::get('/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
             Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
             Route::get('/events/{encryptedId}/participants', [EventParticipantController::class, 'listParticipants'])->name('events.participants');
-            Route::get('/evo', [EventController::class, 'evoIndex'])->name('admin.evo.index');
-            Route::get('/evo/{id}/manage', [EventController::class, 'evoManage'])->name('admin.evo.manage');
-            Route::put('/evo/{id}', [EventController::class, 'evoUpdate'])->name('evo.update');
-            Route::get('/evo/{option}/export', [EventController::class, 'exportEvoParticipants'])->name('evo.export');
 
             Route::get('/employees/search', [EventParticipantController::class, 'search'])->name('employees.search');
             Route::post('/events/{event}/participants', [EventParticipantController::class, 'store'])->name('participants.store');
@@ -92,6 +88,13 @@ Route::prefix('admin')->group(function () {
             Route::get('/ticket/qr-png/{encryptedId}', [EventController::class, 'showQRPNG'])->name('event.qrpng');
             Route::get('/participants/export/{event_id}', [EventParticipantController::class, 'export'])->name('participants.export');
             Route::post('/participants/bulk-approve', [EventParticipantController::class, 'bulkApprove'])->name('participants.bulkApprove');
+        });
+
+        Route::middleware(['permission:viewmenuevent'])->group(function () {
+            Route::get('/evo', [EventController::class, 'evoIndex'])->name('admin.evo.index');
+            Route::get('/evo/{id}/manage', [EventController::class, 'evoManage'])->name('admin.evo.manage');
+            Route::put('/evo/{id}', [EventController::class, 'evoUpdate'])->name('evo.update');
+            Route::get('/evo/export', [EventController::class, 'exportEvoParticipants'])->name('evo.export');
         });
 
         Route::middleware(['permission:viewmenusurvey'])->group(function () {

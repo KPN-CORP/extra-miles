@@ -341,28 +341,52 @@ class EventController extends Controller
     {
         $parentLink = 'Event Management';
         $link = 'EVO';     
-        
         $username = Auth::user()->name;
 
-        $data = Event::withCount('participants')->with('participants', 'formTemplates')
-        ->where('category', 'EVO')
-        ->orderBy('created_at', 'desc')
-        ->first();
+        $data = Event::withCount('participants')
+            ->with('participants', 'formTemplates')
+            ->where('category', 'EVO')
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-        $schema = isset($data->form_schema) ? json_decode($data->form_schema, true) : null;
+        // Kalau belum ada event EVO
+        if (!$data) {
+            return view('pages.admin.events.evoindex', [
+                'link'        => $link,
+                'parentLink'  => $parentLink,
+                'data'        => null,
+                'options'     => [],
+                'programs'    => [],
+                'username'    => $username,
+            ]);
+        }
+
+        // TAB: tetap pakai schema (question_1.options)
+        $schema = $data->form_schema ? json_decode($data->form_schema, true) : null;
         $options = collect($schema['fields'] ?? [])
             ->where('name', 'question_1')
-            ->flatMap(fn($f) => $f['options'] ?? [])
+            ->flatMap(fn ($f) => $f['options'] ?? [])
             ->unique()
             ->values()
             ->toArray();
 
+        // REPORT: ambil semua nilai question_1 DISTINCT dari transaksi
+        $programs = EventParticipant::where('event_id', $data->id)
+            ->selectRaw("JSON_UNQUOTE(JSON_EXTRACT(form_data, '$.question_1')) AS program")
+            ->whereNotNull('form_data')
+            ->distinct()
+            ->pluck('program')
+            ->filter()      // buang null / kosong
+            ->values()
+            ->toArray();
+
         return view('pages.admin.events.evoindex', [
-            'link' => $link,
-            'parentLink' => $parentLink,
-            'data' => $data,
-            'options' => $options,
-            'username' => $username,
+            'link'        => $link,
+            'parentLink'  => $parentLink,
+            'data'        => $data,
+            'options'     => $options,   // untuk TAB
+            'programs'    => $programs,  // untuk filter di modal export
+            'username'    => $username,
         ]);
     }
 
@@ -473,17 +497,22 @@ class EventController extends Controller
         return redirect()->route('admin.evo.index')->with('success', 'EVO updated successfully.');
     }
 
-    public function exportEvoParticipants($option)
+    public function exportEvoParticipants(Request $request)
     {
         $username = Auth::user()->name;
 
-        $data = Event::with('participants')
+        // Ambil value option dari request
+        $option = $request->get('option', 'all'); 
+        $option = urldecode($option);
+
+        $event = Event::with('participants')
             ->where('category', 'EVO')
             ->orderBy('created_at', 'desc')
             ->first();
 
         $fileName = 'participants_' . Str::slug($option) . '.xlsx';
 
-        return Excel::download(new EvoParticipantsExport($data, $option, $username), $fileName);
+        return Excel::download(new EvoParticipantsExport($event, $option, $username), $fileName);
     }
+
 }

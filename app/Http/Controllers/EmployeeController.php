@@ -41,6 +41,7 @@ class EmployeeController extends Controller
             // $employee->roles = $roles;
 
             $employee->hasEvoPermission = $roles->intersect([
+                'EM - Head Corcom',
                 'EM - Tim Corcom',
                 'Admin HCIS',
                 'superadmin'

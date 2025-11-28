@@ -84,9 +84,11 @@
                             <li>
                                 <a href="{{ url('/admin/events') }}"> Events </a>
                             </li>
+                            @can('viewmenuevo')
                             <li>
                                 <a href="{{ url('/admin/evo') }}"> EVO </a>
                             </li>
+                            @endcan
                         </ul>
                     </div>
                 </li>

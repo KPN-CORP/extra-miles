@@ -249,35 +249,70 @@ class EventController extends Controller
 
     public function getEventForm($id)
     {
-      try {
-        // Decrypt the ID
-        $decryptedId = Crypt::decryptString($id);
+        try {
+            // Decrypt the ID
+            $decryptedId = Crypt::decryptString($id);
 
-        $event = Event::findOrFail($decryptedId);
+            $event = Event::findOrFail($decryptedId);
 
-        // Check if form_id is null
-        if (is_null($event->form_id)) {
-            return response()->json(['message' => 'No form associated with this event', 'fields' => null], 200);
+            if (is_null($event->form_id)) {
+                return response()->json([
+                    'message' => 'No form associated with this event',
+                    'fields' => null,
+                    'programQuota' => []
+                ], 200);
+            }
+
+            // Retrieve form template
+            $eventForm = FormTemplate::findOrFail($event->form_id);
+
+            // Parse JSON schema
+            $formSchema = json_decode($eventForm->form_schema, true);
+
+            if (!isset($formSchema)) {
+                return response()->json(['message' => 'Form schema not found'], 404);
+            }
+
+            /* ============================================
+            *  ADD PROGRAM QUOTA STATUS HERE
+            * ============================================ */
+
+            // Ambil semua program dari schema (question_1 only)
+            $programOptions = collect($formSchema['fields'] ?? [])
+                ->where('name', 'question_1')
+                ->flatMap(fn ($f) => $f['options'] ?? [])
+                ->values();
+
+            // Hitung quota per program
+            $programQuota = $programOptions->map(function ($program) use ($event) {
+                $count = EventParticipant::where('event_id', $event->id)
+                    ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(form_data, '$.question_1')) = ?", [$program])
+                    ->count();
+
+                return [
+                    'program'    => $program,
+                    'count'      => $count,
+                    'quota'      => $event->quota,
+                    'quota_full' => $event->quota !== null && $count >= $event->quota,
+                ];
+            })->values();
+
+            /* ============================================
+            *  RETURN JSON WITH QUOTA
+            * ============================================ */
+
+            return response()->json([
+                'fields'       => $formSchema['fields'],  // tetap sama
+                'programQuota' => $programQuota          // tambahan quotas
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Invalid event ID or error processing form'
+            ], 400);
         }
-
-        // Retrieve the form template directly by ID
-        $eventForm = FormTemplate::findOrFail($event->form_id);
-
-        // Parse the form_schema JSON string
-        $formSchema = json_decode($eventForm->form_schema, true); // true = associative array
-
-        // Check if 'fields' exists
-        if (!isset($formSchema)) {
-            return response()->json(['message' => 'Form schema not found'], 404);
-        }
-
-        // Return only the fields
-        return response()->json($formSchema);
-    
-      } catch (\Exception $e) {
-          return response()->json(['message' => 'Invalid event ID or error processing form'], 400);
-      }
     }
+
 
     public function store(Request $request)
     {
@@ -499,4 +534,191 @@ class EventController extends Controller
 
         return response()->json(['registered' => $registered]);
     }
+
+    public function storeEvo(Request $request)
+    {
+        try {
+            // Ambil payload
+            $payload = JWTAuth::parseToken()->getPayload();
+            $userId = $payload->get('sub');
+            $employeeId = $payload->get('employee_id');
+            $fullname = $payload->get('fullname');
+
+            $eventId = Crypt::decryptString($request->eventId);
+
+            // Validasi
+            $validated = $request->validate([
+                'formData' => 'required|array',
+                'personalMobileNumber' => 'required|string',
+            ]);
+
+            $employee = Employee::where('employee_id', $employeeId)->firstOrFail();
+
+            $event = Event::findOrFail($eventId);
+
+            // Hanya EVO memakai multi-transaksi
+            $isEvo = ($event->category === 'EVO');
+
+            // Update nomor WA
+            $employee->update([
+                'whatsapp_number' => $validated['personalMobileNumber'],
+            ]);
+
+            // Ambil list pilihan
+            $selections = $validated['formData']['question_1'] ?? [];
+
+            if (!is_array($selections)) {
+                $selections = [$selections];
+            }
+
+            if ($isEvo) {
+
+                // Cek duplikasi tiap program
+                foreach ($selections as $program) {
+                    $already = EventParticipant::where('event_id', $eventId)
+                        ->where('employee_id', $employeeId)
+                        ->whereJsonContains('form_data->question_1', $program)
+                        ->exists();
+
+                    if ($already) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "You are already registered for program: $program",
+                        ], 409);
+                    }
+                }
+
+                // Insert 1 row per program
+                foreach ($selections as $program) {
+                    EventParticipant::create([
+                        'event_id'      => $eventId,
+                        'fullname'      => $fullname,
+                        'employee_id'   => $employeeId,
+                        'form_id'       => $event->form_id,
+                        'form_data'     => json_encode([
+                            'question_1'      => $program,
+                            'countryCode'     => $validated['formData']['countryCode'] ?? '+62',
+                            'whatsapp_number' => $validated['formData']['whatsapp_number'] ?? '',
+                        ]),
+                        'job_level'     => $employee->job_level,
+                        'unit'          => $employee->unit,
+                        'business_unit' => $employee->group_company,
+                        'location'      => $employee->office_area,
+                        'created_by'    => $userId,
+                    ]);
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'EVO registration completed successfully.',
+                ], 201);
+            }
+
+            // NORMAL (non-EVO)
+            EventParticipant::create([
+                'event_id'      => $eventId,
+                'fullname'      => $fullname,
+                'employee_id'   => $employeeId,
+                'form_id'       => $event->form_id,
+                'form_data'     => json_encode($validated['formData']),
+                'job_level'     => $employee->job_level,
+                'unit'          => $employee->unit,
+                'business_unit' => $employee->group_company,
+                'location'      => $employee->office_area,
+                'created_by'    => $userId,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event registered successfully.',
+            ], 201);
+
+        } catch (\Exception $e) {
+            Log::error('Error submitting event: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateEvo(Request $request)
+    {
+        try {
+            $payload     = JWTAuth::parseToken()->getPayload();
+            $employeeId  = $payload->get('employee_id');
+            $userId      = $payload->get('sub');
+
+            $eventId = Crypt::decryptString($request->eventId);
+
+            $validated = $request->validate([
+                'formData' => 'required|array',
+                'personalMobileNumber' => 'required|string',
+            ]);
+
+            $event = Event::findOrFail($eventId);
+            $isEvo = ($event->category === 'EVO');
+
+            Employee::where('employee_id', $employeeId)->update([
+                'whatsapp_number' => $validated['personalMobileNumber'],
+            ]);
+
+            $selections = $validated['formData']['question_1'] ?? [];
+            if (!is_array($selections)) $selections = [$selections];
+
+            if ($isEvo) {
+                // Hapus semua transaksi lama peserta
+                EventParticipant::where('event_id', $eventId)
+                    ->where('employee_id', $employeeId)
+                    ->delete();
+
+                // Insert ulang
+                foreach ($selections as $program) {
+                    EventParticipant::create([
+                        'event_id'      => $eventId,
+                        'fullname'      => $payload->get('fullname'),
+                        'employee_id'   => $employeeId,
+                        'form_id'       => $event->form_id,
+                        'form_data'     => json_encode([
+                            'question_1'      => $program,
+                            'countryCode'     => $validated['formData']['countryCode'] ?? '+62',
+                            'whatsapp_number' => $validated['formData']['whatsapp_number'] ?? '',
+                        ]),
+                        'created_by'    => $userId,
+                        'updated_by'    => $userId,
+                    ]);
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'EVO registration updated successfully.',
+                ], 200);
+            }
+
+            // Non-EVO Normal Update
+            $participant = EventParticipant::where('event_id', $eventId)
+                ->where('employee_id', $employeeId)
+                ->firstOrFail();
+
+            $participant->form_data = json_encode($validated['formData']);
+            $participant->updated_by = $userId;
+            $participant->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event registration updated successfully.',
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating event registration: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
 }

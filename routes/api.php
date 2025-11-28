@@ -33,6 +33,8 @@ Route::middleware('auth.token')->group(function () {
     Route::get('/events/check-registration/{id}', [EventController::class, 'checkRegistration']);
     Route::post('/event-registration', [EventController::class, 'store']);
     Route::post('/event-registration-update', [EventController::class, 'update']);
+    Route::post('/evo-registration', [EventController::class, 'storeEvo']);
+    Route::post('/evo-registration-update', [EventController::class, 'updateEvo']);
     Route::get('/survey-vote', [SurveyVoteController::class, 'getSurveyVotes']);
     Route::get('/survey-vote/{id}', [SurveyVoteController::class, 'getSurveyVotesDetails']);
     Route::get('/survey-form/{id}', [SurveyVoteController::class, 'getSurveyForm']);
