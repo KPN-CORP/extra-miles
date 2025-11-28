@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SurveyExport;
 use Illuminate\Http\Request;
 use App\Models\MasterBisnisunit;
 use App\Models\Location;
@@ -412,11 +413,11 @@ class SurveyController extends Controller
 
     public function export($survey_id)
     {
-        $survey = Survey::with(['participants' => function ($query) {
-            $query->whereNotNull('form_data');
-        }])->findOrFail($survey_id);
+        // $survey = Survey::with(['participants' => function ($query) {
+        //     $query->whereNotNull('form_data');
+        // }])->findOrFail($survey_id);
 
         // Proses ekspor Excel menggunakan Laravel Excel (Maatwebsite\Excel)
-        return Excel::download(new SurveyExport($survey), 'survey_report.xlsx');
+        return Excel::download(new SurveyExport($survey_id), 'survey_report.xlsx');
     }
 }

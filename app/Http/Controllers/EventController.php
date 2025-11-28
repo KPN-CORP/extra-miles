@@ -296,6 +296,8 @@ class EventController extends Controller
         // Simpan status draft jika ada
         if ($request->action == 'draft') {
             $event->status = 'Draft';
+        }else if($request->action == 'update'){
+            $event->status = 'Open Registration';
         }
 
         $event->save();
