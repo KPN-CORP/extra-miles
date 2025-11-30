@@ -7,6 +7,7 @@ use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
@@ -115,6 +116,7 @@ class NewsController extends Controller
 
     public function update(Request $request, $id)
     {
+        
         $id = Crypt::decryptString($id);
         $news = News::findOrFail($id);
 
@@ -130,18 +132,19 @@ class NewsController extends Controller
         if ($request->hasFile('image')) {
             $folder = 'assets/images/news';
         
-            // Hitung total berita untuk membuat index baru
-            $index = News::count() + 1;
-        
-            // Ambil ekstensi file
-            $extension = $request->file('image')->getClientOriginalExtension();
-        
-            // Buat nama file baru: misal "news_5.jpg"
-            $fileName = 'news_' . $index . '.' . $extension;
-        
-            // Simpan file dengan nama baru
+            // Hapus gambar lama jika ada
+            if ($news->image && Storage::disk('public')->exists($news->image)) {
+                Storage::disk('public')->delete($news->image);
+            }
+
+            // Buat nama baru yang unik
+            $fileName = 'news_' . time() . '_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+
+            // Simpan file
             $imagePath = $request->file('image')->storeAs($folder, $fileName, 'public');
-            $news->image    = $imagePath;
+
+            // Update model
+            $news->image = $imagePath;
         }
 
         $news->category     = $request->category;
