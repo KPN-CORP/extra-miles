@@ -23,7 +23,7 @@ class AuthApiController extends Controller
         return response()->json([
             'message' => 'Login success',
             'token' => $token,
-            'token_type' => 'bearer',
+            'token_type' => 'Bearer',
         ]);
     }
 }
