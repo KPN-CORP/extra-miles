@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login-api', [AuthApiController::class, 'login']);
-Route::middleware('auth:api')->get('/mdc-transactions', [MdcTransactionController::class, 'index']);
+Route::middleware('auth:apiuser')->get('/mdc-transactions', [MdcTransactionController::class, 'index']);
 
 Route::get('auth-service', [AuthController::class, 'login']);
 
