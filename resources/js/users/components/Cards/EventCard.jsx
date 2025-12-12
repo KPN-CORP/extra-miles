@@ -78,7 +78,8 @@ const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
         </div>
       </div>
 
-      {event.status === 'Ongoing' && isOngoing && event.event_participant?.[0]?.attending_status === 'Attending' ? (
+      {/* {event.status === 'Ongoing' && isOngoing && event.event_participant?.[0]?.attending_status === 'Attending' ? ( */}
+      {event.event_participant?.[0]?.attending_status === 'Attending' ? (
         <p className="p-2 pe-0">
         <span className="p-2 py-1 flex items-center justify-center rounded-full ring-1 ring-green-400 text-green-700 text-xl font-medium">
           <i className="ri-check-double-line"></i>

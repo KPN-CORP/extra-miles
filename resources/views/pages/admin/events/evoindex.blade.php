@@ -142,6 +142,7 @@
                                 <th>Location</th>
                                 <th>Submitted At</th>
                                 <th>WhatsApp</th>
+                                <th>Action</th>
                                 {{-- <th>#</th> --}}
                                 </tr>
                             </thead>
@@ -183,7 +184,21 @@
                                         <span class="text-muted">-</span>
                                     @endif
                                     </td>
-                                    {{-- <td>{{ $questionList ?: '-' }}</td> --}}
+                                    <td class="text-center">
+                                        <form id="delete-form-{{ $p->id }}"
+                                            action="{{ route('events.removeEvoParticipants', $p->id) }}"
+                                            method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button"
+                                                    class="btn btn-outline-danger btn-sm btn-remove-participant"
+                                                    data-id="{{ $p->id }}"
+                                                    title="Remove Participant">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -200,7 +215,7 @@
 @endsection
 <!-- Modal Export EVO -->
 <div class="modal fade" id="evoExportModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog">
       <div class="modal-content">
           <form method="GET" action="{{ route('evo.export') }}">
             <div class="modal-body">

@@ -559,11 +559,6 @@ class EventController extends Controller
             // Hanya EVO memakai multi-transaksi
             $isEvo = ($event->category === 'EVO');
 
-            // Update nomor WA
-            $employee->update([
-                'whatsapp_number' => $validated['personalMobileNumber'],
-            ]);
-
             // Ambil list pilihan
             $selections = $validated['formData']['question_1'] ?? [];
 
@@ -607,6 +602,11 @@ class EventController extends Controller
                         'created_by'    => $userId,
                     ]);
                 }
+
+                // Update nomor WA
+                $employee->update([
+                    'whatsapp_number' => $validated['personalMobileNumber'],
+                ]);
 
                 return response()->json([
                     'success' => true,

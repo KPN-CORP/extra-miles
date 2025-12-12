@@ -129,6 +129,26 @@
             });
         });
 
+        document.querySelectorAll(".btn-remove-participant").forEach(function (button) {
+            button.addEventListener("click", function () {
+                const eventId = this.getAttribute("data-id");
+    
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Participant will be removed from this event.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ab2f2b',
+                    cancelButtonColor: '#aaa',
+                    confirmButtonText: 'Yes, remove it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById(`delete-form-${eventId}`).submit();
+                    }
+                });
+            });
+        });
+
         document.querySelectorAll(".btn-close-reg").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 const id = this.dataset.id;

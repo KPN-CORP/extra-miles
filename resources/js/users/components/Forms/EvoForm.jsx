@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { showAlert } from '../Helper/alertHelper';
 import { useAuth } from '../context/AuthContext';
 import { generateValidationSchema } from '../Helper/generateValidationSchema';
+import { log } from 'handlebars';
 
 function parsePhoneNumber(fullNumber) {
     const knownCountryCodes = ['+62', '+60', '+65', '+63', '+66', '+84', '+91', '+966', '+81', '+1'];
@@ -37,6 +38,7 @@ export default function EvoForm({ encryptedID, registered }) {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quotaStatus, setQuotaStatus] = useState({});
+    const isReadOnly = !!registered; // kalau registered ada → semua input disabled
 
     useEffect(() => {
         const fetchFormSchema = async () => {
@@ -48,7 +50,7 @@ export default function EvoForm({ encryptedID, registered }) {
                     },
                 });
 
-                const formSchema = response.data;
+                const formSchema = response.data;                
 
                 const quotaMap = {};
                 response.data.programQuota?.forEach(p => {
@@ -178,6 +180,7 @@ export default function EvoForm({ encryptedID, registered }) {
                                         id="countryCode"
                                         value={values.countryCode}
                                         onChange={handleChange}
+                                        disabled={isReadOnly}
                                         className="border rounded-l p-2 me-1 bg-white"
                                     >
                                         <option value="+62">🇮🇩 +62</option>
@@ -198,6 +201,7 @@ export default function EvoForm({ encryptedID, registered }) {
                                         value={values.whatsapp_number}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
+                                        disabled={isReadOnly}
                                         placeholder="phone number"
                                         className="w-full border rounded-r p-2"
                                     />
@@ -226,8 +230,12 @@ export default function EvoForm({ encryptedID, registered }) {
                                                         const regData = registered?.form_data
                                                             ? JSON.parse(registered.form_data)
                                                             : {};
-                                                        const alreadySelected = regData[field.name].includes(option);     
-                                                                                                
+                                                        const selectedArray = Array.isArray(regData[field.name])
+                                                            ? regData[field.name]
+                                                            : [];
+
+                                                        const alreadySelected = selectedArray.includes(option);
+                    
                                                         const optionKey = `${field.name}-${option}`;
                                                         
                                                         return (
@@ -236,7 +244,7 @@ export default function EvoForm({ encryptedID, registered }) {
                                                                     type="checkbox"
                                                                     name={field.name}
                                                                     value={option}
-                                                                    disabled={quotaStatus[option] === true}
+                                                                    disabled={isReadOnly || quotaStatus[option] === true}
                                                                     checked={
                                                                         values[field.name].includes(option)
                                                                     }
@@ -289,7 +297,7 @@ export default function EvoForm({ encryptedID, registered }) {
                                                                     type="radio"
                                                                     name={field.name}
                                                                     value={option}
-                                                                    disabled={quotaStatus[option] === true}
+                                                                    disabled={isReadOnly || quotaStatus[option] === true}
                                                                     checked={values[field.name] === option}
                                                                     onChange={() => setFieldValue(field.name, option)}
                                                                     className="accent-red-700 w-4 h-4"
@@ -297,7 +305,7 @@ export default function EvoForm({ encryptedID, registered }) {
                                                                 <span
                                                                     className={`text-gray-800 
                                                                         ${alreadySelected ? "text-gray-500 italic" : ""} 
-                                                                        ${!alreadySelected && quotaStatus[option] ? "text-gray-400 line-through" : ""}`}
+                                                                        ${!alreadySelected && quotaStatus[option] ? "text-gray-400 " : ""}`}
                                                                 >
                                                                     {option}
 
@@ -325,6 +333,7 @@ export default function EvoForm({ encryptedID, registered }) {
                                                     value={values[field.name]}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
+                                                    disabled={isReadOnly}
                                                     className="w-full border rounded p-2"
                                                 />
                                             ) : null}
@@ -340,6 +349,7 @@ export default function EvoForm({ encryptedID, registered }) {
                                                     value={values[field.name]}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
+                                                    disabled={isReadOnly}
                                                     className="w-full border rounded p-2"
                                                 />
                                             ) : null}
@@ -352,17 +362,19 @@ export default function EvoForm({ encryptedID, registered }) {
                                 </div>
                             </div>
 
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="w-full px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center text-white text-sm font-semibold"
-                            >
-                                {isSubmitting ? (
-                                    <PulseLoader size={8} color="#fff" margin={2} speedMultiplier={0.75} />
-                                ) : (
-                                    'Submit'
-                                )}
-                            </button>
+                            {!isReadOnly && (
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full px-5 py-2.5 bg-red-700 rounded-lg shadow-md inline-flex justify-center items-center text-white text-sm font-semibold"
+                                >
+                                    {isSubmitting ? (
+                                        <PulseLoader size={8} color="#fff" margin={2} speedMultiplier={0.75} />
+                                    ) : (
+                                        'Submit'
+                                    )}
+                                </button>
+                            )}
                         </Form>
                     )}
                 </Formik>
