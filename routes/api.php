@@ -8,17 +8,20 @@ use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\QuotesController;
 use App\Http\Controllers\Api\SocialController;
 use App\Http\Controllers\Api\SurveyVoteController;
+use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\MdcTransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
+Route::post('/login-api', [AuthApiController::class, 'login']);
+Route::middleware('auth:apiuser')->get('/mdc-transactions', [MdcTransactionController::class, 'index']);
 
 Route::get('auth-service', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->get('/verify', function (Request $request) {
     return response()->json($request->user());
 });
-
 
 Route::middleware('auth.token')->group(function () {
     Route::get('/profile', [EmployeeController::class, 'profile']);
