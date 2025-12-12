@@ -313,6 +313,14 @@ class EventController extends Controller
         return redirect()->back()->with('success', 'Event berhasil diarsipkan.');
     }
 
+    public function removeEvoParticipants($id)
+    {
+        $event = EventParticipant::findOrFail($id);
+        $event->delete();
+
+        return redirect()->back()->with('success', 'Participant removed successfully!');
+    }
+
     public function closeRegistration($id)
     {
         $event = Event::findOrFail($id);

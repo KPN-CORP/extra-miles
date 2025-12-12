@@ -1,7 +1,7 @@
 {
-  "_cloneDeep-D-Ve57l3.js": {
-    "file": "assets/cloneDeep-D-Ve57l3.js",
-    "name": "cloneDeep"
+  "_handlebars-B2xcvs5B.js": {
+    "file": "assets/handlebars-B2xcvs5B.js",
+    "name": "handlebars"
   },
   "node_modules/remixicon/fonts/remixicon.eot": {
     "file": "assets/remixicon-BVJ9S1ev.eot",
@@ -28,7 +28,7 @@
     "src": "public/images/bg-auth.jpg"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BJSbQXi4.css",
+    "file": "assets/app-PMj8MTqH.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -61,12 +61,12 @@
     "src": "resources/fonts/remixicon.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-DJFTty7S.js",
+    "file": "assets/app-DkTrcB3u.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_cloneDeep-D-Ve57l3.js"
+      "_handlebars-B2xcvs5B.js"
     ],
     "css": [
       "assets/app-DVNhP-d0.css"
@@ -85,12 +85,12 @@
     "isEntry": true
   },
   "resources/js/users/main.jsx": {
-    "file": "assets/main-vYNqMbUy.js",
+    "file": "assets/main-CQmB8dA7.js",
     "name": "main",
     "src": "resources/js/users/main.jsx",
     "isEntry": true,
     "imports": [
-      "_cloneDeep-D-Ve57l3.js"
+      "_handlebars-B2xcvs5B.js"
     ],
     "css": [
       "assets/main-CiXS92Zv.css"
