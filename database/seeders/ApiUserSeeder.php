@@ -14,8 +14,8 @@ class ApiUserSeeder extends Seeder
     public function run(): void
     {
         DB::table('api_users')->insert([
-            'username' => 'dept_finance',
-            'password' => bcrypt('passwordRahasia123'),
+            'username' => 'kpn_erp',
+            'password' => bcrypt('a233bab705d4'),
         ]);
     }
 }
