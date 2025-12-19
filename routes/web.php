@@ -31,6 +31,7 @@ use App\Livewire\ManageParticipants;
 
 Route::get('dbauth', [SsoController::class, 'dbauth']);
 Route::get('dbauthlms', [SsoController::class, 'dbauthlms']);
+Route::get('dbauthexpl', [SsoController::class, 'dbauthexpl']);
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
