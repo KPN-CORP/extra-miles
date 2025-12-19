@@ -144,13 +144,13 @@ class SsoController extends Controller
                 $employee_id = $user->employee_id;
 
                 $employee = Employee::where('employee_id', $user->employee_id)->first();
-                $secretKey = 'KPNLMS2025';
+                $secretKey = 'k9LandVU1e3gAAGxSTsyhJkW1qj0bY87VjvOcU4jiFpNV56tNaPDaZDeDY1ipjcy';
 
                 $payload = [
                     'iss' => 'KPN',                 // issuer
                     'aud' => 'VENDOR_LMS',          // audience
                     'iat' => time(),                // issued at
-                    'exp' => time() + 120,           // expired dalam 120 detik
+                    'exp' => time() + 2592000,           // expired dalam 120 detik
                     'email' => $email,
                     'employee_id' => $employee_id,
                     'business_unit' => $employee->group_company,
@@ -171,7 +171,7 @@ class SsoController extends Controller
                 $jwt = "$header.$payloadEncoded.$signature";
 
                 // === STEP 5: Redirect ke vendor dengan token ===
-                $vendorURL = "https://kpn-lms.bluebridgecorp.com/sso/darwinbox/receive?token=" . urlencode($jwt);
+                $vendorURL = "https://kpn-lms.bluebridgecorp.com/api/sso/darwinbox/receive?token=" . urlencode($jwt);
                 header("Location: $vendorURL");
                 exit;
             } else {
@@ -247,7 +247,7 @@ class SsoController extends Controller
                     'iss' => 'KPN',                 // issuer
                     'aud' => 'VENDOR_PS',          // audience
                     'iat' => time(),                // issued at
-                    'exp' => time() + 120,           // expired dalam 120 detik
+                    'exp' => time() + 2592000,           // expired dalam 120 detik
                     'email' => $email,
                     'employee_id' => $employee_id,
                     'business_unit' => $employee->group_company,
