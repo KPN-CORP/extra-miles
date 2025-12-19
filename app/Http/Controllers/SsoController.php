@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Employee;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -136,6 +137,8 @@ class SsoController extends Controller
                 //disini akan ada proses pengiriman data $user->email, $user->employee_id dan JWT Token ke link vendor, token ini ada masa aktifnya jadi proses sinkronisasi ini tidak bisa lama. bantu buatkan scriptnya disini dan JWT tanpa firebase
                 $email = $user->email;
                 $employee_id = $user->employee_id;
+
+                $employee = Employee::where('employee_id', $user->employee_id)->first();
                 $secretKey = 'KPNLMS2025';
 
                 $payload = [
@@ -144,7 +147,11 @@ class SsoController extends Controller
                     'iat' => time(),                // issued at
                     'exp' => time() + 120,           // expired dalam 120 detik
                     'email' => $email,
-                    'employee_id' => $employee_id
+                    'employee_id' => $employee_id,
+                    'business_unit' => $employee->group_company,
+                    'division' => $employee->unit,
+                    'location' => $employee->office_area,
+                    'name' => $employee->fullname,
                 ];
                 
                 function base64UrlEncode($data)
