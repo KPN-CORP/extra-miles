@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\Api\EmployeeApiController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\LiveContentController;
 use App\Http\Controllers\Api\NewsController;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login-api', [AuthApiController::class, 'login']);
 Route::middleware('auth:apiuser')->get('/mdc-transactions', [MdcTransactionController::class, 'index']);
+Route::middleware('auth:apiuser')->get('/employees', [EmployeeApiController::class, 'index']);
 
 Route::get('auth-service', [AuthController::class, 'login']);
 
