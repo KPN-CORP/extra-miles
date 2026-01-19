@@ -369,8 +369,9 @@ class SsoController extends Controller
 
                 $jwt = "$header.$payloadEncoded.$signature";
 
-                // === STEP 5: Redirect ke vendor dengan token ===
-                $vendorURL = "https://kpn-uxflow.primeskills.id/api/sso/darwinbox?token=" . urlencode($jwt);
+                // === STEP 5: Redirect ke vendor dengan token === nastar-academy.com
+                // $vendorURL = "https://kpn-uxflow.primeskills.id/api/sso/darwinbox?token=" . urlencode($jwt);
+                $vendorURL = "https://nastar-academy.com/api/sso/darwinbox?token=" . urlencode($jwt);
                 header("Location: $vendorURL");
                 exit;
             } else {
