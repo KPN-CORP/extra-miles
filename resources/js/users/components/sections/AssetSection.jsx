@@ -7,7 +7,7 @@ export default () => {
 
   return (
     <a
-      href="https://drive.google.com/drive/folders/15u5SUk96Te5AdxzQpVM_WZ5MeG4YkiMf"
+      href="https://drive.google.com/drive/folders/1zmDJ_yE6zL4itNi-XcG8IO6sFfhAQRdA"
       target="_blank"
       rel="noopener noreferrer"
       title="Open News & Events Assets in Google Drive"
