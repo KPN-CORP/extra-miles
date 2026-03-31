@@ -4,6 +4,15 @@
 <div class="container-fluid bg-white py-3 px-3">
     <form method="POST" action="{{ route('events.store') }}" enctype="multipart/form-data">
         @csrf
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="card bg-light shadow">
             <div class="card-header">
                 <h4 class="mb-0">Event Info</h4>

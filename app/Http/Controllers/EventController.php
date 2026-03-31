@@ -20,6 +20,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
@@ -141,6 +142,15 @@ class EventController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'event_name' => [
+                'required',
+                'string',
+                'max:255',
+                // Validasi unik: hanya cek di baris yang deleted_at-nya NULL
+                Rule::unique('events', 'title')->where(function ($query) {
+                    return $query->whereNull('deleted_at');
+                }),
+            ],
             'category' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
