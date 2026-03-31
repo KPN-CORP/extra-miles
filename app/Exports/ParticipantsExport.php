@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles
 {
@@ -57,10 +59,20 @@ class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize
             ->get();
 
         return $participants->map(function ($item, $index) use ($fieldMap) {
+
+        $formData = json_decode($item->form_data, true);
+
+        $phone = $formData['whatsapp_number'] ?? '';
+        $code  = $formData['countryCode'] ?? '';
+        $phone = ltrim($phone, '0');
+
+        $whatsapp = "'" . $code . $phone; // tambah kutip di depan
+
             $base = [
                 'No' => $index + 1,
                 'employee_id' => $item->employee_id,
                 'fullname' => $item->fullname,
+                'Phone Number' => $whatsapp,
                 'business_unit' => $item->business_unit,
                 'job_level' => $item->job_level,
                 'location' => $item->location,
@@ -76,7 +88,7 @@ class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize
             foreach ($fieldMap as $key => $label) {
                 $base[$label] = $formData[$key] ?? null;
             }
-
+            
             return $base;
         });
     }
@@ -100,6 +112,7 @@ class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize
             'No',
             'Employee ID',
             'Full Name',
+            'Phone Number',
             'Business Unit',
             'Job Level',
             'Location',
@@ -123,6 +136,23 @@ class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize
                     'startColor' => ['rgb' => 'ab2f2b'], // warna merah muda
                 ],
             ],
+        ];
+    }
+    
+    public function columnFormats(): array
+    {
+        $headings = $this->headings();
+    
+        $index = array_search('Phone Number', $headings);
+    
+        if ($index === false) {
+            return [];
+        }
+    
+        $columnLetter = Coordinate::stringFromColumnIndex($index + 1);
+    
+        return [
+            $columnLetter => NumberFormat::FORMAT_TEXT,
         ];
     }
 }
