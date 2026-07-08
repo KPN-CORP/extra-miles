@@ -44,26 +44,58 @@ const AnimatedRoutes = () => {
     </AnimatePresence>
   );
 };
+const checkIsMobile = () => {
+  const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
+  const isTouchDevice =
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0 ||
+    navigator.msMaxTouchPoints > 0;
+
+  return isMobileScreen && isTouchDevice;
+};
 
 const AppContent = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 450);
+  const [isMobile, setIsMobile] = useState(checkIsMobile);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 450);
+    const media = window.matchMedia("(max-width: 768px)");
+
+    const handleChange = () => {
+      setIsMobile(checkIsMobile());
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    handleChange();
+
+    if (media.addEventListener) {
+      media.addEventListener("change", handleChange);
+    } else {
+      media.addListener(handleChange); // fallback browser lama
+    }
+
+    window.addEventListener("resize", handleChange);
+
+    return () => {
+      if (media.removeEventListener) {
+        media.removeEventListener("change", handleChange);
+      } else {
+        media.removeListener(handleChange);
+      }
+
+      window.removeEventListener("resize", handleChange);
+    };
   }, []);
 
   useEffect(() => {
     const lockOrientation = async () => {
-      if (isMobile && screen.orientation && typeof screen.orientation.lock === 'function') {
+      if (
+        isMobile &&
+        screen.orientation &&
+        typeof screen.orientation.lock === "function"
+      ) {
         try {
-          await screen.orientation.lock('portrait');
-        } catch (error) {
-          console.warn('Orientation lock failed:', error);
+          await screen.orientation.lock("portrait");
+        } catch (e) {
+          // Beberapa browser memang tidak mengizinkan lock orientation
         }
       }
     };
