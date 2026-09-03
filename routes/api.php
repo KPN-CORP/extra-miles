@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\QuotesController;
 use App\Http\Controllers\Api\SocialController;
 use App\Http\Controllers\Api\SurveyVoteController;
+use App\Http\Controllers\Api\WellnessController;
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\MdcTransactionController;
 use Illuminate\Http\Request;
@@ -53,4 +54,12 @@ Route::middleware('auth.token')->group(function () {
     Route::get('/social', [SocialController::class, 'index']);
     Route::get('/quotes', [QuotesController::class, 'getQuotes']);
     Route::get('/live-content', [LiveContentController::class, 'getLiveContent']);
+
+    // Wellness
+    Route::get('/wellness/activities', [WellnessController::class, 'getActivities']);
+    Route::get('/wellness/activities/{id}', [WellnessController::class, 'getActivityDetails']);
+    Route::get('/wellness/my-registrations', [WellnessController::class, 'myRegistrations']);
+    Route::post('/wellness/registrations', [WellnessController::class, 'register']);
+    Route::post('/wellness/registrations/cancel', [WellnessController::class, 'cancel']);
+    Route::post('/wellness/check-in', [WellnessController::class, 'checkIn']);
 });

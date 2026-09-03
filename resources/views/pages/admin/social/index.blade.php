@@ -1,51 +1,20 @@
 @extends('layouts_.vertical', ['page_title' => 'Social Media'])
 
 @section('css')
-    <style>
-        .nav-tabs .nav-link.active {
-            background-color: #ab2f2b !important;
-            /* Bootstrap primary color */
-            color: white !important;
-            font-weight: bold;
-            border-radius: 0.375rem;
-        }
-
-        .nav-tabs .nav-link {
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .table thead th {
-            white-space: nowrap;
-            vertical-align: middle;
-        }
-
-        .table thead {
-            display: table-header-group;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            overflow-y: visible;
-        }
-        
-        table.dataTable tbody tr>.dtfc-fixed-left, table.dataTable tbody tr>.dtfc-fixed-right {
-            z-index: 3;
-            background-color: white !important;
-        }
-    </style>
+    @include('layouts_.shared.admin-datatable-css')
 @endsection
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0"></h3>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h4 class="page-title mb-0">Social Media</h4>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSocialModal">
             Add Social Media
         </button>
     </div>
     <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow mb-4">
+        <div class="col-12">
+            <div class="card">
                 <div class="card-body">
                     <ul class="nav nav-tabs mb-3" id="eventTab" role="tablist">
                         @foreach (['Active', 'Archive'] as $tab)
@@ -61,25 +30,15 @@
                     </ul>
                     <div class="tab-content" id="eventTabContent">
                         <div class="tab-pane fade show active" id="active" role="tabpanel">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h3 class="card-title"></h3>
-                                <div class="input-group" style="width: 30%;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
-                                    </div>
-                                    <input type="text" name="customsearch" id="customsearch" class="form-control w-  border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
-                                </div>
-                            </div>
                             <div class="table-responsive">
-                                <table class="table table-hover table-sm dt-responsive nowrap mt-2" id="scheduleTable" width="100%"
-                                        cellspacing="0">
+                                <table id="socialActiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
-                                        <tr class="text-center">
-                                            <th>No</th>
+                                        <tr>
+                                            <th class="no-sort">No</th>
                                             <th>Category</th>
                                             <th>Business Unit</th>
                                             <th>Direct Link</th>
-                                            <th>Action</th>
+                                            <th class="no-sort">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -90,7 +49,7 @@
                                                 <td>{{ $social->businessUnit }}</td>
                                                 <td>{{ $social->link }}</td>
                                                 <td>
-                                                    <a href="#" 
+                                                    <a href="#"
                                                         class="btn btn-outline-warning btn-sm edit-social-btn"
                                                         data-id="{{ $social->id }}"
                                                         data-category="{{ $social->category }}"
@@ -117,8 +76,8 @@
                         </div>
 
                         <div class="tab-pane fade" id="archive" role="tabpanel">
-                        
-                        </div> 
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -133,7 +92,7 @@
                 <h5 class="modal-title" id="createSocialModalLabel">Create New Social</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              
+
               <div class="modal-body">
                 <div class="mb-3">
                   <label for="category" class="form-label">Category</label>
@@ -160,12 +119,12 @@
                     <input type="text" class="form-control" id="link" name="link" required>
                 </div>
               </div>
-              
+
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>
-              
+
             </form>
           </div>
         </div>
@@ -216,3 +175,7 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    @include('layouts_.shared.admin-datatable-js')
+@endpush

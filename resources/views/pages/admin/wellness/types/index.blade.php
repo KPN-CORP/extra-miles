@@ -1,0 +1,216 @@
+@extends('layouts_.vertical', ['page_title' => 'Wellness Activity Types'])
+
+@section('css')
+    @include('layouts_.shared.admin-datatable-css')
+    @include('pages.admin.wellness.partials.page-css')
+@endsection
+
+@section('content')
+<div class="container-fluid">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h4 class="page-title mb-0">Wellness Activity Types</h4>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTypeModal">
+            <i class="ri-add-line me-1"></i> Create Type
+        </button>
+    </div>
+
+    @include('pages.admin.wellness.partials.errors')
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-tabs mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#type-active" type="button" role="tab">
+                                Active <span class="badge bg-secondary ms-1">{{ $types->count() }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#type-archive" type="button" role="tab">
+                                Archive <span class="badge bg-secondary ms-1">{{ $archived->count() }}</span>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="type-active" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="no-sort">No</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Activities</th>
+                                            <th>Status</th>
+                                            <th class="no-sort">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($types as $type)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $type->name }}</td>
+                                                <td>{{ \Illuminate\Support\Str::limit($type->description, 80) ?: '-' }}</td>
+                                                <td>{{ $type->activities_count }}</td>
+                                                <td>
+                                                    <span class="badge {{ $type->is_active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
+                                                        {{ $type->is_active ? 'Active' : 'Inactive' }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button type="button"
+                                                        class="btn btn-outline-warning btn-sm js-edit-type"
+                                                        data-url="{{ route('wellness.types.update', $type->encrypted_id) }}"
+                                                        data-name="{{ $type->name }}"
+                                                        data-description="{{ $type->description }}"
+                                                        data-active="{{ $type->is_active ? 1 : 0 }}"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editTypeModal">
+                                                        <i class="ri-edit-box-line"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm js-archive"
+                                                        data-form="archive-type-{{ $type->id }}"
+                                                        data-text="This activity type will be archived.">
+                                                        <i class="ri-archive-line"></i>
+                                                    </button>
+                                                    <form id="archive-type-{{ $type->id }}" class="d-none"
+                                                        action="{{ route('wellness.types.archive', $type->encrypted_id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="type-archive" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="no-sort">No</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Archived At</th>
+                                            <th class="no-sort">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($archived as $type)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $type->name }}</td>
+                                                <td>{{ \Illuminate\Support\Str::limit($type->description, 80) ?: '-' }}</td>
+                                                <td>{{ $type->deleted_at?->format('d M Y H:i') }}</td>
+                                                <td>
+                                                    <form action="{{ route('wellness.types.restore', $type->encrypted_id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                                            <i class="ri-arrow-go-back-line"></i> Restore
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Create --}}
+    <div class="modal fade" id="createTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('wellness.types.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create Activity Type</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="create-type-name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="create-type-name" name="name" maxlength="100" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="create-type-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="create-type-description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="create-type-active" name="is_active" value="1" checked>
+                            <label class="form-check-label" for="create-type-active">Active</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Edit --}}
+    <div class="modal fade" id="editTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="" id="editTypeForm">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Activity Type</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="edit-type-name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit-type-name" name="name" maxlength="100" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-type-description" class="form-label">Description</label>
+                            <textarea class="form-control" id="edit-type-description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="edit-type-active" name="is_active" value="1">
+                            <label class="form-check-label" for="edit-type-active">Active</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+    @include('layouts_.shared.admin-datatable-js')
+    @include('pages.admin.wellness.partials.confirm-js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.js-edit-type').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    document.getElementById('editTypeForm').action = this.dataset.url;
+                    document.getElementById('edit-type-name').value = this.dataset.name;
+                    document.getElementById('edit-type-description').value = this.dataset.description || '';
+                    document.getElementById('edit-type-active').checked = this.dataset.active === '1';
+                });
+            });
+        });
+    </script>
+@endpush

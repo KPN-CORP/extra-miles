@@ -62,5 +62,21 @@ return [
         'Crypt' => Illuminate\Support\Facades\Crypt::class,
     ],
     'xor_key' => env('XOR_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Development Mode
+    |--------------------------------------------------------------------------
+    |
+    | When DEVELOPMENT_MODE holds the key below, the local admin login form at
+    | /admin/login is enabled so the back-office can be reached without going
+    | through the Darwinbox SSO handshake. Leave DEVELOPMENT_MODE unset
+    | everywhere except local development machines.
+    |
+    */
+
+    'development_mode' => env('DEVELOPMENT_MODE'),
+
+    'development_mode_key' => 'keydevelopment',
     'version' => env('APP_VERSION', 'unknown'),
 ];

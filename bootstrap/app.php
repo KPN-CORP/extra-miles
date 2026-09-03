@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'locale' => \App\Http\Middleware\LanguageSwitcher::class,
             'notification' => \App\Http\Middleware\NotificationMiddleware::class,
+            'dev.mode' => \App\Http\Middleware\EnsureDevelopmentMode::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

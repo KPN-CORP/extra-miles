@@ -20,6 +20,9 @@ import NewsDetails from './pages/NewsDetails';
 import Social from './pages/Social';
 import LoginFailed from './pages/LoginFailed';
 import EvoRegistration from './pages/EvoRegistration';
+import Wellness from './pages/Wellness';
+import WellnessDetails from './pages/WellnessDetails';
+import MyWellness from './pages/MyWellness';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -40,6 +43,9 @@ const AnimatedRoutes = () => {
         <Route path="/news/:id" element={<NewsDetails />} />
         <Route path="/social" element={<Social />} />
         <Route path="/evo" element={<EvoRegistration />} />
+        <Route path="/wellness" element={<Wellness />} />
+        <Route path="/wellness/my-registrations" element={<MyWellness />} />
+        <Route path="/wellness/:id" element={<WellnessDetails />} />
       </Routes>
     </AnimatePresence>
   );

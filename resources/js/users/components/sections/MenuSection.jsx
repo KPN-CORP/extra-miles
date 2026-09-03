@@ -111,6 +111,14 @@ return (
               🔗 Social Media
           </button>
         </div>
+        <div className="self-stretch inline-flex justify-center items-start gap-3">
+          <button onClick={(e) => handleNavigate(e, "/wellness")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
+              💚 Wellness
+          </button>
+          <button onClick={(e) => handleNavigate(e, "/wellness/my-registrations")} className="flex-1 min-w-fit p-3 bg-white text-red-700 ring-1 ring-red-700 ring-inset rounded-lg shadow-md flex justify-center items-center gap-2 text-[10px] font-semibold">
+              🗓️ My Wellness
+          </button>
+        </div>
         <LiveContent isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} id={data.content_link}>
           <h2 className="text-lg font-semibold mb-4">Live Event Info</h2>
           <button

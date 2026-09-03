@@ -1,50 +1,17 @@
 @extends('layouts_.vertical', ['page_title' => 'Survey'])
 
 @section('css')
-    <style>
-        .nav-tabs .nav-link.active {
-            background-color: #ab2f2b !important;
-            /* Bootstrap primary color */
-            color: white !important;
-            font-weight: bold;
-            border-radius: 0.375rem;
-        }
-
-        .nav-tabs .nav-link {
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .table thead th {
-            white-space: nowrap;
-            vertical-align: middle;
-        }
-
-        .table thead {
-            display: table-header-group;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            overflow-y: visible;
-        }
-        
-        table.dataTable tbody tr>.dtfc-fixed-left, table.dataTable tbody tr>.dtfc-fixed-right {
-            z-index: 3;
-            background-color: white !important;
-        }
-    </style>
+    @include('layouts_.shared.admin-datatable-css')
 @endsection
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
+            <h4 class="page-title mb-1">Survey</h4>
             <div class="text-muted small">
-                <span class="me-3 fs-5"><i
-                        class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}</span>
-                <span class="me-3"><i class="ri-time-line me-1"></i><span
-                        id="currentTime"></span>
-                    WIB</span>
+                <span class="me-3"><i class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}</span>
+                <span><i class="ri-time-line me-1"></i><span id="currentTime"></span> WIB</span>
             </div>
         </div>
         <div class="dropdown">
@@ -58,8 +25,8 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow mb-4">
+        <div class="col-12">
+            <div class="card">
                 <div class="card-body">
                     <ul class="nav nav-tabs mb-3" id="eventTab" role="tablist">
                         @foreach (['Open', 'Closed', 'Archive'] as $tab)
@@ -76,30 +43,18 @@
                     <div class="tab-content" id="eventTabContent">
                         {{-- =============================== Detail tabel Open =============================== --}}
                         <div class="tab-pane fade show active" id="open" role="tabpanel">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h3 class="card-title"></h3>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
-                                        </div>
-                                        <input type="text" name="customsearch" id="customsearch" class="form-control w-  border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
-                                    </div>
-                                </div>
-                            </div>
                             <div class="table-responsive">
-                                <table class="table table-hover table-sm dt-responsive nowrap mt-2" id="scheduleTable" width="100%"
-                                        cellspacing="0">
+                                <table id="surveyOpenTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
-                                        <tr class="text-center">
-                                            <th>No</th>
+                                        <tr>
+                                            <th class="no-sort">No</th>
                                             <th>Created Date</th>
                                             <th>End Date</th>
                                             <th>Category</th>
                                             <th>Form Name</th>
                                             <th>Total Participant</th>
                                             <th>Status</th>
-                                            <th>Action</th>
+                                            <th class="no-sort">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -113,7 +68,7 @@
                                             <td style="text-align: center;">
                                                 {{ $survey->survey_participant_count }}
                                             </td>
-                                            <td><span class="badge 
+                                            <td><span class="badge
                                                 @if($survey->status === 'Ongoing')
                                                     bg-success
                                                 @elseif($survey->status === 'Draft')
@@ -124,7 +79,7 @@
                                             ">
                                                 {{ $survey->status }}
                                             </span></td>
-                                            <td> 
+                                            <td>
                                                 @if($survey->status === 'Ongoing' || $survey->status == 'Draft')
                                                     <a href="{{ route('survey.edit', $survey->id) }}" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
                                                 @endif
@@ -154,30 +109,18 @@
 
                         {{-- =============================== Detail tabel Closed =============================== --}}
                         <div class="tab-pane fade" id="closed" role="tabpanel">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h3 class="card-title"></h3>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
-                                        </div>
-                                        <input type="text" name="customsearch1" id="customsearch1" class="form-control w-  border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
-                                    </div>
-                                </div>
-                            </div>
                             <div class="table-responsive">
-                                <table class="table table-hover table-sm dt-responsive nowrap mt-2" id="scheduleTable1" width="100%"
-                                        cellspacing="0">
+                                <table id="surveyClosedTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
-                                        <tr class="text-center">
-                                            <th>No</th>
+                                        <tr>
+                                            <th class="no-sort">No</th>
                                             <th>Created Date</th>
                                             <th>End Date</th>
                                             <th>Category</th>
                                             <th>Form Name</th>
                                             <th>Total Participant</th>
                                             <th>Status</th>
-                                            <th>Action</th>
+                                            <th class="no-sort">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -191,7 +134,7 @@
                                             <td style="text-align: center;">
                                                 {{ $survey->survey_participant_count }}
                                             </td>
-                                            <td><span class="badge 
+                                            <td><span class="badge
                                                 @if($survey->status === 'Ongoing')
                                                     bg-success
                                                 @elseif($survey->status === 'Draft')
@@ -202,7 +145,7 @@
                                             ">
                                                 {{ $survey->status }}
                                             </span></td>
-                                            <td> 
+                                            <td>
                                                 @if($survey->status === 'Ongoing' || $survey->status == 'Draft')
                                                     <a href="{{ route('survey.edit', $survey->id) }}" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
                                                 @endif
@@ -227,23 +170,11 @@
 
                         {{-- =============================== Detail tabel Archive =============================== --}}
                         <div class="tab-pane fade" id="archive" role="tabpanel">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h3 class="card-title"></h3>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
-                                        </div>
-                                        <input type="text" name="customsearch2" id="customsearch2" class="form-control w-  border-dark-subtle border-left-0" placeholder="Search.." aria-label="search" aria-describedby="search" >
-                                    </div>
-                                </div>
-                            </div>
                             <div class="table-responsive">
-                                <table class="table table-hover table-sm dt-responsive nowrap mt-2" id="scheduleTable2" width="100%"
-                                        cellspacing="0">
+                                <table id="surveyArchiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
-                                        <tr class="text-center">
-                                            <th>No</th>
+                                        <tr>
+                                            <th class="no-sort">No</th>
                                             <th>Created Date</th>
                                             <th>End Date</th>
                                             <th>Category</th>
@@ -264,7 +195,7 @@
                                             <td style="text-align: center;">
                                                 {{ $survey->survey_participant_count }}
                                             </td>
-                                            <td><span class="badge 
+                                            <td><span class="badge
                                                 @if($survey->status === 'Ongoing')
                                                     bg-success
                                                 @elseif($survey->status === 'Draft')
@@ -275,7 +206,7 @@
                                             ">
                                                 {{ $survey->status }}
                                             </span></td>
-                                            <td> 
+                                            <td>
                                                 {{ $survey->deleted_at }}
                                             </td>
                                         </tr>
@@ -292,3 +223,7 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    @include('layouts_.shared.admin-datatable-js')
+@endpush

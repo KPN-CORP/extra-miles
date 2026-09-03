@@ -37,6 +37,24 @@
 
 @section('content')
 <div class="container-fluid">
+    {{-- EventController::evoIndex passes data => null when no event carries the
+         EVO category yet. Everything below dereferences $data, so it needs its
+         own empty state rather than a "property id on null" error. --}}
+    @if (! $data)
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="ri-calendar-event-line fs-1 text-muted d-block mb-2"></i>
+                <h5 class="mb-1">No EVO event yet</h5>
+                <p class="text-muted small mb-3">
+                    Create an event with the <strong>EVO</strong> category, and its dashboard,
+                    participants and report will appear here.
+                </p>
+                <a href="{{ route('admin.events.create') }}" class="btn btn-primary">
+                    <i class="ri-add-line me-1"></i> Create Event
+                </a>
+            </div>
+        </div>
+    @else
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <div class="text-muted small">
@@ -211,6 +229,7 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 @endsection
 <!-- Modal Export EVO -->

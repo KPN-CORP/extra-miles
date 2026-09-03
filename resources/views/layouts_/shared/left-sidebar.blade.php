@@ -94,6 +94,31 @@
                 </li>
                 @endcan
 
+                @can('viewmenuwellness')
+                <li class="side-nav-item">
+                    <a data-bs-toggle="collapse" href="#sidebarWellness" aria-expanded="false" aria-controls="sidebarWellness" class="side-nav-link">
+                        <i class="ri-heart-pulse-line"></i>
+                        <span>Wellness</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="sidebarWellness">
+                        <ul class="side-nav-second-level">
+                            <li>
+                                <a href="{{ url('/admin/wellness/activities') }}"> Activities </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('/admin/wellness/blacklist') }}"> Blacklist </a>
+                            </li>
+                            @can('viewmenuwellnesstype')
+                            <li>
+                                <a href="{{ url('/admin/wellness/types') }}"> Activity Types </a>
+                            </li>
+                            @endcan
+                        </ul>
+                    </div>
+                </li>
+                @endcan
+
                 @can('viewmenusurvey')
                 <li class="side-nav-item">
                     <a href="{{ url('/admin/survey') }}" class="side-nav-link">

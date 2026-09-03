@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\DevLoginController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -26,8 +27,12 @@ use App\Http\Controllers\QuotesController;
 use App\Http\Controllers\EventParticipantController;
 use App\Http\Controllers\FormTemplateController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\WellnessActivityController;
+use App\Http\Controllers\WellnessActivityScheduleController;
+use App\Http\Controllers\WellnessActivityTypeController;
+use App\Http\Controllers\WellnessBlacklistController;
+use App\Http\Controllers\WellnessRegistrationController;
 use App\Livewire\ManageParticipants;
-
 
 Route::get('dbauth', [SsoController::class, 'dbauth']);
 Route::get('dbauthlms', [SsoController::class, 'dbauthlms']);
@@ -54,12 +59,12 @@ Route::get('/images/{filename}', function ($filename) {
 });
 
 Route::prefix('admin')->group(function () {
-    
+
     Route::middleware('auth', 'locale', 'notification')->group(function () {
 
         // News
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-        
+
         Route::middleware(['permission:viewmenunews'])->group(function () {
             // News
             Route::get('/news', [NewsController::class, 'index'])->name('admin.news.index');
@@ -122,7 +127,7 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::middleware(['permission:viewmenulive'])->group(function () {
-            //Live
+            // Live
             Route::get('/live', [LiveContentController::class, 'index'])->name('live.index');
             Route::post('/live/store', [LiveContentController::class, 'store'])->name('live.store');
             Route::delete('/live/{id}', [LiveContentController::class, 'destroy'])->name('live.destroy');
@@ -147,6 +152,53 @@ Route::prefix('admin')->group(function () {
             Route::get('/forms/{id}/schema', [FormTemplateController::class, 'getSchema']);
         });
 
+        Route::middleware(['permission:viewmenuwellness'])->group(function () {
+            // Wellness -- activity types (master data)
+            Route::middleware(['permission:viewmenuwellnesstype'])->group(function () {
+                Route::get('/wellness/types', [WellnessActivityTypeController::class, 'index'])->name('admin.wellness.types.index');
+                Route::post('/wellness/types', [WellnessActivityTypeController::class, 'store'])->name('wellness.types.store');
+                Route::put('/wellness/types/{encryptedId}', [WellnessActivityTypeController::class, 'update'])->name('wellness.types.update');
+                Route::delete('/wellness/types/{encryptedId}/archive', [WellnessActivityTypeController::class, 'archive'])->name('wellness.types.archive');
+                Route::post('/wellness/types/{encryptedId}/restore', [WellnessActivityTypeController::class, 'restore'])->name('wellness.types.restore');
+            });
+
+            // Wellness -- activities
+            Route::get('/wellness/activities', [WellnessActivityController::class, 'index'])->name('admin.wellness.activities.index');
+            Route::get('/wellness/activities/create', [WellnessActivityController::class, 'create'])->name('wellness.activities.create');
+            Route::post('/wellness/activities', [WellnessActivityController::class, 'store'])->name('wellness.activities.store');
+            Route::get('/wellness/activities/{encryptedId}/edit', [WellnessActivityController::class, 'edit'])->name('wellness.activities.edit');
+            Route::put('/wellness/activities/{encryptedId}', [WellnessActivityController::class, 'update'])->name('wellness.activities.update');
+            Route::delete('/wellness/activities/{encryptedId}/archive', [WellnessActivityController::class, 'archive'])->name('wellness.activities.archive');
+            Route::post('/wellness/activities/{encryptedId}/restore', [WellnessActivityController::class, 'restore'])->name('wellness.activities.restore');
+
+            // Wellness -- schedules (sessions of one activity)
+            Route::get('/wellness/activities/{encryptedId}/schedules', [WellnessActivityScheduleController::class, 'index'])->name('admin.wellness.schedules.index');
+            Route::post('/wellness/activities/{encryptedId}/schedules', [WellnessActivityScheduleController::class, 'store'])->name('wellness.schedules.store');
+            Route::put('/wellness/schedules/{encryptedId}', [WellnessActivityScheduleController::class, 'update'])->name('wellness.schedules.update');
+            Route::delete('/wellness/schedules/{encryptedId}/archive', [WellnessActivityScheduleController::class, 'archive'])->name('wellness.schedules.archive');
+            Route::get('/wellness/schedules/{encryptedId}/qr', [WellnessActivityScheduleController::class, 'qr'])->name('wellness.schedules.qr');
+            Route::post('/wellness/schedules/{encryptedId}/rotate-qr', [WellnessActivityScheduleController::class, 'rotateQr'])->name('wellness.schedules.rotateQr');
+
+            // Wellness -- participants of one schedule
+            Route::get('/wellness/schedules/{encryptedId}/participants', [WellnessRegistrationController::class, 'index'])->name('admin.wellness.registrations.index');
+            Route::post('/wellness/schedules/{encryptedId}/participants', [WellnessRegistrationController::class, 'store'])->name('wellness.registrations.store');
+            Route::get('/wellness/schedules/{encryptedId}/export', [WellnessRegistrationController::class, 'export'])->name('wellness.registrations.export');
+            Route::post('/wellness/registrations/{encryptedId}/confirm', [WellnessRegistrationController::class, 'confirm'])->name('wellness.registrations.confirm');
+            Route::post('/wellness/registrations/{encryptedId}/requeue', [WellnessRegistrationController::class, 'requeue'])->name('wellness.registrations.requeue');
+            Route::post('/wellness/registrations/{encryptedId}/blacklist', [WellnessRegistrationController::class, 'blacklist'])->name('wellness.registrations.blacklist');
+            Route::post('/wellness/registrations/{encryptedId}/cancel', [WellnessRegistrationController::class, 'cancel'])->name('wellness.registrations.cancel');
+            Route::post('/wellness/registrations/bulk-confirm', [WellnessRegistrationController::class, 'bulkConfirm'])->name('wellness.registrations.bulkConfirm');
+
+            // Wellness -- blacklist master list
+            Route::get('/wellness/blacklist', [WellnessBlacklistController::class, 'index'])->name('admin.wellness.blacklist.index');
+            Route::post('/wellness/blacklist', [WellnessBlacklistController::class, 'store'])->name('wellness.blacklist.store');
+            Route::put('/wellness/blacklist/{encryptedId}', [WellnessBlacklistController::class, 'update'])->name('wellness.blacklist.update');
+            Route::post('/wellness/blacklist/{encryptedId}/lift', [WellnessBlacklistController::class, 'lift'])->name('wellness.blacklist.lift');
+            Route::delete('/wellness/blacklist/{encryptedId}/archive', [WellnessBlacklistController::class, 'archive'])->name('wellness.blacklist.archive');
+            Route::post('/wellness/blacklist/{encryptedId}/restore', [WellnessBlacklistController::class, 'restore'])->name('wellness.blacklist.restore');
+            Route::get('/wellness/employees/search', [WellnessRegistrationController::class, 'searchEmployees'])->name('wellness.employees.search');
+        });
+
         Route::middleware(['permission:viewroleem'])->group(function () {
             // Roles
             Route::get('/roles', [RoleController::class, 'index'])->name('roles');
@@ -163,16 +215,21 @@ Route::prefix('admin')->group(function () {
 
         Route::get('{first}/{second}', [HomeController::class, 'secondLevel'])->name('second');
         Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-        Route::get('login', function () {
-            return redirect()->away('https://kpncorporation.darwinbox.com');
-        })->name('login');
     });
-    
+
+    // Login stays outside the 'auth' group: the auth middleware redirects
+    // unauthenticated visitors here, so this route must be reachable by them.
+    // Without DEVELOPMENT_MODE=keydevelopment in .env it only bounces the
+    // browser to Darwinbox as before; with it, a local login form is rendered
+    // so the admin pages can be reached without the SSO handshake.
+    Route::get('login', [DevLoginController::class, 'create'])->name('login');
+    Route::post('login', [DevLoginController::class, 'store'])
+        ->middleware('dev.mode')
+        ->name('dev.login.store');
 
     Route::fallback(function () {
         return view('errors.404');
     });
-    
+
     require __DIR__.'/auth.php';
 });
-

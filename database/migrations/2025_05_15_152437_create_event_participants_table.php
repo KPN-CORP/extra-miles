@@ -14,14 +14,20 @@ return new class extends Migration
         Schema::create('event_participants', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('event_id');
-            $table->string('employee_id');
-            $table->string('fullname');
-            $table->string('business_unit');
-            $table->string('job_level');
-            $table->string('location');
-            $table->string('status'); // e.g., Request, Approved, etc.
+            $table->string('employee_id')->nullable();
+            $table->string('fullname')->nullable();
+            $table->string('business_unit')->nullable();
+            $table->string('job_level')->nullable();
+            $table->string('location')->nullable();
+            $table->string('unit')->nullable();
+            $table->unsignedBigInteger('form_id')->nullable();
+            $table->json('form_data')->nullable();
+            $table->string('status')->nullable(); // e.g., Request, Approved, etc.
+            $table->string('attending_status')->nullable();
             $table->string('note')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
         });
