@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { Scanner } from '@yudiel/react-qr-scanner';
 
@@ -15,6 +16,7 @@ import { useAuth } from '../Context/AuthContext';
 export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess }) {
     const apiUrl = useApiUrl();
     const { token } = useAuth();
+    const { t } = useTranslation();
 
     const [isVisible, setIsVisible] = useState(false);
     const [result, setResult] = useState(null);
@@ -59,7 +61,7 @@ export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess 
 
                 if (onScanSuccess) onScanSuccess();
             } catch (err) {
-                setError(err.response?.data?.error || 'We could not record your attendance.');
+                setError(err.response?.data?.error || t('wellness.qr.failed'));
             } finally {
                 setBusy(false);
             }
@@ -94,17 +96,17 @@ export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess 
                     <div className="w-10"></div>
                     <div className="flex flex-col w-full text-center px-4 gap-2 mb-2">
                         {result ? (
-                            <div className="text-green-800 text-lg"><strong>Checked in</strong></div>
+                            <div className="text-green-800 text-lg"><strong>{t('wellness.qr.checkedIn')}</strong></div>
                         ) : (
                             <span className="text-gray-600 text-sm leading-none">
-                                <i className="ri-alert-line text-yellow-500"></i> Point your camera at the session QR code to confirm your attendance.
+                                <i className="ri-alert-line text-yellow-500"></i> {t('wellness.qr.pointCamera')}
                             </span>
                         )}
                     </div>
                     <button
                         onClick={handleClose}
                         className="w-10 text-gray-500 hover:text-gray-800 text-2xl flex justify-end"
-                        aria-label="Close modal"
+                        aria-label={t('common.closeModal')}
                     >
                         <i className="ri-close-line"></i>
                     </button>
@@ -122,7 +124,7 @@ export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess 
                             render={(previewId) => (
                                 <div className="w-full h-full flex items-center justify-center text-white">
                                     <video id={previewId} className="w-full h-full object-cover" />
-                                    <p className="absolute">Align QR Code</p>
+                                    <p className="absolute">{t('qr.align')}</p>
                                 </div>
                             )}
                             constraints={{ facingMode: 'environment' }}
@@ -132,7 +134,7 @@ export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess 
 
                 {result ? (
                     <div className="text-center px-4">
-                        <p className="text-gray-600 text-base">You&apos;re attending 🎉</p>
+                        <p className="text-gray-600 text-base">{t('wellness.qr.attending')}</p>
                         <p className="text-red-700 text-base font-bold">{result.activity}</p>
                         <p className="text-gray-400 text-xs mt-1">{result.attended_at}</p>
                     </div>
@@ -142,7 +144,7 @@ export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess 
                     </div>
                 ) : (
                     <div className="w-full text-center text-gray-600 text-sm">
-                        {busy ? 'Checking you in...' : 'Make sure the QR code is fully inside the frame.'}
+                        {busy ? t('wellness.qr.checkingIn') : t('wellness.qr.keepInFrame')}
                     </div>
                 )}
             </div>

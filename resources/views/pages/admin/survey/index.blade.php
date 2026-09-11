@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Survey'])
+@extends('layouts_.vertical', ['page_title' => __('Survey')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -8,19 +8,19 @@
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
-            <h4 class="page-title mb-1">Survey</h4>
+            <h4 class="page-title mb-1">{{ __('Survey') }}</h4>
             <div class="text-muted small">
                 <span class="me-3"><i class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}</span>
-                <span><i class="ri-time-line me-1"></i><span id="currentTime"></span> WIB</span>
+                <span><i class="ri-time-line me-1"></i><span id="currentTime"></span> {{ __('WIB') }}</span>
             </div>
         </div>
         <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button" id="createDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                Create
+                {{ __('Create') }}
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="createDropdown">
-                <li><a class="dropdown-item" href="{{ route('admin.survey.create', ['type' => 'survey']) }}">Survey Form</a></li>
-                <li><a class="dropdown-item" href="{{ route('admin.survey.create', ['type' => 'vote']) }}">Voting Form</a></li>
+                <li><a class="dropdown-item" href="{{ route('admin.survey.create', ['type' => 'survey']) }}">{{ __('Survey Form') }}</a></li>
+                <li><a class="dropdown-item" href="{{ route('admin.survey.create', ['type' => 'vote']) }}">{{ __('Voting Form') }}</a></li>
             </ul>
         </div>
     </div>
@@ -35,7 +35,7 @@
                                     id="{{ strtolower(str_replace(' ', '-', $tab)) }}-tab" data-bs-toggle="tab"
                                     data-bs-target="#{{ strtolower(str_replace(' ', '-', $tab)) }}" type="button"
                                     role="tab">
-                                    {{ $tab }}
+                                    {{ __($tab) }}
                                 </button>
                             </li>
                         @endforeach
@@ -47,14 +47,14 @@
                                 <table id="surveyOpenTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Created Date</th>
-                                            <th>End Date</th>
-                                            <th>Category</th>
-                                            <th>Form Name</th>
-                                            <th>Total Participant</th>
-                                            <th>Status</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('End Date') }}</th>
+                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Form Name') }}</th>
+                                            <th>{{ __('Total Participant') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -63,7 +63,7 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $survey->created_at }}</td>
                                             <td>{{ $survey->end_date }}</td>
-                                            <td>{{ $survey->category }}</td>
+                                            <td>{{ __($survey->category) }}</td>
                                             <td>{{ $survey->title }}</td>
                                             <td style="text-align: center;">
                                                 {{ $survey->survey_participant_count }}
@@ -77,7 +77,7 @@
                                                     text-bg-light
                                                 @endif
                                             ">
-                                                {{ $survey->status }}
+                                                {{ __($survey->status) }}
                                             </span></td>
                                             <td>
                                                 @if($survey->status === 'Ongoing' || $survey->status == 'Draft')
@@ -91,7 +91,7 @@
                                                     <a href="{{ route('vote.participants', \Illuminate\Support\Facades\Crypt::encryptString($survey->id)) }}" class="btn btn-outline-info btn-sm"><i class="ri-eye-line"></i></a>
                                                 @endif
                                                 @if($survey->status === 'Draft')
-                                                    <form action="{{ route('survey.archive', $survey->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Arsipkan survey ini?')">
+                                                    <form action="{{ route('survey.archive', $survey->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('{{ __('Archive this survey?') }}')">
                                                         @csrf
                                                         <button type="submit" class="btn btn-outline-danger btn-sm">
                                                             <i class="ri-archive-line"></i>
@@ -113,14 +113,14 @@
                                 <table id="surveyClosedTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Created Date</th>
-                                            <th>End Date</th>
-                                            <th>Category</th>
-                                            <th>Form Name</th>
-                                            <th>Total Participant</th>
-                                            <th>Status</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('End Date') }}</th>
+                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Form Name') }}</th>
+                                            <th>{{ __('Total Participant') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -129,7 +129,7 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $survey->created_at }}</td>
                                             <td>{{ $survey->end_date }}</td>
-                                            <td>{{ $survey->category }}</td>
+                                            <td>{{ __($survey->category) }}</td>
                                             <td>{{ $survey->title }}</td>
                                             <td style="text-align: center;">
                                                 {{ $survey->survey_participant_count }}
@@ -143,7 +143,7 @@
                                                     text-bg-light
                                                 @endif
                                             ">
-                                                {{ $survey->status }}
+                                                {{ __($survey->status) }}
                                             </span></td>
                                             <td>
                                                 @if($survey->status === 'Ongoing' || $survey->status == 'Draft')
@@ -174,14 +174,14 @@
                                 <table id="surveyArchiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Created Date</th>
-                                            <th>End Date</th>
-                                            <th>Category</th>
-                                            <th>Form Name</th>
-                                            <th>Total Participant</th>
-                                            <th>Status</th>
-                                            <th>Archive At</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('End Date') }}</th>
+                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Form Name') }}</th>
+                                            <th>{{ __('Total Participant') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th>{{ __('Archive At') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -190,7 +190,7 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $survey->created_at }}</td>
                                             <td>{{ $survey->end_date }}</td>
-                                            <td>{{ $survey->category }}</td>
+                                            <td>{{ __($survey->category) }}</td>
                                             <td>{{ $survey->title }}</td>
                                             <td style="text-align: center;">
                                                 {{ $survey->survey_participant_count }}
@@ -204,7 +204,7 @@
                                                     text-bg-light
                                                 @endif
                                             ">
-                                                {{ $survey->status }}
+                                                {{ __($survey->status) }}
                                             </span></td>
                                             <td>
                                                 {{ $survey->deleted_at }}

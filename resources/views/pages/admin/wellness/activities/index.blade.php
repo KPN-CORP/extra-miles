@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Wellness Activities'])
+@extends('layouts_.vertical', ['page_title' => __('Wellness Activities')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -8,20 +8,22 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h4 class="page-title mb-0">Wellness Activities</h4>
+        <h4 class="page-title mb-0">{{ __('Wellness Activities') }}</h4>
         <div class="d-flex gap-2">
             @can('viewmenuwellnesstype')
                 <a href="{{ route('admin.wellness.types.index') }}" class="btn btn-outline-secondary">
-                    <i class="ri-price-tag-3-line me-1"></i> Activity Types
+                    <i class="ri-price-tag-3-line me-1"></i> {{ __('Activity Types') }}
                 </a>
             @endcan
             <a href="{{ route('wellness.activities.create') }}" class="btn btn-primary">
-                <i class="ri-add-line me-1"></i> Create Activity
+                <i class="ri-add-line me-1"></i> {{ __('Create Activity') }}
             </a>
         </div>
     </div>
 
     @include('pages.admin.wellness.partials.errors')
+
+    @include('pages.admin.wellness.activities._filters')
 
     <div class="row">
         <div class="col-12">
@@ -30,30 +32,53 @@
                     <ul class="nav nav-tabs mb-3" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#activity-active" type="button" role="tab">
-                                Active <span class="badge bg-secondary ms-1">{{ $activities->count() }}</span>
+                                {{ __('Active') }}
+                                <span class="badge {{ $filtersActive ? 'bg-primary' : 'bg-secondary' }} ms-1">{{ $activities->count() }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#activity-archive" type="button" role="tab">
-                                Archive <span class="badge bg-secondary ms-1">{{ $archived->count() }}</span>
+                                {{ __('Archive') }} <span class="badge bg-secondary ms-1">{{ $archived->count() }}</span>
                             </button>
                         </li>
                     </ul>
 
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="activity-active" role="tabpanel">
+                            {{-- Rendered instead of the table, not inside it: a DataTable
+                                 needs one cell per column in every body row, so a spanning
+                                 "nothing here" row trips its column-count check. --}}
+                            @if ($activities->isEmpty())
+                                <div class="text-center text-muted border border-dashed rounded py-5">
+                                    @if ($filtersActive)
+                                        <i class="ri-filter-off-line fs-2 d-block mb-2"></i>
+                                        <div class="fw-semibold">{{ __('No activities match these filters') }}</div>
+                                        <a href="{{ route('admin.wellness.activities.index') }}"
+                                            class="btn btn-sm btn-outline-secondary mt-3">
+                                            <i class="ri-close-line me-1"></i>{{ __('Reset') }}
+                                        </a>
+                                    @else
+                                        <i class="ri-heart-pulse-line fs-2 d-block mb-2"></i>
+                                        <div class="fw-semibold">{{ __('No activities yet') }}</div>
+                                        <a href="{{ route('wellness.activities.create') }}"
+                                            class="btn btn-sm btn-primary mt-3">
+                                            <i class="ri-add-line me-1"></i>{{ __('Create Activity') }}
+                                        </a>
+                                    @endif
+                                </div>
+                            @else
                             <div class="table-responsive">
                                 <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Activity</th>
-                                            <th>Type</th>
-                                            <th>Method</th>
-                                            <th>Schedules</th>
-                                            <th>Status</th>
-                                            <th>Created</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Activity') }}</th>
+                                            <th>{{ __('Type') }}</th>
+                                            <th>{{ __('Method') }}</th>
+                                            <th>{{ __('Schedules') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th>{{ __('Created') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -70,10 +95,18 @@
                                                         <i class="{{ $activity->registration_method->icon() }} me-1"></i>{{ $activity->registration_method->shortLabel() }}
                                                     </span>
                                                 </td>
-                                                <td>
-                                                    <a href="{{ route('admin.wellness.schedules.index', $activity->encrypted_id) }}">
-                                                        {{ $activity->schedules_count }} session(s)
-                                                    </a>
+                                                <td data-order="{{ $activity->schedules_count }}">
+                                                    @if ($activity->schedules_count)
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-link p-0 text-decoration-none js-toggle-schedules"
+                                                            data-target="wa-sched-{{ $activity->id }}"
+                                                            aria-expanded="false">
+                                                            <i class="ri-arrow-right-s-line js-chevron"></i>
+                                                            {{ __(':count session(s)', ['count' => $activity->schedules_count]) }}
+                                                        </button>
+                                                    @else
+                                                        <span class="text-muted">{{ __('None') }}</span>
+                                                    @endif
                                                 </td>
                                                 <td>
                                                     <span class="badge {{ $activity->status->badgeClass() }}">{{ $activity->status->label() }}</span>
@@ -81,16 +114,16 @@
                                                 <td>{{ $activity->created_at?->format('d M Y') }}</td>
                                                 <td>
                                                     <a href="{{ route('admin.wellness.schedules.index', $activity->encrypted_id) }}"
-                                                        class="btn btn-outline-primary btn-sm" title="Manage schedules">
+                                                        class="btn btn-outline-primary btn-sm" title="{{ __('Manage schedules') }}">
                                                         <i class="ri-calendar-line"></i>
                                                     </a>
                                                     <a href="{{ route('wellness.activities.edit', $activity->encrypted_id) }}"
-                                                        class="btn btn-outline-warning btn-sm" title="Edit">
+                                                        class="btn btn-outline-warning btn-sm" title="{{ __('Edit') }}">
                                                         <i class="ri-edit-box-line"></i>
                                                     </a>
                                                     <button type="button" class="btn btn-outline-danger btn-sm js-archive"
                                                         data-form="archive-activity-{{ $activity->id }}"
-                                                        data-text="This activity and its schedules will be archived.">
+                                                        data-text="{{ __('This activity and its schedules will be archived.') }}">
                                                         <i class="ri-archive-line"></i>
                                                     </button>
                                                     <form id="archive-activity-{{ $activity->id }}" class="d-none"
@@ -105,6 +138,19 @@
                                     </tbody>
                                 </table>
                             </div>
+                            @endif
+
+                            {{-- Session panels live here until a row is expanded, then
+                                 they are moved into that row's DataTables child. --}}
+                            <div class="d-none">
+                                @foreach ($activities as $activity)
+                                    @if ($activity->schedules_count)
+                                        <div id="wa-sched-{{ $activity->id }}">
+                                            @include('pages.admin.wellness.activities._schedule-detail', ['activity' => $activity])
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="activity-archive" role="tabpanel">
@@ -112,11 +158,11 @@
                                 <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Activity</th>
-                                            <th>Type</th>
-                                            <th>Archived At</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Activity') }}</th>
+                                            <th>{{ __('Type') }}</th>
+                                            <th>{{ __('Archived At') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -130,7 +176,7 @@
                                                     <form action="{{ route('wellness.activities.restore', $activity->encrypted_id) }}" method="POST">
                                                         @csrf
                                                         <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                                            <i class="ri-arrow-go-back-line"></i> Restore
+                                                            <i class="ri-arrow-go-back-line"></i> {{ __('Restore') }}
                                                         </button>
                                                     </form>
                                                 </td>
@@ -152,4 +198,44 @@
 @push('scripts')
     @include('layouts_.shared.admin-datatable-js')
     @include('pages.admin.wellness.partials.confirm-js')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Expanding uses DataTables' own child-row API rather than inserting a
+            // <tr> by hand: DataTables owns the tbody, and a hand-inserted row
+            // would be dropped the moment the table is sorted, searched or paged.
+            document.addEventListener('click', function (event) {
+                var toggle = event.target.closest('.js-toggle-schedules');
+
+                if (!toggle) {
+                    return;
+                }
+
+                var tr = toggle.closest('tr');
+                var table = window.jQuery(tr).closest('table');
+
+                if (!table.length || !window.jQuery.fn.DataTable.isDataTable(table[0])) {
+                    return;
+                }
+
+                var row = table.DataTable().row(tr);
+                var chevron = toggle.querySelector('.js-chevron');
+
+                if (row.child.isShown()) {
+                    // hide() only detaches the child row; DataTables keeps the node,
+                    // so the panel is still there when it is shown again.
+                    row.child.hide();
+                    chevron.className = 'ri-arrow-right-s-line js-chevron';
+                    toggle.setAttribute('aria-expanded', 'false');
+
+                    return;
+                }
+
+                var panel = document.getElementById(toggle.dataset.target);
+                row.child(panel).show();
+                chevron.className = 'ri-arrow-down-s-line js-chevron';
+                toggle.setAttribute('aria-expanded', 'true');
+            });
+        });
+    </script>
 @endpush

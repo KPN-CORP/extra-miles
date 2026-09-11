@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>QR Attendance</title>
+    <title>{{ __('QR Attendance') }}</title>
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
     <style>
         body {
@@ -62,18 +62,18 @@
             <div id="qrcode"></div>
         </div>
         <div class="right">
-            <h3>Scan QR for Attendance</h3>
+            <h3>{{ __('Scan QR for Attendance') }}</h3>
             <div class="detail">
-                <div class="label">Event Name :</div>
+                <div class="label">{{ __('Event Name') }} :</div>
                 <span>{{ $event->title }}</span>
             </div>
             <div class="detail">
-                <div class="label">Schedule :</div>
-                <span>Start : {{ \Carbon\Carbon::parse($event->start_date)->format('j F Y').', '.$event->time_start }}</span>
-                <span>End : {{ \Carbon\Carbon::parse($event->end_date)->format('j F Y').', '.$event->time_end }}</span>
+                <div class="label">{{ __('Schedule') }} :</div>
+                <span>{{ __('Start') }} : {{ \Carbon\Carbon::parse($event->start_date)->format('j F Y').', '.$event->time_start }}</span>
+                <span>{{ __('End') }} : {{ \Carbon\Carbon::parse($event->end_date)->format('j F Y').', '.$event->time_end }}</span>
             </div>
             <div class="detail">
-                <div class="label">Description :</div>
+                <div class="label">{{ __('Description') }} :</div>
                 <span>{!! $event->description !!}</span>
             </div>
         </div>

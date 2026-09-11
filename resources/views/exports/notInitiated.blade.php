@@ -1,12 +1,12 @@
 <table>
     <thead>
     <tr>
-        <th>Employee ID</th>
-        <th>Name</th>
-        <th>Designation</th>
-        <th>Business Unit</th>
-        <th>Company</th>
-        <th>Location</th>
+        <th>{{ __('Employee ID') }}</th>
+        <th>{{ __('Name') }}</th>
+        <th>{{ __('Designation') }}</th>
+        <th>{{ __('Business Unit') }}</th>
+        <th>{{ __('Company') }}</th>
+        <th>{{ __('Location') }}</th>
     </tr>
     </thead>
     <tbody>

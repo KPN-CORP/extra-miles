@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Not Found</title>
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="d-flex align-items-center justify-content-center vh-100">
-            <div class="form-group text-center">
-                <div class="mb-3">
-                    <img @style('width: 50%') src="{{ asset('storage/img/page-not-found.svg') }}" alt="Page Not Found">
-                </div>
-                <h1 class="h3 mb-5">Page Not Found!</h1>
-                <a href="/" class="btn btn-primary px-4" >Return</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+@extends('errors.layout')
+
+@section('code', '404')
+@section('title', __('Page Not Found'))
+@section('message', __('We could not find the page you were looking for. It may have been moved, renamed, or removed.'))
+
+@if (isset($exception) && trim($exception->getMessage()) !== '')
+    @section('detail', $exception->getMessage())
+@endif
+
+@section('icon')
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+        stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-4.2-4.2" />
+        <path d="M8.5 8.5 13.5 13.5M13.5 8.5 8.5 13.5" />
+    </svg>
+@endsection

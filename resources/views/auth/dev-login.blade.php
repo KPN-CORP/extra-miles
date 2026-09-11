@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Development Login — {{ config('app.name') }}</title>
+    <title>{{ __('Development Login') }} — {{ config('app.name') }}</title>
     <link rel="icon" type="image/ico" href="{{ asset('storage/img/favicon.ico') }}">
     <style>
         :root { color-scheme: light; }
@@ -80,13 +80,15 @@
 </head>
 <body>
     <div class="card">
-        <h1>Development Login</h1>
-        <p class="subtitle">{{ config('app.name') }} — admin back-office</p>
+        <h1>{{ __('Development Login') }}</h1>
+        <p class="subtitle">{{ config('app.name') }} — {{ __('admin back-office') }}</p>
 
         <div class="banner">
-            <strong>DEVELOPMENT_MODE is active.</strong> This form bypasses Darwinbox SSO and
-            signs you in as any existing user. Remove <code>DEVELOPMENT_MODE</code> from
-            <code>.env</code> outside your local machine.
+            {!! __('development_mode_banner', [
+                'flag' => '<strong>DEVELOPMENT_MODE</strong>',
+                'code' => '<code>DEVELOPMENT_MODE</code>',
+                'env' => '<code>.env</code>',
+            ]) !!}
         </div>
 
         @if ($errors->any())
@@ -102,24 +104,24 @@
         <form method="POST" action="{{ route('dev.login.store') }}">
             @csrf
 
-            <label for="identifier">Employee ID / Email</label>
+            <label for="identifier">{{ __('Employee ID / Email') }}</label>
             <input type="text" id="identifier" name="identifier" value="{{ old('identifier') }}"
                    autofocus autocomplete="username" required>
 
-            <label for="password">Password</label>
+            <label for="password">{{ __('Password') }}</label>
             <input type="password" id="password" name="password" autocomplete="current-password">
-            <p class="hint">Leave blank — most SSO accounts have no password set.</p>
+            <p class="hint">{{ __('Leave blank — most SSO accounts have no password set.') }}</p>
 
             <div class="remember">
                 <input type="checkbox" id="remember" name="remember" value="1">
-                <label for="remember">Remember me</label>
+                <label for="remember">{{ __('Remember me') }}</label>
             </div>
 
-            <button type="submit">Sign in</button>
+            <button type="submit">{{ __('Sign in') }}</button>
         </form>
 
         <p class="sso">
-            <a href="https://kpncorporation.darwinbox.com">Sign in with Darwinbox SSO instead</a>
+            <a href="https://kpncorporation.darwinbox.com">{{ __('Sign in with Darwinbox SSO instead') }}</a>
         </p>
     </div>
 </body>

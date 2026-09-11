@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Reports'])
+@extends('layouts_.vertical', ['page_title' => __('Reports')])
 
 @section('css')
 @endsection
@@ -13,14 +13,14 @@
               <div class="row">
                 <div class="col-md-auto">
                   <div class="mb-3">
-                    <label class="form-label" for="report_type">Select Report:</label>
+                    <label class="form-label" for="report_type">{{ __('Select Report') }}:</label>
                     <select class="form-select border-dark-subtle" id="reportType" onchange="adminReportType(this.value)">
-                    <option value="">- select -</option>
-                    <option value="Goal">Detailed Goals</option>
-                    <option value="Employee">Goal Menu Access</option>
+                    <option value="">- {{ __('select') }} -</option>
+                    <option value="Goal">{{ __('Detailed Goals') }}</option>
+                    <option value="Employee">{{ __('Goal Menu Access') }}</option>
                     @if(auth()->check())
                       @can('employeepa')
-                        <option value="EmployeePA">Employee PA</option>
+                        <option value="EmployeePA">{{ __('Employee PA') }}</option>
                       @endcan
                     @endif
                     </select>
@@ -30,7 +30,7 @@
             <div class="row">
               <div class="col-md-auto">
                 <div class="d-md-block d-none mb-2">
-                  <button class="input-group-text bg-white border-dark-subtle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="ri-filter-line me-1"></i>Filters</button>
+                  <button class="input-group-text bg-white border-dark-subtle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="ri-filter-line me-1"></i>{{ __('Filters') }}</button>
                 </div>
               </div>
               <div class="col-md-auto">
@@ -39,7 +39,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text bg-white border-dark-subtle"><i class="ri-search-line"></i></span>
                     </div>
-                    <input type="text" name="customsearch" id="customsearch" class="form-control  border-dark-subtle border-left-0" placeholder="search.." aria-label="search" aria-describedby="search">
+                    <input type="text" name="customsearch" id="customsearch" class="form-control  border-dark-subtle border-left-0" placeholder="{{ __('search..') }}" aria-label="{{ __('search') }}" aria-describedby="search">
                     <div class="d-md-none input-group-append">
                       <button class="input-group-text bg-white border-dark-subtle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="ri-filter-line"></i></button>
                     </div>
@@ -56,7 +56,7 @@
               <input type="hidden" name="export_group_company" id="export_group_company">
               <input type="hidden" name="export_company" id="export_company">
               <input type="hidden" name="export_location" id="export_location">
-              <a id="export" onclick="exportExcel()" class="btn btn-outline-secondary px-4 shadow disabled"><i class="ri-arrow-circle-down-line"></i> Download</a>
+              <a id="export" onclick="exportExcel()" class="btn btn-outline-secondary px-4 shadow disabled"><i class="ri-arrow-circle-down-line"></i> {{ __('Download') }}</a>
             </form>
           </div>
         </div>
@@ -77,8 +77,8 @@
 
       <div class="offcanvas offcanvas-end" tabindex="-1"  id="offcanvasRight" aria-labelledby="offcanvasRightLabel" aria-modal="false" role="dialog">
           <div class="offcanvas-header">
-              <h5 id="offcanvasRightLabel">Filters</h5>
-              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+              <h5 id="offcanvasRightLabel">{{ __('Filters') }}</h5>
+              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="{{ __('Close') }}"></button>
           </div> <!-- end offcanvas-header-->
 
           <div class="offcanvas-body">
@@ -104,7 +104,7 @@
                   <div class="row">
                       <div class="col">
                           <div class="mb-3">
-                              <label class="form-label" for="group_company">Group Company</label>
+                              <label class="form-label" for="group_company">{{ __('Group Company') }}</label>
                               <select class="form-select select2" name="group_company[]" id="group_company" multiple>
                                   @foreach ($groupCompanies as $groupCompany)
                                   <option value="{{ $groupCompany }}">{{ $groupCompany }}</option>
@@ -116,7 +116,7 @@
                   <div class="row">
                       <div class="col">
                           <div class="mb-3">
-                              <label class="form-label" for="company">Company</label>
+                              <label class="form-label" for="company">{{ __('Company') }}</label>
                               <select class="form-select select2" name="company[]" id="company" multiple>
                                   @foreach ($companies as $company)
                                   <option value="{{ $company->contribution_level_code }}">{{ $company->contribution_level }}</option>
@@ -128,7 +128,7 @@
                   <div class="row">
                       <div class="col">
                           <div class="mb-3">
-                              <label class="form-label" for="location">Location</label>
+                              <label class="form-label" for="location">{{ __('Location') }}</label>
                               <select class="form-select select2" name="location[]" id="location" multiple>
                                   @foreach ($locations as $location)
                                   <option value="{{ $location->work_area }}">{{ $location->area.' ('.$location->company_name.')' }}</option>
@@ -141,7 +141,7 @@
           </div> <!-- end offcanvas-body-->
           <div class="offcanvas-footer p-3 text-end">
             <button type="button" id="offcanvas-cancel" class="btn btn-outline-secondary me-2" data-bs-dismiss="offcanvas">{{ __('Cancel') }}</button>
-            <button type="submit" class="btn btn-primary" form="admin_report_filter">Apply</button>
+            <button type="submit" class="btn btn-primary" form="admin_report_filter">{{ __('Apply') }}</button>
           </div>
       </div>
     </div>

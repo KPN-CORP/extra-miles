@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'News'])
+@extends('layouts_.vertical', ['page_title' => __('News')])
 
 @section('css')
     <style>
@@ -46,9 +46,9 @@
                     <div class="card bg-light">
                         <div class="card-body px-2 px-md-3 row g-3">
                             <div class="col-md-4">
-                                <label for="category" class="form-label">Category</label>
+                                <label for="category" class="form-label">{{ __('Category') }}</label>
                                 <select class="form-select" id="category" name="category" required>
-                                    <option value="" selected disabled>Please select</option>
+                                    <option value="" selected disabled>{{ __('Please select') }}</option>
                                     <option value="CSR">CSR</option>
                                     <option value="Event">Event</option>
                                     <option value="Sport">Sport</option>
@@ -59,21 +59,21 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label for="business_unit" class="form-label">Belong to Business Unit</label>
-                                <select class="select2 form-control select2-multiple" name="business_unit[]" id="business_unit" data-toggle="select2" multiple="multiple" data-placeholder="Please select">
+                                <label for="business_unit" class="form-label">{{ __('Belong to Business Unit') }}</label>
+                                <select class="select2 form-control select2-multiple" name="business_unit[]" id="business_unit" data-toggle="select2" multiple="multiple" data-placeholder="{{ __('Please select') }}">
                                     @foreach($bisnisunits as $bisnisunit)
                                         <option value="{{ $bisnisunit }}">{{ $bisnisunit }}</option>
                                     @endforeach
                                 </select>
-                                <small class="text-muted"><i class="ri-information-line me-1"></i>Blank means it applies to every Business Unit.</small>
+                                <small class="text-muted"><i class="ri-information-line me-1"></i>{{ __('Blank means it applies to every Business Unit.') }}</small>
                             </div>
                             <div class="col-md-4">
-                                <label for="hashtag" class="form-label">Hashtag</label>
-                                <input type="text" class="form-control" name="hashtag" id="hashtag" placeholder="create your hashtag.." value="{{ old('hashtag') }}" required>
+                                <label for="hashtag" class="form-label">{{ __('Hashtag') }}</label>
+                                <input type="text" class="form-control" name="hashtag" id="hashtag" placeholder="{{ __('create your hashtag..') }}" value="{{ old('hashtag') }}" required>
                                 <div class="invalid-feedback">
                                     {{ $invalidFeedback }}
                                 </div>
-                                <small class="text-muted"><i class="ri-information-line me-1"></i>Separate each hashtag with a coma.</small>
+                                <small class="text-muted"><i class="ri-information-line me-1"></i>{{ __('Separate each hashtag with a coma.') }}</small>
                             </div>
                         </div>
                     </div>
@@ -82,25 +82,25 @@
                             <div class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-2">
-                                        <label for="image" class="form-label">News Banner</label>
-                                        <button type="button" class="form-control btn btn-outline-primary" onclick="document.getElementById('image').click()">Select Image</button>
+                                        <label for="image" class="form-label">{{ __('News Banner') }}</label>
+                                        <button type="button" class="form-control btn btn-outline-primary" onclick="document.getElementById('image').click()">{{ __('Select Image') }}</button>
                                         <input type="file" name="image" id="image" accept="image/*" class="form-control d-none" onchange="previewImage(event)" required>
                                         <div class="invalid-feedback">
                                             {{ $invalidFeedback }}
                                         </div>
-                                        <small class="text-muted">Maximum file size 2MB</small>
+                                        <small class="text-muted">{{ __('Maximum file size 2MB') }}</small>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mt-3" id="image-preview-container" style="display: none;">
                                         <div class="row">
                                             <div class="col">
-                                                <label class="form-label">Image Preview</label>
+                                                <label class="form-label">{{ __('Image Preview') }}</label>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col">
-                                                <img id="image-preview" src="#" alt="Preview" class="img-fluid rounded">
+                                                <img id="image-preview" src="#" alt="{{ __('Preview') }}" class="img-fluid rounded">
                                             </div>
                                         </div>
                                     </div>
@@ -109,7 +109,7 @@
                             <div class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-2">
-                                        <label for="publish_date" class="form-label">Published Date</label>
+                                        <label for="publish_date" class="form-label">{{ __('Published Date') }}</label>
                                         <input type="date" class="form-control" name="publish_date" id="publish_date" value="{{ old('publish_date') }}" required>
                                         <div class="invalid-feedback">
                                             {{ $invalidFeedback }}
@@ -120,8 +120,8 @@
                             <div class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="title" class="form-label">Headline</label>
-                                        <input name="title" class="form-control" id="title" placeholder="create your headlines here.." required value="{{ old('title') }}">
+                                        <label for="title" class="form-label">{{ __('Headline') }}</label>
+                                        <input name="title" class="form-control" id="title" placeholder="{{ __('create your headlines here..') }}" required value="{{ old('title') }}">
                                         <div class="invalid-feedback">
                                             {{ $invalidFeedback }}
                                         </div>
@@ -129,8 +129,8 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <label for="content" class="form-label">Body</label>
-                                <textarea name="content" class="form-control" rows="4" style="height:50px" id="description" placeholder="write your news here.." required>{{ old('content') }}</textarea>
+                                <label for="content" class="form-label">{{ __('Body') }}</label>
+                                <textarea name="content" class="form-control" rows="4" style="height:50px" id="description" placeholder="{{ __('write your news here..') }}" required>{{ old('content') }}</textarea>
                                 <div class="invalid-feedback">
                                     {{ $invalidFeedback }}
                                 </div>
@@ -138,7 +138,7 @@
                             <div class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label for="link" class="form-label">Youtube link</label>
+                                        <label for="link" class="form-label">{{ __('Youtube link') }}</label>
                                         <input type="text" class="form-control" name="link" id="link" placeholder="https://www.youtube.com/watch?v=example" value="{{ old('link') }}">
                                     </div>
                                 </div>
@@ -146,9 +146,9 @@
                         </div>
                     </div>
                     <div class="d-flex text-center text-md-end justify-content-around justify-content-md-end mb-2">
-                        <button type="submit" name="action" value="draft" class="btn btn-secondary me-md-2">Save as Draft</button>
-                        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
-                        <button type="submit" name="action" value="create" class="btn btn-primary">Save</button>
+                        <button type="submit" name="action" value="draft" class="btn btn-secondary me-md-2">{{ __('Save as Draft') }}</button>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary me-md-2">{{ __('Cancel') }}</a>
+                        <button type="submit" name="action" value="create" class="btn btn-primary">{{ __('Save') }}</button>
                     </div>
                 </div>
             </div>

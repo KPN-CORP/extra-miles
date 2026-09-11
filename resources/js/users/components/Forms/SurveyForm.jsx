@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { PulseLoader } from 'react-spinners';
@@ -7,6 +8,7 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom'; // Import useParams to get id from endpoint
 import { showAlert } from '../Helper/alertHelper';
 import { useAuth } from '../context/AuthContext';
+import { translate } from '../Helper/localeHelper';
 
 export function generateValidationSchema(fields) {
     const shape = {};
@@ -28,20 +30,20 @@ export function generateValidationSchema(fields) {
         case 'select':
         case 'radio':
           schema = Yup.string();
-          if (isRequired) schema = schema.required('This field is required');
-          if (min !== null) schema = schema.min(min, `Minimum ${min} characters`);
-          if (max !== null) schema = schema.max(max, `Maximum ${max} characters`);
+          if (isRequired) schema = schema.required(translate('validation.required'));
+          if (min !== null) schema = schema.min(min, translate('validation.minChars', { min }));
+          if (max !== null) schema = schema.max(max, translate('validation.maximumChars', { max }));
           break;
   
         case 'checkbox':
           if (field.options) {
             schema = Yup.array();
             if (isRequired || min !== null) {
-              schema = schema.min(min || 1, `Select at least ${min || 1} option(s)`);
+              schema = schema.min(min || 1, translate('validation.selectAtLeast', { min: min || 1 }));
             }
           } else {
             schema = Yup.boolean();
-            if (isRequired) schema = schema.oneOf([true], 'Must be checked');
+            if (isRequired) schema = schema.oneOf([true], translate('validation.mustBeChecked'));
           }
           break;
   
@@ -65,6 +67,7 @@ export default function SurveyForm({participated, setParticipated}) {
     const { token } = useAuth();
     const [hasParticipated, setHasParticipated] = useState(participated);
     const navigate = useNavigate();
+    const { t } = useTranslation();
   
     React.useEffect(() => {
       const fetchFormSchema = async () => {
@@ -123,8 +126,8 @@ export default function SurveyForm({participated, setParticipated}) {
         const success = response.status === 201;
         showAlert({
           icon: success ? 'success' : 'error',
-          title: success ? 'Success!' : 'Something went wrong',
-          text: success ? 'Your response has been recorded. Thanks a bunch for joining the survey!' : 'Please try again later.',
+          title: success ? t('survey.successTitle') : t('alerts.somethingWentWrong'),
+          text: success ? t('survey.successText') : t('alerts.tryAgainLater'),
           timer: 2500,
           showConfirmButton: false,
         });
@@ -171,11 +174,11 @@ export default function SurveyForm({participated, setParticipated}) {
                     </div>
                   ) : field.type === 'checkbox' ? (
                     <label className="flex items-center">
-                      <Field type="checkbox" name={field.name} className="mr-2" /> I agree
+                      <Field type="checkbox" name={field.name} className="mr-2" /> {t('common.iAgree')}
                     </label>
                   ) : field.type === 'select' ? (
                     <Field as="select" name={field.name} className="w-full border rounded p-2">
-                      <option value="">Select an option</option>
+                      <option value="">{t('common.selectAnOption')}</option>
                       {field.options.map((option, index) => (
                         <option key={index} value={option}>{option}</option>
                       ))}
@@ -189,7 +192,7 @@ export default function SurveyForm({participated, setParticipated}) {
                         value={values[field.name]}
                         onChange={handleChange}
                         onBlur={handleBlur} 
-                        placeholder="isi disini..."
+                        placeholder={t('common.typeHere')}
                         className="w-full border rounded p-2" 
                     />
                   ) : field.type === 'radio' ? (
@@ -215,7 +218,7 @@ export default function SurveyForm({participated, setParticipated}) {
               ))}
   
               <button type="submit" disabled={isSubmitting} className="w-full px-5 py-2.5 rounded-lg shadow-md text-sm font-semibold text-red-700" style={{ backgroundColor: '#DEBD69' }}>
-                Submit
+                {t('common.submit')}
               </button>
             </Form>
           )}

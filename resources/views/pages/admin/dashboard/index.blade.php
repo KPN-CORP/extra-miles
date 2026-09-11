@@ -1,5 +1,5 @@
-@extends('layouts_.vertical', ['page_title' => 'Dashboard'])
+@extends('layouts_.vertical', ['page_title' => __('Dashboard')])
 
 @section('content')
-    <h1>Selamat datang di Dashboard</h1>
+    <h1>{{ __('Welcome to the Dashboard') }}</h1>
 @endsection

@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import LanguageToggle from "../components/Layout/LanguageToggle";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -23,7 +25,8 @@ export default function News() {
   const navigate = useNavigate();
   const apiUrl = useApiUrl();
   const { token } = useAuth();
-  const { direction } = useNavigationDirection();  
+  const { direction } = useNavigationDirection();
+  const { t, i18n } = useTranslation();
   const [skipExit, setSkipExit] = useState(false);
   
   const pageVariants = {
@@ -53,6 +56,7 @@ export default function News() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Category");
+  const dateLocale = i18n.resolvedLanguage === "id" ? "id-ID" : "en-US";
 
   // Image loaded state per image id to avoid one global flag
   const [loadedImages, setLoadedImages] = useState({});
@@ -97,8 +101,8 @@ export default function News() {
       } catch (err) {
         showAlert({
           icon: "warning",
-          title: "Connection Ended",
-          text: "Unable to connect to the server. Please try again later.",
+          title: t('alerts.connectionEnded'),
+          text: t('alerts.connectionEndedText'),
           timer: 2500,
           showConfirmButton: false,
         }).then(() => {
@@ -142,8 +146,10 @@ export default function News() {
     });
   }, [allNews, selectedBU, selectedDate, searchQuery]);
 
+  // Called from both onLoad and onError: a failed image must still clear the
+  // skeleton, otherwise it animates over the card indefinitely.
   const handleImageLoad = (id) => {
-    setLoadedImages((prev) => ({ ...prev, [id]: true }));
+    setLoadedImages((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
   };
 
   if (loading) return (
@@ -172,8 +178,9 @@ export default function News() {
                 <i className="ri-arrow-left-line" />
               </button>
               <div className="text-center text-red-700 text-lg font-bold flex-grow">
-                News
+                {t('news.title')}
               </div>
+              <LanguageToggle />
               <div style={{ flexBasis: "40px" }} /> {/* placeholder for symmetry */}
             </div>
             <motion.div
@@ -190,7 +197,7 @@ export default function News() {
               </div>
                 <input
                     type="text"
-                    placeholder="Search"
+                    placeholder={t('common.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 bg-transparent outline-none text-sm text-gray-700 placeholder-gray-400"
@@ -207,7 +214,7 @@ export default function News() {
 
             {/* Swiper Latest News */}
             <div className="flex items-center justify-between mb-1">
-              <div className="text-red-700 text-xs font-bold">Latest News</div>
+              <div className="text-red-700 text-xs font-bold">{t('news.latest')}</div>
             </div>
             <div className="overflow-x-scroll whitespace-nowrap mb-4">
               <Swiper
@@ -219,7 +226,7 @@ export default function News() {
               >
                 {latestNews.map((item) => {
                     const newsDate = new Date(item.publish_date);
-                    const day = newsDate.toLocaleDateString("id-ID", {
+                    const day = newsDate.toLocaleDateString(dateLocale, {
                       weekday: "long",
                       day: "2-digit",
                       month: "long",
@@ -241,6 +248,7 @@ export default function News() {
                             alt={item.title}
                             loading="lazy"
                             onLoad={() => handleImageLoad(item.encrypted_id)}
+                            onError={() => handleImageLoad(item.encrypted_id)}
                             />
                             {!loadedImages[item.encrypted_id] && (
                             <div className="absolute inset-0 flex items-center justify-center bg-orange-50 z-10">
@@ -284,7 +292,7 @@ export default function News() {
                       : "bg-transparent outline outline-1 text-sm outline-stone-400 text-gray-600"
                   }`}
                 >
-                  {bu}
+                  {bu === "All BU" ? t('event.allBu') : bu}
                 </button>
               ))}
             </div>
@@ -294,7 +302,7 @@ export default function News() {
               <div className="space-y-3">
                   {filteredNews.map((news) => {
                       const newsDate = new Date(news.publish_date);
-                      const day = newsDate.toLocaleDateString("id-ID", {
+                      const day = newsDate.toLocaleDateString(dateLocale, {
                           weekday: "long",
                           day: "2-digit",
                           month: "long",
@@ -363,12 +371,12 @@ export default function News() {
             >
                 <div className="pointer-events-auto bg-white rounded-lg p-5 w-11/12 max-w-md shadow-lg relative">
                 <h2 className="text-lg font-semibold text-red-700 mb-4">
-                    Filters
+                    {t('news.filters')}
                 </h2>
 
                 <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700 mt-2">
-                    Categories:
+                    {t('news.categories')}
                     </label>
                     <select
                         className="w-full border border-gray-300 rounded px-3 py-1 text-sm"
@@ -377,7 +385,7 @@ export default function News() {
                         >
                         {categories.map((category) => (
                             <option key={category} value={category}>
-                            {category}
+                            {category === "All Category" ? t('news.allCategories') : category}
                             </option>
                         ))}
                     </select>
@@ -388,14 +396,14 @@ export default function News() {
                     className="px-4 py-1 bg-red-700 text-white rounded"
                     onClick={() => setIsModalOpen(false)}
                     >
-                    Apply
+                    {t('common.apply')}
                     </button>
                 </div>
 
                 <button
                     className="absolute top-2 right-2 text-gray-400 hover:text-red-600"
                     onClick={() => setIsModalOpen(false)}
-                    aria-label="Close modal"
+                    aria-label={t('common.closeModal')}
                 >
                     <i className="ri-close-line text-xl" />
                 </button>

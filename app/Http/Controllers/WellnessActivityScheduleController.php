@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\WellnessRegistrationStatus;
 use App\Enums\WellnessScheduleStatus;
 use App\Http\Controllers\Concerns\DecryptsRouteId;
 use App\Http\Requests\WellnessActivityScheduleRequest;
@@ -20,7 +19,7 @@ class WellnessActivityScheduleController extends Controller
         $activity = WellnessActivity::with('type')->findOrFail($this->decryptId($encryptedId));
 
         $schedules = $activity->schedules()
-            ->withCount($this->seatCounts())
+            ->withSeatCounts()
             ->orderBy('start_at')
             ->get();
 
@@ -47,7 +46,7 @@ class WellnessActivityScheduleController extends Controller
 
     public function update(WellnessActivityScheduleRequest $request, string $encryptedId)
     {
-        $schedule = WellnessActivitySchedule::withCount($this->seatCounts())
+        $schedule = WellnessActivitySchedule::withSeatCounts()
             ->findOrFail($this->decryptId($encryptedId));
 
         // Shrinking the quota below the seats already held would silently put the
@@ -64,7 +63,7 @@ class WellnessActivityScheduleController extends Controller
 
     public function archive(string $encryptedId)
     {
-        $schedule = WellnessActivitySchedule::withCount($this->seatCounts())
+        $schedule = WellnessActivitySchedule::withSeatCounts()
             ->findOrFail($this->decryptId($encryptedId));
 
         if ($schedule->taken_seats > 0) {
@@ -102,17 +101,5 @@ class WellnessActivityScheduleController extends Controller
         return view('pages.admin.wellness.schedules.qr', [
             'schedule' => $schedule,
         ]);
-    }
-
-    /**
-     * @return array<string, \Closure>
-     */
-    protected function seatCounts(): array
-    {
-        return [
-            'registrations as taken_seats' => fn ($q) => $q->whereIn('status', WellnessRegistrationStatus::slotConsumingValues()),
-            'registrations as queued_seats' => fn ($q) => $q->whereIn('status', WellnessRegistrationStatus::queuedValues()),
-            'registrations as attended_seats' => fn ($q) => $q->whereNotNull('attended_at'),
-        ];
     }
 }

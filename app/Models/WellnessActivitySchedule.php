@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\WellnessRegistrationStatus;
 use App\Enums\WellnessScheduleStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -53,6 +54,20 @@ class WellnessActivitySchedule extends Model
         return Crypt::encryptString($this->id);
     }
 
+    /**
+     * Adds taken_seats / queued_seats / attended_seats. One definition shared by
+     * the schedule list, the activity list and the activity edit form, so the
+     * three can never disagree about what counts as an occupied seat.
+     */
+    public function scopeWithSeatCounts(Builder $query): Builder
+    {
+        return $query->withCount([
+            'registrations as taken_seats' => fn ($q) => $q->whereIn('status', WellnessRegistrationStatus::slotConsumingValues()),
+            'registrations as queued_seats' => fn ($q) => $q->whereIn('status', WellnessRegistrationStatus::queuedValues()),
+            'registrations as attended_seats' => fn ($q) => $q->whereNotNull('attended_at'),
+        ]);
+    }
+
     public function activity()
     {
         return $this->belongsTo(WellnessActivity::class, 'wellness_activity_id');
@@ -61,6 +76,11 @@ class WellnessActivitySchedule extends Model
     public function registrations()
     {
         return $this->hasMany(WellnessActivityRegistration::class, 'wellness_activity_schedule_id');
+    }
+
+    public function feedback()
+    {
+        return $this->hasMany(WellnessActivityFeedback::class, 'wellness_activity_schedule_id');
     }
 
     public function creator()

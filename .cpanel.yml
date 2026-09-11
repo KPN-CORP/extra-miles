@@ -20,8 +20,14 @@ deployment:
     # Run database migrations (for first deployment)
     # - php artisan migrate --force
 
-    # Clear Laravel application cache
+    # Rebuild Laravel's caches. optimize:clear first so nothing stale survives,
+    # then `optimize` re-caches config, events, routes and views. Without this
+    # every request re-parses .env, all of config/ and the whole route table,
+    # which is the single largest per-request cost on the cPanel host.
+    # Route caching requires that no route action be a closure -- keep new routes
+    # pointing at controllers or `optimize` will fail here and the deploy stops.
     - php artisan optimize:clear
+    - php artisan optimize
     
 # deployment:
 #   tasks:

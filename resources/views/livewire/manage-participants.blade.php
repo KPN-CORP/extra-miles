@@ -14,13 +14,13 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <span class="badge bg-warning text-dark"><h5>REQUEST : {{ $countRequest }}</h5></span>
-            <span class="badge bg-danger"><h5>WAITING LIST : {{ $countWaitingList }}</h5></span>
-            <span class="badge bg-success"><h5>APPROVED : {{ $countApproved }}</h5></span>
-            <span class="badge bg-warning text-dark"><h5>CONFIRMATION NEEDED : {{ $countConfirmation }}</h5></span>
-            <span class="badge bg-primary"><h5>CONFIRMED : {{ $countConfirmed }}</h5></span>
-            <span class="badge bg-info"><h5>ATTENDING : {{ $countAttending }}</h5></span>
-            <span class="badge bg-dark"><h5>NOT ATTENDING : {{ $countNotAttending }}</h5></span>
+            <span class="badge bg-warning text-dark"><h5>{{ strtoupper(__('Request')) }} : {{ $countRequest }}</h5></span>
+            <span class="badge bg-danger"><h5>{{ strtoupper(__('Waiting List')) }} : {{ $countWaitingList }}</h5></span>
+            <span class="badge bg-success"><h5>{{ strtoupper(__('Approved')) }} : {{ $countApproved }}</h5></span>
+            <span class="badge bg-warning text-dark"><h5>{{ strtoupper(__('Confirmation Needed')) }} : {{ $countConfirmation }}</h5></span>
+            <span class="badge bg-primary"><h5>{{ strtoupper(__('Confirmed')) }} : {{ $countConfirmed }}</h5></span>
+            <span class="badge bg-info"><h5>{{ strtoupper(__('Attending')) }} : {{ $countAttending }}</h5></span>
+            <span class="badge bg-dark"><h5>{{ strtoupper(__('Not Attending')) }} : {{ $countNotAttending }}</h5></span>
         </div>
     </div>
 
@@ -32,7 +32,7 @@
                         <button class="nav-link @if($loop->first) active @endif"
                                 wire:click="$set('activeTab', '{{ strtolower(str_replace(' ', '_', $tab)) }}')"
                                 type="button" role="tab">
-                            {{ $tab }}
+                            {{ __($tab) }}
                         </button>
                     </li>
                 @endforeach

@@ -2,6 +2,8 @@
 // events which keep date and time in separate columns -- so dateTimeHelper
 // does not fit here.
 
+import { localeTag, translate } from './localeHelper';
+
 export function parseSessionDate(value) {
     if (!value) return null;
     // "2026-09-02 08:00:00" -> a Date the browser reads as local time.
@@ -16,6 +18,7 @@ export function formatSession(schedule) {
         return { day: '', month: '', year: '', time: '', full: '', isPast: false };
     }
 
+    const locale = localeTag();
     const two = (n) => String(n).padStart(2, '0');
     const time = end
         ? `${two(start.getHours())}:${two(start.getMinutes())} - ${two(end.getHours())}:${two(end.getMinutes())}`
@@ -23,11 +26,11 @@ export function formatSession(schedule) {
 
     return {
         day: start.getDate(),
-        month: start.toLocaleString('en-US', { month: 'short' }),
+        month: start.toLocaleString(locale, { month: 'short' }),
         year: start.getFullYear(),
-        weekday: start.toLocaleString('en-US', { weekday: 'long' }),
+        weekday: start.toLocaleString(locale, { weekday: 'long' }),
         time,
-        full: `${start.toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}, ${time}`,
+        full: `${start.toLocaleString(locale, { day: 'numeric', month: 'short', year: 'numeric' })}, ${time}`,
         isPast: end ? end < new Date() : start < new Date(),
     };
 }
@@ -52,7 +55,11 @@ export function statusStyle(status) {
 
 export function seatLabel(schedule) {
     if (!schedule) return '';
-    if (schedule.quota === null || schedule.quota === undefined) return 'Unlimited seats';
-    if (schedule.is_full) return 'Full - waitlist only';
-    return `${schedule.remaining_seats} of ${schedule.quota} seats left`;
+    if (schedule.quota === null || schedule.quota === undefined) return translate('wellness.seats.unlimited');
+    if (schedule.is_full) return translate('wellness.seats.full');
+
+    return translate('wellness.seats.remaining', {
+        remaining: schedule.remaining_seats,
+        quota: schedule.quota,
+    });
 }

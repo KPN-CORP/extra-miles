@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Wellness Schedules'])
+@extends('layouts_.vertical', ['page_title' => __('Wellness Schedules')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -11,19 +11,19 @@
         <div>
             <h4 class="page-title mb-0">{{ $activity->name }}</h4>
             <small class="text-muted">
-                {{ $activity->type?->name ?? 'No type' }} &middot;
+                {{ $activity->type?->name ?? __('No type') }} &middot;
                 <span class="badge {{ $activity->status->badgeClass() }}">{{ $activity->status->label() }}</span>
             </small>
         </div>
         <div class="d-flex gap-2">
             <a href="{{ route('wellness.activities.edit', $activity->encrypted_id) }}" class="btn btn-outline-warning">
-                <i class="ri-edit-box-line me-1"></i> Edit Activity
+                <i class="ri-edit-box-line me-1"></i> {{ __('Edit Activity') }}
             </a>
             <a href="{{ route('admin.wellness.activities.index') }}" class="btn btn-outline-secondary">
-                <i class="ri-arrow-left-line me-1"></i> Back
+                <i class="ri-arrow-left-line me-1"></i> {{ __('Back') }}
             </a>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createScheduleModal">
-                <i class="ri-add-line me-1"></i> Add Schedule
+                <i class="ri-add-line me-1"></i> {{ __('Add Schedule') }}
             </button>
         </div>
     </div>
@@ -38,15 +38,15 @@
                         <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="no-sort">No</th>
-                                    <th>Session</th>
-                                    <th>Location</th>
-                                    <th>Registration Window</th>
-                                    <th>Seats</th>
-                                    <th>Queue</th>
-                                    <th>Attended</th>
-                                    <th>Status</th>
-                                    <th class="no-sort">Action</th>
+                                    <th class="no-sort">{{ __('No') }}</th>
+                                    <th>{{ __('Session') }}</th>
+                                    <th>{{ __('Location') }}</th>
+                                    <th>{{ __('Registration Window') }}</th>
+                                    <th>{{ __('Seats') }}</th>
+                                    <th>{{ __('Queue') }}</th>
+                                    <th>{{ __('Attended') }}</th>
+                                    <th>{{ __('Status') }}</th>
+                                    <th class="no-sort">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -63,17 +63,17 @@
                                         <td>
                                             @if ($schedule->registration_start_at || $schedule->registration_end_at)
                                                 <small>
-                                                    {{ $schedule->registration_start_at?->format('d M H:i') ?? 'anytime' }}
+                                                    {{ $schedule->registration_start_at?->format('d M H:i') ?? __('anytime') }}
                                                     &rarr;
-                                                    {{ $schedule->registration_end_at?->format('d M H:i') ?? 'session end' }}
+                                                    {{ $schedule->registration_end_at?->format('d M H:i') ?? __('session end') }}
                                                 </small>
                                             @else
-                                                <small class="text-muted">Always open</small>
+                                                <small class="text-muted">{{ __('Always open') }}</small>
                                             @endif
                                         </td>
                                         <td>
                                             @if ($schedule->quota === null)
-                                                <span class="badge bg-info-subtle text-info">{{ $schedule->taken_seats }} / unlimited</span>
+                                                <span class="badge bg-info-subtle text-info">{{ $schedule->taken_seats }} / {{ __('unlimited') }}</span>
                                             @else
                                                 <span class="badge {{ $schedule->taken_seats >= $schedule->quota ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' }}">
                                                     {{ $schedule->taken_seats }} / {{ $schedule->quota }}
@@ -85,11 +85,11 @@
                                         <td><span class="badge {{ $schedule->status->badgeClass() }}">{{ $schedule->status->label() }}</span></td>
                                         <td>
                                             <a href="{{ route('admin.wellness.registrations.index', $schedule->encrypted_id) }}"
-                                                class="btn btn-outline-primary btn-sm" title="Participants">
+                                                class="btn btn-outline-primary btn-sm" title="{{ __('Participants') }}">
                                                 <i class="ri-group-line"></i>
                                             </a>
                                             <a href="{{ route('wellness.schedules.qr', $schedule->encrypted_id) }}" target="_blank"
-                                                class="btn btn-outline-dark btn-sm" title="Attendance QR">
+                                                class="btn btn-outline-dark btn-sm" title="{{ __('Attendance QR') }}">
                                                 <i class="ri-qr-code-line"></i>
                                             </a>
                                             <button type="button" class="btn btn-outline-warning btn-sm js-edit-schedule"
@@ -101,12 +101,12 @@
                                                 data-regstart="{{ $schedule->registration_start_at?->format('Y-m-d\TH:i') }}"
                                                 data-regend="{{ $schedule->registration_end_at?->format('Y-m-d\TH:i') }}"
                                                 data-status="{{ $schedule->status->value }}"
-                                                data-bs-toggle="modal" data-bs-target="#editScheduleModal" title="Edit">
+                                                data-bs-toggle="modal" data-bs-target="#editScheduleModal" title="{{ __('Edit') }}">
                                                 <i class="ri-edit-box-line"></i>
                                             </button>
                                             <button type="button" class="btn btn-outline-danger btn-sm js-archive"
                                                 data-form="archive-schedule-{{ $schedule->id }}"
-                                                data-text="This schedule will be archived.">
+                                                data-text="{{ __('This schedule will be archived.') }}">
                                                 <i class="ri-archive-line"></i>
                                             </button>
                                             <form id="archive-schedule-{{ $schedule->id }}" class="d-none"
@@ -133,15 +133,15 @@
                 <form action="{{ route('wellness.schedules.store', $activity->encrypted_id) }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title">Add Schedule</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ __('Add Schedule') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                     </div>
                     <div class="modal-body">
                         @include('pages.admin.wellness.schedules._fields', ['prefix' => 'create', 'statuses' => $statuses])
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Schedule</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Save Schedule') }}</button>
                     </div>
                 </form>
             </div>
@@ -156,15 +156,15 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-header">
-                        <h5 class="modal-title">Edit Schedule</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ __('Edit Schedule') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                     </div>
                     <div class="modal-body">
                         @include('pages.admin.wellness.schedules._fields', ['prefix' => 'edit', 'statuses' => $statuses])
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Update Schedule</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Update Schedule') }}</button>
                     </div>
                 </form>
             </div>

@@ -5,7 +5,7 @@
             <div class="row">
               <div class="col-md-auto text-center">
                   <button class="btn btn-outline-primary btn-sm px-2 my-1 me-1 filter-btn" data-id="all">{{ __('All Task') }}</button>
-                  <button class="btn btn-outline-primary btn-sm px-2 my-1 me-1 filter-btn" data-id="draft">Draft</button>
+                  <button class="btn btn-outline-primary btn-sm px-2 my-1 me-1 filter-btn" data-id="draft">{{ __('Draft') }}</button>
                   <button class="btn btn-outline-primary btn-sm px-2 my-1 me-1 filter-btn" data-id="waiting for revision">{{ __('Waiting For Revision') }}</button>
                   <button class="btn btn-outline-primary btn-sm px-2 my-1 me-1 filter-btn" data-id="waiting for approval">{{ __('Pending') }}</button>
                   <button class="btn btn-outline-primary btn-sm px-2 my-1 me-1 filter-btn" data-id="approved">{{ __('Approved') }}</button>
@@ -16,11 +16,11 @@
             <table class="table table-sm table-hover nowrap align-middle w-100" id="adminReportTable" cellspacing="0">
                 <thead class="thead-light">
                     <tr>
-                        <th>Employees</th>
-                        <th>KPI</th>
-                        <th>Goal Status</th>
-                        <th>Approval Status</th>
-                        <th>Initiated On</th>
+                        <th>{{ __('Employees') }}</th>
+                        <th>{{ __('KPI') }}</th>
+                        <th>{{ __('Goal Status') }}</th>
+                        <th>{{ __('Approval Status') }}</th>
+                        <th>{{ __('Initiated On') }}</th>
                         <th>{{ __('Initiated By') }}</th>
                         <th>{{ __('Last Updated On') }}</th>
                         <th class="text-center">{{ __('Revoke') }}</th>
@@ -34,9 +34,9 @@
                         <a href="javascript:void(0)" class="btn btn-light btn-sm font-weight-medium" data-bs-toggle="modal" data-bs-target="#modalDetail{{ $row->goal->id }}"><i class="ri-search-line"></i></a>
                         </td>
                         <td class="text-center">
-                        <span class="badge {{ $row->goal->form_status == 'Approved' ? 'bg-success' : ($row->goal->form_status == 'Draft' ? 'badge-outline-secondary' : 'bg-secondary')}} px-1">{{ $row->goal->form_status == 'Draft' ? 'Draft' : $row->goal->form_status }}</span></td>
+                        <span class="badge {{ $row->goal->form_status == 'Approved' ? 'bg-success' : ($row->goal->form_status == 'Draft' ? 'badge-outline-secondary' : 'bg-secondary')}} px-1">{{ $row->goal->form_status == 'Draft' ? __('Draft') : __($row->goal->form_status) }}</span></td>
                         <td class="text-center">
-                        <a href="javascript:void(0)" data-bs-id="{{ $row->employee_id }}" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="{{ $row->goal->form_status=='Draft' ? 'Draft' : ($row->approvalLayer ? 'Manager L'.$row->approvalLayer.' : '.$row->name : $row->name) }}" class="badge {{ $row->status == 'Approved' ? 'bg-success' : ( $row->status=='Sendback' || $row->goal->form_status=='Draft' ? 'bg-secondary' : 'bg-warning' ) }} px-1">{{ $row->status == 'Pending' ? ($row->goal->form_status=='Draft' ? 'Not Started' : __('Pending')) : ( $row->status=='Sendback'? 'Waiting For Revision' : $row->status) }}</a>
+                        <a href="javascript:void(0)" data-bs-id="{{ $row->employee_id }}" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="{{ $row->goal->form_status=='Draft' ? __('Draft') : ($row->approvalLayer ? __('Manager').' L'.$row->approvalLayer.' : '.$row->name : $row->name) }}" class="badge {{ $row->status == 'Approved' ? 'bg-success' : ( $row->status=='Sendback' || $row->goal->form_status=='Draft' ? 'bg-secondary' : 'bg-warning' ) }} px-1">{{ $row->status == 'Pending' ? ($row->goal->form_status=='Draft' ? __('Not Started') : __('Pending')) : ( $row->status=='Sendback'? __('Waiting For Revision') : __($row->status)) }}</a>
                         </td>
                         <td class="text-center">{{ $row->formatted_created_at }}</td>
                         <td>{{ $row->initiated->name }}<br>{{ $row->initiated->employee_id }}</td>
@@ -77,19 +77,19 @@
                                         @foreach ($formData as $index => $data)
                                             <div class="card mb-4 shadow">
                                                 <div class="card-header pb-0 border-0 bg-white">
-                                                    <h4>KPI {{ $index + 1 }}</h4>
+                                                    <h4>{{ __('KPI') }} {{ $index + 1 }}</h4>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row">
                                                         <div class="col-md-4 mb-3">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="kpi">KPI</label>
+                                                                <label class="form-label" for="kpi">{{ __('KPI') }}</label>
                                                                 <textarea class="form-control bg-gray-100" disabled>{{ $data['kpi'] }}</textarea>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-2 mb-3">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="target">Target</label>
+                                                                <label class="form-label" for="target">{{ __('Target') }}</label>
                                                                 <input type="text" value="{{ $data['target'] }}" class="form-control bg-gray-100" disabled>
                                                             </div>
                                                         </div>
@@ -125,7 +125,7 @@
                                             </div>
                                         @endforeach
                                         @else
-                                            <p>No form data available.</p>
+                                            <p>{{ __('No form data available.') }}</p>
                                         @endif                
                             </div>
                                     </form>

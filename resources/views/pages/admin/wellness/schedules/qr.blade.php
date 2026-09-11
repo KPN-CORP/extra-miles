@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Attendance QR &middot; {{ $schedule->activity->name }}</title>
+    <title>{{ __('Attendance QR') }} &middot; {{ $schedule->activity->name }}</title>
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
     <style>
         body {
@@ -69,27 +69,28 @@
             <h1>{{ $schedule->activity->name }}</h1>
             <div class="type">{{ $schedule->activity->type?->name }}</div>
 
-            <div class="label">Date</div>
+            <div class="label">{{ __('Date') }}</div>
             <div class="value">{{ $schedule->start_at->format('l, d F Y') }}</div>
 
-            <div class="label">Time</div>
+            <div class="label">{{ __('Time') }}</div>
             <div class="value">{{ $schedule->start_at->format('H:i') }} &ndash; {{ $schedule->end_at->format('H:i') }}</div>
 
-            <div class="label">Location</div>
+            <div class="label">{{ __('Location') }}</div>
             <div class="value">{{ $schedule->location ?: '-' }}</div>
 
-            <div class="label">Seats</div>
-            <div class="value">{{ $schedule->quota === null ? 'Unlimited' : $schedule->quota }}</div>
+            <div class="label">{{ __('Seats') }}</div>
+            <div class="value">{{ $schedule->quota === null ? __('Unlimited') : $schedule->quota }}</div>
 
             <div class="hint">
-                Scanning is open from
-                <strong>{{ $schedule->checkInOpensAt()->format('d M H:i') }}</strong> until
-                <strong>{{ $schedule->checkInClosesAt()->format('d M H:i') }}</strong>.
-                Only approved participants can check in.
+                {!! __('Scanning is open from :from until :until.', [
+                    'from' => '<strong>'.$schedule->checkInOpensAt()->format('d M H:i').'</strong>',
+                    'until' => '<strong>'.$schedule->checkInClosesAt()->format('d M H:i').'</strong>',
+                ]) !!}
+                {{ __('Only approved participants can check in.') }}
             </div>
 
             <div class="actions">
-                <button type="button" onclick="window.print()">Print this QR</button>
+                <button type="button" onclick="window.print()">{{ __('Print this QR') }}</button>
             </div>
         </div>
     </div>

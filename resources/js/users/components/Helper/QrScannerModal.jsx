@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { useApiUrl } from '../context/ApiContext';
@@ -9,7 +10,8 @@ export default function QRScannerModal({ isOpen, onClose, event, onScanSuccess }
   const [isVisible, setIsVisible] = useState(false);
   const encryptedId = event?.encrypted_id;
   const apiUrl = useApiUrl();
-  const { token } = useAuth();  
+  const { token } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isOpen) setIsVisible(true);
@@ -99,18 +101,18 @@ export default function QRScannerModal({ isOpen, onClose, event, onScanSuccess }
               {result ? (
                 <>
                 <div className=" text-green-800 rounded align-text-bottom text-lg">
-                  <strong>Successful</strong>
+                  <strong>{t('qr.successful')}</strong>
                 </div>
                 </>
               ) : (
-                <span className="text-gray-600 text-sm font-normal leading-none"><i className='ri-alert-line text-yellow-500'></i> Please point your camera at the barcode to scan and confirm your attendance.</span>
+                <span className="text-gray-600 text-sm font-normal leading-none"><i className='ri-alert-line text-yellow-500'></i> {t('qr.pointCamera')}</span>
               )}
             </div>
           </div>
           <button
             onClick={handleClose}
             className="w-10 text-gray-500 hover:text-gray-800 text-2xl flex justify-end"
-            aria-label="Close modal"
+            aria-label={t('common.closeModal')}
           >
             <i className="ri-close-line"></i>
           </button>
@@ -151,7 +153,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onScanSuccess }
               render={(previewId) => (
                 <div className="w-full h-full flex items-center justify-center text-white">
                   <video id={previewId} className="w-full h-full object-cover" />
-                  {!result && <p className="absolute">Align QR Code</p>}
+                  {!result && <p className="absolute">{t('qr.align')}</p>}
                 </div>
               )}
               constraints={{ facingMode: 'environment' }}
@@ -164,7 +166,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onScanSuccess }
           <>
           <div className="flex flex-col w-full text-center justify-start px-4 gap-2 mb-2">
             <div className="row">
-              <span className="text-gray-600 text-base font-normal leading-tight">Hi, you're attending the event 🎉 </span>
+              <span className="text-gray-600 text-base font-normal leading-tight">{t('qr.attendingEvent')} </span>
               <span className="text-red-700 text-base font-bold leading-tight">{event?.title} </span>
             </div>
           </div>
@@ -173,7 +175,7 @@ export default function QRScannerModal({ isOpen, onClose, event, onScanSuccess }
           </div> */}
           </>
         ) : (
-          <div className="w-full text-center justify-start text-gray-600 text-sm font-normal leading-none">Make sure the barcode is clearly visible within the scanning area!</div>
+          <div className="w-full text-center justify-start text-gray-600 text-sm font-normal leading-none">{t('qr.keepInFrame')}</div>
         )}
       </div>
     </div>

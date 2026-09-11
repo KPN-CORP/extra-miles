@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Reports'])
+@extends('layouts_.vertical', ['page_title' => __('Reports')])
 
 @section('css')
 @endsection
@@ -15,10 +15,10 @@
                   <div class="row justify-content-between align-items-start">
                     <div class="col-md-auto">
                       <div class="mb-3">
-                          <label class="form-label" for="report_type">Select Report</label>
+                          <label class="form-label" for="report_type">{{ __('Select Report') }}</label>
                           <select class="form-select border-dark-subtle" onchange="reportType(this.value)">
-                          <option value="">- select -</option>
-                          <option value="Goal">Detailed Goals</option>
+                          <option value="">- {{ __('select') }} -</option>
+                          <option value="Goal">{{ __('Detailed Goals') }}</option>
                           </select>
                       </div> 
                     </div>
@@ -27,7 +27,7 @@
                     <div class="col-md col-lg-4">
                         <div class="input-group flex-nowrap mb-3">
                           <label class="input-group-text border-dark-subtle" for="customsearch"><i class="ri-search-line"></i></label>
-                          <input type="text" name="customsearch" id="customsearch" class="form-control border-dark-subtle" placeholder="search.." aria-label="search" aria-describedby="search">
+                          <input type="text" name="customsearch" id="customsearch" class="form-control border-dark-subtle" placeholder="{{ __('search..') }}" aria-label="{{ __('search') }}" aria-describedby="search">
                           <div class="d-md-none input-group-append">
                             <button class="input-group-text bg-white border-dark-subtle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="ri-filter-line"></i></button>
                           </div>
@@ -35,7 +35,7 @@
                     </div>
                     <div class="col-sm-auto d-none d-md-inline">
                       <div class="mb-3">
-                        <button class="input-group-text bg-white border-dark-subtle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="ri-filter-line me-1"></i>Filters</button>
+                        <button class="input-group-text bg-white border-dark-subtle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="ri-filter-line me-1"></i>{{ __('Filters') }}</button>
                       </div>
                     </div>
                   </div>
@@ -69,8 +69,8 @@
           </div>
           <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" aria-modal="false" role="dialog">
             <div class="offcanvas-header">
-                <h5 id="offcanvasRightLabel">Filters</h5>
-                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <h5 id="offcanvasRightLabel">{{ __('Filters') }}</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="{{ __('Close') }}"></button>
             </div> <!-- end offcanvas-header-->
 
             <div class="offcanvas-body">
@@ -99,7 +99,7 @@
             </div> <!-- end offcanvas-body-->
             <div class="offcanvas-footer p-3 text-end">
               <button type="button" id="offcanvas-cancel" class="btn btn-outline-secondary me-2" data-bs-dismiss="offcanvas">{{ __('Cancel') }}</button>
-              <button type="submit" class="btn btn-primary" form="report_filter">Apply</button>
+              <button type="submit" class="btn btn-primary" form="report_filter">{{ __('Apply') }}</button>
             </div>
         </div>
         </div>

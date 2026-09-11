@@ -1,6 +1,7 @@
 // App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ApiProvider } from './components/context/ApiContext';
 import { AnimatePresence } from "motion/react";
 import { NavigationProvider } from './components/Context/NavigationProvider'; // sesuaikan path
@@ -61,6 +62,7 @@ const checkIsMobile = () => {
 };
 
 const AppContent = () => {
+  const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(checkIsMobile);
 
   useEffect(() => {
@@ -113,9 +115,9 @@ const AppContent = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center">
         <i className="ri-smartphone-line text-6xl text-red-500 mb-4"></i>
-        <h1 className="text-2xl font-bold text-gray-800">Mobile Only</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('app.mobileOnly')}</h1>
         <p className="text-gray-600 mt-2">
-          Please open this app on a mobile device.
+          {t('app.mobileOnlyText')}
         </p>
       </div>
     );

@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Social Media'])
+@extends('layouts_.vertical', ['page_title' => __('Social Media')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -7,9 +7,9 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h4 class="page-title mb-0">Social Media</h4>
+        <h4 class="page-title mb-0">{{ __('Social Media') }}</h4>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSocialModal">
-            Add Social Media
+            {{ __('Add Social Media') }}
         </button>
     </div>
     <div class="row">
@@ -23,7 +23,7 @@
                                     id="{{ strtolower(str_replace(' ', '-', $tab)) }}-tab" data-bs-toggle="tab"
                                     data-bs-target="#{{ strtolower(str_replace(' ', '-', $tab)) }}" type="button"
                                     role="tab">
-                                    {{ $tab }}
+                                    {{ __($tab) }}
                                 </button>
                             </li>
                         @endforeach
@@ -34,11 +34,11 @@
                                 <table id="socialActiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Category</th>
-                                            <th>Business Unit</th>
-                                            <th>Direct Link</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Business Unit') }}</th>
+                                            <th>{{ __('Direct Link') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -89,24 +89,24 @@
             <form action="{{ route('social.store') }}" method="POST">
               @csrf
               <div class="modal-header">
-                <h5 class="modal-title" id="createSocialModalLabel">Create New Social</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="createSocialModalLabel">{{ __('Create New Social') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
               </div>
 
               <div class="modal-body">
                 <div class="mb-3">
-                  <label for="category" class="form-label">Category</label>
+                  <label for="category" class="form-label">{{ __('Category') }}</label>
                     <select class="form-select" id="category" name="category" required>
-                        <option value="" selected disabled>Please select</option>
+                        <option value="" selected disabled>{{ __('Please select') }}</option>
                         <option value="youtube">Youtube</option>
                         <option value="instagram">Instagram</option>
                         <option value="tiktok">Tiktok</option>
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label for="businessunit" class="form-label">Business Unit</label>
+                    <label for="businessunit" class="form-label">{{ __('Business Unit') }}</label>
                     <select class="form-select" id="businessunit" name="businessunit" required>
-                        <option value="" selected disabled>Please select</option>
+                        <option value="" selected disabled>{{ __('Please select') }}</option>
                         <option value="KPN Corporation">KPN Corporation</option>
                         <option value="Cement">Cement</option>
                         <option value="Plantations">Plantations</option>
@@ -115,14 +115,14 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label for="link" class="form-label">Link</label>
+                    <label for="link" class="form-label">{{ __('Link') }}</label>
                     <input type="text" class="form-control" id="link" name="link" required>
                 </div>
               </div>
 
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
               </div>
 
             </form>
@@ -136,23 +136,23 @@
               @method('PUT')
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="editSocialModalLabel">Edit Social</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <h5 class="modal-title" id="editSocialModalLabel">{{ __('Edit Social') }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="category" class="form-label">Category</label>
+                        <label for="category" class="form-label">{{ __('Category') }}</label>
                         <select class="form-select" id="edit-category" name="category" required>
-                            <option value="" selected disabled>Please select</option>
+                            <option value="" selected disabled>{{ __('Please select') }}</option>
                             <option value="youtube">Youtube</option>
                             <option value="instagram">Instagram</option>
                             <option value="tiktok">Tiktok</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="businessunit" class="form-label">Business Unit</label>
+                        <label for="businessunit" class="form-label">{{ __('Business Unit') }}</label>
                         <select class="form-select" id="edit-businessunit" name="businessunit" required>
-                            <option value="" selected disabled>Please select</option>
+                            <option value="" selected disabled>{{ __('Please select') }}</option>
                             <option value="KPN Corporation">KPN Corporation</option>
                             <option value="Cement">Cement</option>
                             <option value="Plantations">Plantations</option>
@@ -161,13 +161,13 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="link" class="form-label">Link</label>
+                        <label for="link" class="form-label">{{ __('Link') }}</label>
                         <input type="text" class="form-control" id="edit-link" name="link" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                  <button type="submit" class="btn btn-primary">Update Social</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                  <button type="submit" class="btn btn-primary">{{ __('Update Social') }}</button>
                 </div>
               </div>
           </form>

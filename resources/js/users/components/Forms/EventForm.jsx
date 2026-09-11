@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form, Field } from 'formik';
 import { PulseLoader } from 'react-spinners';
 import { useApiUrl } from '../context/ApiContext';
@@ -39,6 +40,7 @@ export default function EventForm() {
     const { token, user } = useAuth();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {        
         
@@ -92,12 +94,12 @@ export default function EventForm() {
             const normalizedNumber = `${values.countryCode}${values.whatsapp_number.replace(/^0+/, '')}`; // Normalisasi nomor WhatsApp
 
             const result = await showAlert({
-                title: 'Confirmation',
-                html: `Pastikan nomor WhatsApp Anda sudah benar:<br><strong>${normalizedNumber}</strong><br><br>Lanjutkan registrasi?`,
+                title: t('event.whatsappConfirmTitle'),
+                html: t('event.whatsappConfirmHtml', { number: normalizedNumber }),
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, lanjutkan',
-                cancelButtonText: 'Batal',
+                confirmButtonText: t('event.whatsappConfirmYes'),
+                cancelButtonText: t('common.cancel'),
             });
         
             if (!result.isConfirmed) {
@@ -124,8 +126,8 @@ export default function EventForm() {
             if (response.status === 201) {
                 showAlert({
                     icon: 'success',
-                    title: 'Registration Successful',
-                    text: response.data.message || 'You have successfully registered for the event. Thank you!',
+                    title: t('event.registrationSuccessful'),
+                    text: response.data.message || t('event.registrationSuccessfulText'),
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
@@ -134,8 +136,8 @@ export default function EventForm() {
             } else {
                 showAlert({
                     icon: 'error',
-                    title: 'Registration Failed',
-                    text: response.data.message || 'An error occurred during registration. Please try again.',
+                    title: t('event.registrationFailed'),
+                    text: response.data.message || t('event.registrationFailedText'),
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
@@ -144,7 +146,7 @@ export default function EventForm() {
             }
         } catch (error) {
             console.error("Error submitting form:", error);
-            alert("An error occurred while submitting the form.");
+            alert(t('alerts.submitFormError'));
         } finally {
             setSubmitting(false);
             setIsSubmitting(false);
@@ -182,8 +184,8 @@ export default function EventForm() {
                 if (response.status === 201) {
                     showAlert({
                         icon: 'success',
-                        title: 'Registration Successful',
-                        text: response.data.message || 'You have successfully registered for the event.',
+                        title: t('event.registrationSuccessful'),
+                        text: response.data.message || t('event.registrationSuccessfulText'),
                         timer: 2500,
                         showConfirmButton: false,
                     }).then(() => {
@@ -192,8 +194,8 @@ export default function EventForm() {
                 } else {
                     showAlert({
                         icon: 'error',
-                        title: 'Registration Failed',
-                        text: response.data.message || 'Something went wrong.',
+                        title: t('event.registrationFailed'),
+                        text: response.data.message || t('alerts.somethingWentWrong'),
                         timer: 2500,
                         showConfirmButton: false,
                     }).then(() => {
@@ -204,8 +206,8 @@ export default function EventForm() {
                 console.error("Error submitting registration:", error);
                 showAlert({
                     icon: 'error',
-                    title: 'Network Error',
-                    text: 'Unable to connect to the server. Please try again later.',
+                    title: t('alerts.networkError'),
+                    text: t('alerts.connectionEndedText'),
                     timer: 3000,
                     showConfirmButton: false,
                 });
@@ -226,7 +228,7 @@ export default function EventForm() {
                     {isSubmitting ? (
                         <PulseLoader size={8} color="#fff" margin={2} speedMultiplier={0.75} />
                     ) : (
-                        'Submit'
+                        t('common.submit')
                     )}
                 </button>
             </div>
@@ -254,7 +256,7 @@ try {
                     <Form>
                         <div className="mb-6">
                             <label className="block text-gray-700 mb-2" htmlFor="whatsapp_number">
-                                WhatsApp Number <span className="text-red-600">*</span>
+                                {t('common.whatsappNumber')} <span className="text-red-600">*</span>
                             </label>
                             <div className="flex">
                                 <select
@@ -280,7 +282,7 @@ try {
                                 value={values.whatsapp_number}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
-                                placeholder="phone number"
+                                placeholder={t('common.phoneNumber')}
                                 className="w-full border rounded-r p-2"
                                 />
                             </div>
@@ -331,7 +333,7 @@ try {
                                         onBlur={handleBlur}
                                         className="mr-2" 
                                         />
-                                        I agree
+                                        {t('common.iAgree')}
                                     </label>
                                 ) : field.type === 'radio' ? (
                                     <div className="space-y-2">
@@ -359,7 +361,7 @@ try {
                                         onBlur={handleBlur}
                                         className="w-full border rounded p-2"
                                     >
-                                        <option value="" label="Select an option" />
+                                        <option value="" label={t('common.selectAnOption')} />
                                         {field.options.map((option, index) => (
                                             <option key={index} value={option} label={option}>
                                                 {option}
@@ -398,7 +400,7 @@ try {
                             {isSubmitting ? (
                             <PulseLoader size={8} color="#fff" margin={2} speedMultiplier={0.75} />
                             ) : (
-                                'Submit'
+                                t('common.submit')
                             )}
                         </button>
                     </Form>

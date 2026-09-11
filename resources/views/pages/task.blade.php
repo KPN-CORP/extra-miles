@@ -1,5 +1,5 @@
 <x-app-layout>
-    @section('title', 'Tasks')
+    @section('title', __('Tasks'))
     <x-slot name="content">
     <!-- Begin Page Content -->
     <div class="container-fluid">
@@ -16,10 +16,10 @@
                       <table class="table table-hover" id="taskTable" width="100%" cellspacing="0">
                           <thead class="thead-light">
                               <tr class="text-center">
-                                  <th>Employees</th>
-                                  <th>Category</th>
-                                  <th>Trigger date</th>
-                                  <th>Actions</th>
+                                  <th>{{ __('Employees') }}</th>
+                                  <th>{{ __('Category') }}</th>
+                                  <th>{{ __('Trigger date') }}</th>
+                                  <th>{{ __('Actions') }}</th>
                               </tr>
                           </thead>
                           <tbody>
@@ -27,25 +27,25 @@
                                   <td>Tiger Nixon</td>
                                   <td>KPI Setting</td>
                                   <td>Edinburgh</td>
-                                  <td class="text-center"><button class="btn btn-sm btn-outline-primary px-4">Act</button></td>
+                                  <td class="text-center"><button class="btn btn-sm btn-outline-primary px-4">{{ __('Act') }}</button></td>
                               </tr>
                               <tr>
                                   <td>Garrett Winters</td>
                                   <td>KPI Setting</td>
                                   <td>Tokyo</td>
-                                  <td class="text-center"><button class="btn btn-sm btn-outline-primary px-4">Act</button></td>
+                                  <td class="text-center"><button class="btn btn-sm btn-outline-primary px-4">{{ __('Act') }}</button></td>
                               </tr>
                               <tr>
                                   <td>Ashton Cox</td>
                                   <td>KPI Setting</td>
                                   <td>San Francisco</td>
-                                  <td class="text-center"><button class="btn btn-sm btn-outline-primary px-4">Act</button></td>
+                                  <td class="text-center"><button class="btn btn-sm btn-outline-primary px-4">{{ __('Act') }}</button></td>
                               </tr>
                               <tr>
                                   <td>Cedric Kelly</td>
                                   <td>KPI Setting</td>
                                   <td>Edinburgh</td>
-                                  <td class="text-center"><button class="btn btn-sm btn-outline-primary px-4">Act</button></td>
+                                  <td class="text-center"><button class="btn btn-sm btn-outline-primary px-4">{{ __('Act') }}</button></td>
                               </tr>
                           </tbody>
                       </table>

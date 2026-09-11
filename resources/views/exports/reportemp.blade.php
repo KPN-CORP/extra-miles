@@ -1,10 +1,10 @@
 <table>
     <thead>
     <tr>
-        <th>Employee ID</th>
-        <th>Name</th>
-        <th>Gender</th>
-        <th>Email</th>
+        <th>{{ __('Employee ID') }}</th>
+        <th>{{ __('Name') }}</th>
+        <th>{{ __('Gender') }}</th>
+        <th>{{ __('Email') }}</th>
     </tr>
     </thead>
     <tbody>

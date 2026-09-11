@@ -1,53 +1,69 @@
 
 {{-- <script src="{{ asset('js/report.js') }}"></script> --}}
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+{{-- CKEditor is ~1 MB and only the eight admin forms carrying a rich-text field
+     need it, yet this file is inlined on every admin page. Fetching it on demand
+     keeps it off every list page; window.ckeditorReady() injects the script the
+     first time an editor is actually wanted and resolves once ClassicEditor is
+     global. Callers must go through it rather than assuming the global exists. --}}
+<script>
+    window.ckeditorReady = (function () {
+        var pending = null;
+
+        return function () {
+            if (pending) {
+                return pending;
+            }
+
+            if (typeof window.ClassicEditor !== 'undefined') {
+                pending = Promise.resolve();
+
+                return pending;
+            }
+
+            pending = new Promise(function (resolve, reject) {
+                var tag = document.createElement('script');
+
+                tag.src = 'https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js';
+                tag.onload = resolve;
+                tag.onerror = function () {
+                    // Let the next caller retry instead of caching the failure.
+                    pending = null;
+                    reject(new Error('CKEditor failed to load'));
+                };
+
+                document.head.appendChild(tag);
+            });
+
+            return pending;
+        };
+    })();
+</script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @if(Session::has('toast'))
 <script>
-    const toastData = {!! json_encode(Session::get('toast')) !!};
+    // Deferred to DOMContentLoaded because Swal now comes from the Vite bundle
+    // (window.Swal in resources/js/app.js), which is a module script and so has
+    // not executed yet while this tag is being parsed.
+    document.addEventListener('DOMContentLoaded', function () {
+        const toastData = {!! json_encode(Session::get('toast')) !!};
 
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 2000,
-    });
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+        });
 
-    Toast.fire({
-        icon: toastData.type,
-        title: toastData.message
+        Toast.fire({
+            icon: toastData.type,
+            title: toastData.message
+        });
     });
 </script>
 @endif
 
 <script>
-    // script QR Code
-    function showQRModal(token) {
-        document.getElementById("qrcode").innerHTML = "";
-
-        const dummyURL = `https://example.com/ticket/${token}`;
-        
-        new QRCode(document.getElementById("qrcode"), {
-            text: dummyURL,
-            width: 300,
-            height: 300,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-
-        const linkEl = document.getElementById("dummyLink");
-        linkEl.href = dummyURL;
-        linkEl.textContent = dummyURL;
-
-        const modal = new bootstrap.Modal(document.getElementById('qrModal'));
-        modal.show();
-    }
-
     // script Archive Event
     document.addEventListener("DOMContentLoaded", function () {
         const editButtons = document.querySelectorAll('.edit-quote-btn');
@@ -94,13 +110,13 @@
             button.addEventListener('click', function () {
                 const quoteId = this.dataset.id;
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "This data will be archived.",
+                    title: @json(__('Are you sure?')),
+                    text: @json(__('This data will be archived.')),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ab2f2b',
                     cancelButtonColor: '#aaa',
-                    confirmButtonText: 'Yes, archive it!'
+                    confirmButtonText: @json(__('Yes, archive it!'))
                 }).then((result) => {
                     if (result.isConfirmed) {
                         document.getElementById('archive-form-' + quoteId).submit();
@@ -114,13 +130,13 @@
                 const eventId = this.getAttribute("data-id");
     
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Event will be archived.",
+                    title: @json(__('Are you sure?')),
+                    text: @json(__('Event will be archived.')),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ab2f2b',
                     cancelButtonColor: '#aaa',
-                    confirmButtonText: 'Yes, archive it!'
+                    confirmButtonText: @json(__('Yes, archive it!'))
                 }).then((result) => {
                     if (result.isConfirmed) {
                         document.getElementById(`delete-form-${eventId}`).submit();
@@ -134,13 +150,13 @@
                 const eventId = this.getAttribute("data-id");
     
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Participant will be removed from this event.",
+                    title: @json(__('Are you sure?')),
+                    text: @json(__('Participant will be removed from this event.')),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ab2f2b',
                     cancelButtonColor: '#aaa',
-                    confirmButtonText: 'Yes, remove it!'
+                    confirmButtonText: @json(__('Yes, remove it!'))
                 }).then((result) => {
                     if (result.isConfirmed) {
                         document.getElementById(`delete-form-${eventId}`).submit();
@@ -154,17 +170,17 @@
                 const id = this.dataset.id;
                 const action = this.dataset.action;
                 const message = action === 'close' 
-                    ? 'Close registration for this event?' 
-                    : 'Reopen registration for this event?';
+                    ? @json(__('Close registration for this event?'))
+                    : @json(__('Reopen registration for this event?'));
 
                 Swal.fire({
-                    title: 'Are you sure?',
+                    title: @json(__('Are you sure?')),
                     text: message,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#ab2f2b',
                     cancelButtonColor: '#aaa',
-                    confirmButtonText: 'Yes, continue'
+                    confirmButtonText: @json(__('Yes, continue'))
                 }).then((result) => {
                     if (result.isConfirmed) {
                         document.getElementById(`close-form-${id}`).submit();
@@ -227,10 +243,10 @@
         document.addEventListener("DOMContentLoaded", function() {
             Swal.fire({
                 icon: 'success',
-                title: 'Success',
-                text: '{{ session('success') }}',
+                title: @json(__('Success')),
+                text: @json(session('success')),
                 confirmButtonColor: '#ab2f2b',
-                confirmButtonText: 'OK'
+                confirmButtonText: @json(__('OK'))
             });
         });
     </script>
@@ -241,10 +257,10 @@
         document.addEventListener("DOMContentLoaded", function() {
             Swal.fire({
                 icon: 'error',
-                title: 'Oops...',
-                text: '{{ session('error') }}',
+                title: @json(__('Oops...')),
+                text: @json(session('error')),
                 confirmButtonColor: '#ab2f2b',
-                confirmButtonText: 'OK'
+                confirmButtonText: @json(__('OK'))
             });
         });
     </script>
@@ -269,8 +285,16 @@
     });
 
     document.addEventListener('DOMContentLoaded', function () {
-        ClassicEditor
-            .create(document.querySelector('#description'), {
+        // This file is inlined on every admin page, but only a handful carry a
+        // #description field. The check does double duty: CKEditor throws
+        // "can't convert null to object" rather than no-opping on a missing
+        // element, and pages without one never request the library at all.
+        const descriptionField = document.querySelector('#description');
+
+        if (!descriptionField) return;
+
+        window.ckeditorReady().then(() => ClassicEditor
+            .create(descriptionField, {
                 toolbar: [
                     'heading',
                     '|',
@@ -284,14 +308,19 @@
                 ],
                 removePlugins: ['Image', 'ImageToolbar', 'EasyImage', 'ImageUpload', 'MediaEmbed', 'CKFinder']
             })
-            .catch(error => {
-                console.error(error);
-            });
+        ).catch(error => {
+            // The plain textarea stays usable when the editor cannot be loaded.
+            console.error(error);
+        });
     });
 
     document.addEventListener('DOMContentLoaded', function () {
-        ClassicEditor
-            .create(document.querySelector('#newsHeadline'), {
+        const newsHeadlineField = document.querySelector('#newsHeadline');
+
+        if (!newsHeadlineField) return;
+
+        window.ckeditorReady().then(() => ClassicEditor
+            .create(newsHeadlineField, {
                 toolbar: [
                     'bold', 'italic', 'underline', 'strikethrough',
                     '|',
@@ -299,9 +328,9 @@
                 ],
                 removePlugins: ['Image', 'ImageToolbar', 'EasyImage', 'ImageUpload', 'MediaEmbed', 'CKFinder']
             })
-            .catch(error => {
-                console.error(error);
-            });
+        ).catch(error => {
+            console.error(error);
+        });
     });
 
     function previewImage(event) {
@@ -373,14 +402,14 @@
             const id = this.getAttribute('data-id');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: "This will archive the live content.",
+                title: @json(__('Are you sure?')),
+                text: @json(__('This will archive the live content.')),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ab2f2b',
                 cancelButtonColor: '#aaa',
-                confirmButtonText: 'Yes, archive it!',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: @json(__('Yes, archive it!')),
+                cancelButtonText: @json(__('Cancel'))
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById('archive-live-form-' + id).submit();
@@ -718,10 +747,11 @@
                 e.preventDefault();
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Quota Exceeded',
-                    html: `Kuota tersisa hanya <b>${eventRemainingQuota}</b> peserta.<br>
-                           Kamu memilih <b>${selectedCount}</b> peserta.`,
-                    confirmButtonText: 'OK'
+                    title: @json(__('Quota Exceeded')),
+                    html: @json(__('Only :remaining seat(s) remain.', ['remaining' => '__REMAINING__'])).replace('__REMAINING__', '<b>' + eventRemainingQuota + '</b>')
+                        + '<br>'
+                        + @json(__('You selected :selected participant(s).', ['selected' => '__SELECTED__'])).replace('__SELECTED__', '<b>' + selectedCount + '</b>'),
+                    confirmButtonText: @json(__('OK'))
                 });
                 return false;
             }
@@ -743,13 +773,13 @@
 
     function submitApproveParticipant(actionUrl) {
         Swal.fire({
-            title: 'Approve This Participant?',
-            text: "The participant will be moved to the 'Confirmation' status.",
+            title: @json(__('Approve This Participant?')),
+            text: @json(__('The participant will be moved to the Confirmation status.')),
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#198754',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Ya, Approve'
+            confirmButtonText: @json(__('Yes, approve'))
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = document.createElement('form');

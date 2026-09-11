@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { PulseLoader } from "react-spinners";
 import { showAlert } from "../Helper/alertHelper";
@@ -10,6 +11,7 @@ export default () => {
   const { token } = useAuth();  
   const [datas, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
 
 
@@ -26,8 +28,8 @@ export default () => {
         } catch (err) {
             showAlert({
                 icon: 'warning',
-                title: 'Connection Ended',
-                text: 'Unable to connect to the server. Please try again later.',
+                title: t('alerts.connectionEnded'),
+                text: t('alerts.connectionEndedText'),
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => {

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -40,7 +41,8 @@ export default function Event() {
     const [activeYear, setActiveYear] = useState(new Date().getFullYear());
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [categories, setCategories] = useState([]);
-    const { token } = useAuth(); 
+    const { token } = useAuth();
+    const { t } = useTranslation();
     const handleSwipeLeft = () => {
         const newMonth = new Date(activeYear, activeMonth + 1, 1);
         setActiveMonth(newMonth.getMonth());
@@ -87,8 +89,8 @@ export default function Event() {
             } catch (err) {
                 showAlert({
                     icon: 'warning',
-                    title: 'Connection Ended',
-                    text: 'Unable to connect to the server. Please try again later.',
+                    title: t('alerts.connectionEnded'),
+                    text: t('alerts.connectionEndedText'),
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
@@ -194,7 +196,7 @@ export default function Event() {
                     <i className="ri-arrow-left-line"></i>
                 </button>
             </div>
-            <div className="flex-2 text-center text-red-700 text-lg font-bold">Upcoming Events</div>
+            <div className="flex-2 text-center text-red-700 text-lg font-bold">{t('event.upcomingEvents')}</div>
             <div className="flex-1" /> {/* Spacer to balance layout */}
         </div>
         {/* Main Content */}
@@ -249,7 +251,7 @@ export default function Event() {
                     : "bg-transparent outline outline-1 text-sm outline-stone-400 text-gray-600"
                 }`}
                 >
-                {item}
+                {item === "All" ? t('event.allCategories') : item}
                 </button>
             ))}
             </div>
@@ -335,7 +337,7 @@ export default function Event() {
                                 <div className="inline-flex flex-col justify-start items-start">
                                 <div className={`px-2 py-0.5 ${statusColors.bg} rounded inline-flex justify-center items-center`}>
                                     <div className={`text-center ${statusColors.text} text-[8px] font-medium`}>
-                                    {isClosed || isOngoing || closedRegistration ? eventStatus : (registeredStatus ?? event.status)}
+                                    {t(`event.status.${isClosed || isOngoing || closedRegistration ? eventStatus : (registeredStatus ?? event.status)}`, { defaultValue: isClosed || isOngoing || closedRegistration ? eventStatus : (registeredStatus ?? event.status) })}
                                     </div>
                                     {(event.status === "Ongoing" && isOngoing) && (
                                     <div className="ms-1">

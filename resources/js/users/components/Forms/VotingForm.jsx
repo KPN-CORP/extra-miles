@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { PulseLoader } from 'react-spinners';
@@ -10,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import { getImageUrl } from '../Helper/imagePath';
 import VoteProgressBar from '../Helper/progressBar';
 import StarRatingField from '../Helper/starRatingField';
+import { translate } from '../Helper/localeHelper';
 
 export function generateValidationSchema(fields) {
     const shape = {};
@@ -31,20 +33,20 @@ export function generateValidationSchema(fields) {
         case 'select':
         case 'radio':
           schema = Yup.string();
-          if (isRequired) schema = schema.required('This field is required');
-          if (min !== null) schema = schema.min(min, `Minimum ${min} characters`);
-          if (max !== null) schema = schema.max(max, `Maximum ${max} characters`);
+          if (isRequired) schema = schema.required(translate('validation.required'));
+          if (min !== null) schema = schema.min(min, translate('validation.minChars', { min }));
+          if (max !== null) schema = schema.max(max, translate('validation.maximumChars', { max }));
           break;
   
         case 'checkbox':
           if (field.options) {
             schema = Yup.array();
             if (isRequired || min !== null) {
-              schema = schema.min(min || 1, `Select at least ${min || 1} option(s)`);
+              schema = schema.min(min || 1, translate('validation.selectAtLeast', { min: min || 1 }));
             }
           } else {
             schema = Yup.boolean();
-            if (isRequired) schema = schema.oneOf([true], 'Must be checked');
+            if (isRequired) schema = schema.oneOf([true], translate('validation.mustBeChecked'));
           }
           break;
   
@@ -68,6 +70,7 @@ export default function VotingForm({ participated, setParticipated, eventEnded }
     const { token } = useAuth();
     const navigate = useNavigate();
     const [voteResults, setVoteResults] = useState([]);
+    const { t } = useTranslation();
     
     const [hasParticipated, setHasParticipated] = useState(participated); // inisialisasi dari props jika perlu    
 
@@ -142,8 +145,8 @@ export default function VotingForm({ participated, setParticipated, eventEnded }
       if (eventEnded) {
         showAlert({
           icon: 'warning',
-          title: 'Voting Closed',
-          text: 'Voting time has ended. You can no longer vote.',
+          title: t('vote.closedTitle'),
+          text: t('vote.closedText'),
           timer: 2500,
           showConfirmButton: false,
         });
@@ -152,11 +155,11 @@ export default function VotingForm({ participated, setParticipated, eventEnded }
       try {
         const result = await showAlert({
           icon: 'question',
-          title: 'Are you sure?',
-          text: 'Do you want to submit your vote now?',
+          title: t('vote.confirmTitle'),
+          text: t('vote.confirmText'),
           showCancelButton: true,
-          confirmButtonText: 'Yes, submit',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: t('vote.confirmYes'),
+          cancelButtonText: t('common.cancel'),
         });
     
         if (!result.isConfirmed) {
@@ -180,10 +183,10 @@ export default function VotingForm({ participated, setParticipated, eventEnded }
         const success = response.status === 201;
         showAlert({
           icon: success ? 'success' : 'error',
-          title: success ? 'Success!' : 'Something went wrong',
+          title: success ? t('survey.successTitle') : t('alerts.somethingWentWrong'),
           text: success
-            ? 'Your response has been recorded. Thanks a bunch for your vote!'
-            : 'Please try again later.',
+            ? t('vote.successText')
+            : t('alerts.tryAgainLater'),
           timer: 2500,
           showConfirmButton: false,
         });
@@ -229,8 +232,8 @@ export default function VotingForm({ participated, setParticipated, eventEnded }
                 if (Object.keys(errors).length > 0) {
                   showAlert({
                     icon: 'warning',
-                    title: 'No vote detected',
-                    text: 'Please make your selection before submitting the form.',
+                    title: t('vote.noVoteTitle'),
+                    text: t('vote.noVoteText'),
                   });
                   return;
                 }
@@ -264,14 +267,14 @@ export default function VotingForm({ participated, setParticipated, eventEnded }
                           value={values[field.name]}
                           onChange={handleChange}
                           onBlur={handleBlur} 
-                          placeholder="isi disini..."
+                          placeholder={t('common.typeHere')}
                           className="w-full border rounded p-2" 
                       />
                       <ErrorMessage name={field.name} component="div" className="text-red-700 text-sm mt-1" />
                       </div>
                   ) : field.type === 'radio' ? (
                     <>
-                    <label className="block text-white font-medium mb-2" htmlFor={field.name}>{voteResults.total === 1 ? 'Voter' : 'Voters'} : {voteResults.total}
+                    <label className="block text-white font-medium mb-2" htmlFor={field.name}>{voteResults.total === 1 ? t('vote.voter') : t('vote.voters')} : {voteResults.total}
                     </label>
                     <div className="w-full p-3 bg-red-700 rounded-xl border border-white inline-flex flex-col justify-center items-center gap-4 mb-4">
                       <div className="self-stretch flex flex-col justify-start items-start gap-5">
@@ -313,7 +316,7 @@ export default function VotingForm({ participated, setParticipated, eventEnded }
                       render={() => (
                         <div className="w-full bg-red-100 rounded-xl shadow-lg flex items-center gap-2 mb-4 p-2 px-3 text-white font-medium text-sm">
                           <i className="ri-error-warning-line text-lg"></i>
-                          {`Kamu belum pilih ${field.label}`}
+                          {t('vote.notSelected', { label: field.label })}
                         </div>
                       )}
                     />
@@ -325,7 +328,7 @@ export default function VotingForm({ participated, setParticipated, eventEnded }
               ))}
               {!hasParticipated &&
                 <button type="submit" disabled={isSubmitting} className="w-full px-5 py-2.5 rounded-lg shadow-md text-sm font-semibold text-red-700" style={{ backgroundColor: '#DEBD69' }}>
-                  Submit
+                  {t('common.submit')}
                 </button>
               }
             </Form>

@@ -2,18 +2,18 @@
     <div class="modal-dialog modal-right">
         <div class="modal-content">
             <div class="modal-header border-0">
-                <h5 class="modal-title">Filters</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">{{ __('Filters') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
             <div class="modal-body">
             <form id="report_filter" action="{{ route('reports.content') }}" method="POST">
             @csrf
                 <div class="mt-2">
                     <div class="form-group">
-                        <label class="form-label" for="report_type">Report Type:</label>
+                        <label class="form-label" for="report_type">{{ __('Report Type') }}:</label>
                         <select class="form-select" name="report_type" id="report_type">
-                        <option value="">select report</option>
-                        <option value="Goal">Goal</option>
+                        <option value="">{{ __('select report') }}</option>
+                        <option value="Goal">{{ __('Goal') }}</option>
                         </select>
                     </div> 
                 </div>
@@ -21,7 +21,7 @@
             </div>
             <div class="modal-footer">
                 <a class="btn btn-outline-secondary me-3" data-dismiss="modal">{{ __('Cancel') }}</a>
-                <button type="submit" class="btn btn-primary" form="report_filter">Apply</button>
+                <button type="submit" class="btn btn-primary" form="report_filter">{{ __('Apply') }}</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

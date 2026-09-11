@@ -4,6 +4,7 @@ import { useAuth } from '../components/context/AuthContext';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { SyncLoader } from 'react-spinners';
+import { useTranslation } from 'react-i18next';
 
 function ConfirmLogin() {
   const { saveToken } = useAuth();
@@ -11,6 +12,7 @@ function ConfirmLogin() {
   const navigate = useNavigate();
   const apiUrl = useApiUrl();
   const [error, setError] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -54,18 +56,18 @@ function ConfirmLogin() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-red-100 overflow-hidden">
-        <h1 className="mb-4 text-red-700 text-4xl font-bold italic">EXTRA MILE</h1>
+        <h1 className="mb-4 text-red-700 text-4xl font-bold italic">{t('app.brand')}</h1>
         <p className="text-center text-red-700 text-lg font-semibold">
-          Service is currently unavailable now.
+          {t('app.serviceUnavailable')}
         </p>
-        <p className="text-sm text-gray-700 mt-2">Please try again in a few moments.</p>
+        <p className="text-sm text-gray-700 mt-2">{t('app.tryAgainInAMoment')}</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 overflow-hidden">
-      <h1 className="mb-4 text-red-700 text-4xl font-bold italic">EXTRA MILE</h1>
+      <h1 className="mb-4 text-red-700 text-4xl font-bold italic">{t('app.brand')}</h1>
       <SyncLoader color="#B91C1C" size={15} />
     </div>
   );

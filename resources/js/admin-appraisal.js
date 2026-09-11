@@ -288,6 +288,10 @@ $(document).ready(function () {
     let downloadDetailButton = document.querySelector(".download-detail-btn");
     let reportDetailButton = document.querySelector(".report-detail-btn");
 
+    // These buttons only exist on the appraisal report page, but app.js loads
+    // this file on every admin page -- bail out instead of dereferencing null.
+    if (!downloadDetailButton || !reportDetailButton) return;
+
     // Check if reportFiles has value
     if (reportFiles && reportFiles.length > 0) {
         

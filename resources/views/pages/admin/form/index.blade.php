@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Form Builder'])
+@extends('layouts_.vertical', ['page_title' => __('Form Builder')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -7,8 +7,8 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h4 class="page-title mb-0">Form Builder</h4>
-        <a href="{{ route('form.create') }}" class="btn btn-primary">Create Form</a>
+        <h4 class="page-title mb-0">{{ __('Form Builder') }}</h4>
+        <a href="{{ route('form.create') }}" class="btn btn-primary">{{ __('Create Form') }}</a>
     </div>
     <div class="row">
         <div class="col-12">
@@ -21,7 +21,7 @@
                                     id="{{ strtolower(str_replace(' ', '-', $tab)) }}-tab" data-bs-toggle="tab"
                                     data-bs-target="#{{ strtolower(str_replace(' ', '-', $tab)) }}" type="button"
                                     role="tab">
-                                    {{ $tab }}
+                                    {{ __($tab) }}
                                 </button>
                             </li>
                         @endforeach
@@ -33,13 +33,13 @@
                                 <table id="formActiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Created Date</th>
-                                            <th>Category</th>
-                                            <th>Title</th>
-                                            <th class="no-sort">Detail</th>
-                                            <th>Status</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th class="no-sort">{{ __('Detail') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -55,10 +55,10 @@
                                                           data-id="{{ $form->id }}"
                                                           data-title="{{ $form->title }}"
                                                           data-schema='@json(json_decode($form->form_schema))'>
-                                                          <i class="ri-search-line"></i> View
+                                                          <i class="ri-search-line"></i> {{ __('View') }}
                                                     </span>
                                                 </td>
-                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td><span class="badge bg-success">{{ __('Active') }}</span></td>
                                                 <td>
                                                     <a href="{{ route('formbuilder.edit', $form->id) }}"
                                                         class="btn btn-outline-warning btn-sm edit-quote-btn"
@@ -88,13 +88,13 @@
                                 <table id="formArchiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Created Date</th>
-                                            <th>Category</th>
-                                            <th>Title</th>
-                                            <th class="no-sort">Detail</th>
-                                            <th>Status</th>
-                                            <th>Deleted At</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th class="no-sort">{{ __('Detail') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th>{{ __('Deleted At') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -110,10 +110,10 @@
                                                           data-id="{{ $form->id }}"
                                                           data-title="{{ $form->title }}"
                                                           data-schema='@json(json_decode($form->form_schema))'>
-                                                          <i class="ri-search-line"></i> View
+                                                          <i class="ri-search-line"></i> {{ __('View') }}
                                                     </span>
                                                 </td>
-                                                <td><span class="badge bg-danger">Archive</span></td>
+                                                <td><span class="badge bg-danger">{{ __('Archive') }}</span></td>
                                                 <td>{{ $form->deleted_at }}</td>
                                             </tr>
                                             @empty
@@ -132,8 +132,8 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="schemaModalLabel">Form Schema</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title" id="schemaModalLabel">{{ __('Form Schema') }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
         </div>
         <div class="modal-body" id="schemaFields">
             <!-- Dynamic content -->

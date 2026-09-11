@@ -7,17 +7,17 @@
                     <thead class="thead-light">
                         <tr class="text-center">
                         <th>#</th>
-                        <th>NIK</th>
-                        <th>Name</th>
-                        <th>DOJ</th>
+                        <th>{{ __('NIK') }}</th>
+                        <th>{{ __('Name') }}</th>
+                        <th>{{ __('DOJ') }}</th>
                         <th>{{ __('Type') }}</th>
-                        <th>Unit</th>
-                        <th>Job</th>
-                        <th>Grade</th>
-                        <th>PT</th>
-                        <th>Locations</th>
-                        <th>BU</th>
-                        <th>Goals Menu</th>
+                        <th>{{ __('Unit') }}</th>
+                        <th>{{ __('Job') }}</th>
+                        <th>{{ __('Grade') }}</th>
+                        <th>{{ __('PT') }}</th>
+                        <th>{{ __('Locations') }}</th>
+                        <th>{{ __('BU') }}</th>
+                        <th>{{ __('Goals Menu') }}</th>
                         </tr>
                     </thead>
                     <tbody>

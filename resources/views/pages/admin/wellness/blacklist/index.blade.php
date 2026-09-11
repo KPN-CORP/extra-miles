@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Wellness Blacklist'])
+@extends('layouts_.vertical', ['page_title' => __('Wellness Blacklist')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -9,7 +9,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-end mb-2">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBlacklistModal">
-            <i class="ri-user-forbid-line me-1"></i> Add to Blacklist
+            <i class="ri-user-forbid-line me-1"></i> {{ __('Add to Blacklist') }}
         </button>
     </div>
 
@@ -18,9 +18,7 @@
     <div class="alert alert-light border d-flex align-items-start gap-2" role="alert">
         <i class="ri-information-line mt-1"></i>
         <div class="small mb-0">
-            Blacklisted employees can still register for wellness sessions, but the system
-            never confirms their seat automatically &mdash; an admin decides each time.
-            An entry with no end date stays in force until it is lifted.
+            {{ __('Blacklisted employees can still register for wellness sessions, but the system never confirms their seat automatically — an admin decides each time. An entry with no end date stays in force until it is lifted.') }}
         </div>
     </div>
 
@@ -31,17 +29,17 @@
                     <ul class="nav nav-tabs mb-3" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#bl-active" type="button" role="tab">
-                                Active <span class="badge bg-secondary ms-1">{{ $active->count() }}</span>
+                                {{ __('Active') }} <span class="badge bg-secondary ms-1">{{ $active->count() }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-expired" type="button" role="tab">
-                                Expired <span class="badge bg-secondary ms-1">{{ $expired->count() }}</span>
+                                {{ __('Expired') }} <span class="badge bg-secondary ms-1">{{ $expired->count() }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#bl-archive" type="button" role="tab">
-                                Archive <span class="badge bg-secondary ms-1">{{ $archived->count() }}</span>
+                                {{ __('Archive') }} <span class="badge bg-secondary ms-1">{{ $archived->count() }}</span>
                             </button>
                         </li>
                     </ul>
@@ -53,13 +51,13 @@
                                 <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Employee Name</th>
-                                            <th>Employee ID</th>
-                                            <th>Reason</th>
-                                            <th>End Date</th>
-                                            <th>Added</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Employee Name') }}</th>
+                                            <th>{{ __('Employee ID') }}</th>
+                                            <th>{{ __('Reason') }}</th>
+                                            <th>{{ __('End Date') }}</th>
+                                            <th>{{ __('Added') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -72,10 +70,10 @@
                                                 <td>
                                                     @if ($entry->end_date)
                                                         <span class="badge bg-warning-subtle text-warning">
-                                                            until {{ $entry->end_date->format('d M Y') }}
+                                                            {{ __('until :date', ['date' => $entry->end_date->format('d M Y')]) }}
                                                         </span>
                                                     @else
-                                                        <span class="badge bg-dark-subtle text-dark">No expiry</span>
+                                                        <span class="badge bg-dark-subtle text-dark">{{ __('No expiry') }}</span>
                                                     @endif
                                                 </td>
                                                 <td>{{ $entry->created_at?->format('d M Y') }}</td>
@@ -86,19 +84,19 @@
                                                         data-fullname="{{ $entry->fullname }}"
                                                         data-reason="{{ $entry->reason }}"
                                                         data-end="{{ $entry->end_date?->format('Y-m-d') }}"
-                                                        data-bs-toggle="modal" data-bs-target="#editBlacklistModal" title="Edit">
+                                                        data-bs-toggle="modal" data-bs-target="#editBlacklistModal" title="{{ __('Edit') }}">
                                                         <i class="ri-edit-box-line"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-outline-success btn-sm js-confirm"
                                                         data-form="lift-{{ $entry->id }}"
-                                                        data-title="Lift this blacklist?"
-                                                        data-text="{{ $entry->fullname ?: $entry->employee_id }} will be able to be confirmed automatically again."
-                                                        data-confirm="Yes, lift it" title="Lift">
+                                                        data-title="{{ __('Lift this blacklist?') }}"
+                                                        data-text="{{ __(':name will be able to be confirmed automatically again.', ['name' => $entry->fullname ?: $entry->employee_id]) }}"
+                                                        data-confirm="{{ __('Yes, lift it') }}" title="{{ __('Lift') }}">
                                                         <i class="ri-shield-check-line"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger btn-sm js-archive"
                                                         data-form="archive-bl-{{ $entry->id }}"
-                                                        data-text="This blacklist entry will be archived." title="Archive">
+                                                        data-text="{{ __('This blacklist entry will be archived.') }}" title="{{ __('Archive') }}">
                                                         <i class="ri-archive-line"></i>
                                                     </button>
 
@@ -127,11 +125,11 @@
                                 <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Employee Name</th>
-                                            <th>Employee ID</th>
-                                            <th>Reason</th>
-                                            <th>Ended</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Employee Name') }}</th>
+                                            <th>{{ __('Employee ID') }}</th>
+                                            <th>{{ __('Reason') }}</th>
+                                            <th>{{ __('Ended') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -157,12 +155,12 @@
                                 <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Employee Name</th>
-                                            <th>Employee ID</th>
-                                            <th>Reason</th>
-                                            <th>Archived At</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Employee Name') }}</th>
+                                            <th>{{ __('Employee ID') }}</th>
+                                            <th>{{ __('Reason') }}</th>
+                                            <th>{{ __('Archived At') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -177,7 +175,7 @@
                                                     <form action="{{ route('wellness.blacklist.restore', $entry->encrypted_id) }}" method="POST">
                                                         @csrf
                                                         <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                                            <i class="ri-arrow-go-back-line"></i> Restore
+                                                            <i class="ri-arrow-go-back-line"></i> {{ __('Restore') }}
                                                         </button>
                                                     </form>
                                                 </td>
@@ -202,34 +200,34 @@
                 <form action="{{ route('wellness.blacklist.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title">Add to Blacklist</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ __('Add to Blacklist') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3 position-relative">
-                            <label for="bl-search" class="form-label">Employee <span class="text-danger">*</span></label>
+                            <label for="bl-search" class="form-label">{{ __('Employee') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="bl-search"
-                                placeholder="Search by name or employee ID" autocomplete="off">
+                                placeholder="{{ __('Search by name or employee ID') }}" autocomplete="off">
                             <input type="hidden" name="employee_id" id="bl-employee-id">
                             <div id="bl-results" class="list-group position-absolute w-100 shadow"
                                 style="z-index: 1056; max-height: 240px; overflow-y: auto;"></div>
-                            <div class="form-text" id="bl-selected">No employee selected yet.</div>
+                            <div class="form-text" id="bl-selected">{{ __('No employee selected yet.') }}</div>
                         </div>
                         <div class="mb-3">
-                            <label for="bl-reason" class="form-label">Blacklist Reason <span class="text-danger">*</span></label>
+                            <label for="bl-reason" class="form-label">{{ __('Blacklist Reason') }} <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="bl-reason" name="reason" rows="3" required
-                                placeholder="e.g. Confirmed a seat twice and did not attend."></textarea>
+                                placeholder="{{ __('e.g. Confirmed a seat twice and did not attend.') }}"></textarea>
                         </div>
                         <div class="mb-0">
-                            <label for="bl-end" class="form-label">Blacklist End Date</label>
+                            <label for="bl-end" class="form-label">{{ __('Blacklist End Date') }}</label>
                             <input type="date" class="form-control" id="bl-end" name="end_date"
                                 min="{{ now()->toDateString() }}">
-                            <div class="form-text">Optional. Leave empty for a blacklist that does not expire.</div>
+                            <div class="form-text">{{ __('Optional. Leave empty for a blacklist that does not expire.') }}</div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Add</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Add') }}</button>
                     </div>
                 </form>
             </div>
@@ -244,29 +242,29 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-header">
-                        <h5 class="modal-title">Edit Blacklist Entry</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ __('Edit Blacklist Entry') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Employee</label>
+                            <label class="form-label">{{ __('Employee') }}</label>
                             <input type="text" class="form-control" id="edit-bl-name" disabled>
                             <input type="hidden" name="employee_id" id="edit-bl-employee-id">
                         </div>
                         <div class="mb-3">
-                            <label for="edit-bl-reason" class="form-label">Blacklist Reason <span class="text-danger">*</span></label>
+                            <label for="edit-bl-reason" class="form-label">{{ __('Blacklist Reason') }} <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="edit-bl-reason" name="reason" rows="3" required></textarea>
                         </div>
                         <div class="mb-0">
-                            <label for="edit-bl-end" class="form-label">Blacklist End Date</label>
+                            <label for="edit-bl-end" class="form-label">{{ __('Blacklist End Date') }}</label>
                             <input type="date" class="form-control" id="edit-bl-end" name="end_date"
                                 min="{{ now()->toDateString() }}">
-                            <div class="form-text">Leave empty for a blacklist that does not expire.</div>
+                            <div class="form-text">{{ __('Leave empty for a blacklist that does not expire.') }}</div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
                     </div>
                 </form>
             </div>
@@ -305,7 +303,7 @@
             search.addEventListener('input', function () {
                 var term = this.value.trim();
                 hidden.value = '';
-                selected.textContent = 'No employee selected yet.';
+                selected.textContent = @json(__('No employee selected yet.'));
                 window.clearTimeout(timer);
 
                 if (term.length < 2) {
@@ -326,12 +324,12 @@
                                 item.className = 'list-group-item list-group-item-action';
                                 item.innerHTML = employee.fullname + ' (' + employee.employee_id + ')' +
                                     (employee.blacklisted
-                                        ? ' <span class="badge bg-dark-subtle text-dark">Already blacklisted</span>'
+                                        ? ' <span class="badge bg-dark-subtle text-dark">' + @json(__('Already blacklisted')) + '</span>'
                                         : '');
                                 item.addEventListener('click', function () {
                                     hidden.value = employee.employee_id;
                                     search.value = employee.fullname;
-                                    selected.textContent = 'Selected: ' + employee.fullname +
+                                    selected.textContent = @json(__('Selected')) + ': ' + employee.fullname +
                                         ' - ' + (employee.group_company || '-') + ' / ' + (employee.unit || '-');
                                     results.innerHTML = '';
                                 });

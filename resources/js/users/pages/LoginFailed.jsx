@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SyncLoader } from 'react-spinners';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { showAlert } from '../components/Helper/alertHelper';
 
@@ -7,16 +8,17 @@ function LoginFailed() {
   const [searchParams] = useSearchParams();
   const [errorText, setErrorText] = useState('');
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const errorParam = searchParams.get('error');
-    const message = errorParam ? decodeURIComponent(errorParam) : 'Your session has ended.';
+    const message = errorParam ? decodeURIComponent(errorParam) : t('alerts.sessionEndedText');
 
     setErrorText(message);
 
     showAlert({
       icon: 'error',
-      title: 'Login Failed',
+      title: t('alerts.loginFailed'),
       text: message,
       timer: 3000,
       showConfirmButton: false,
@@ -33,11 +35,11 @@ function LoginFailed() {
 
       }      
     });
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 overflow-hidden">
-      <h1 className="mb-4 text-red-700 text-4xl font-bold italic">EXTRA MILE</h1>
+      <h1 className="mb-4 text-red-700 text-4xl font-bold italic">{t('app.brand')}</h1>
       <SyncLoader color="#B91C1C" size={15} />
     </div>
   );

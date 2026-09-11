@@ -53,6 +53,14 @@ class WellnessRegistrationController extends Controller
             $groups[$status->value] = $registrations->where('status', $status)->values();
         }
 
+        // Read-only here: employees write feedback from the mobile app after
+        // they have attended, the admin side only lists it.
+        $feedback = $schedule->feedback()
+            ->with('registration')
+            ->orderByDesc('submitted_at')
+            ->orderByDesc('id')
+            ->get();
+
         return view('pages.admin.wellness.registrations.index', [
             'parentLink' => 'Wellness',
             'link' => 'Participants',
@@ -64,6 +72,7 @@ class WellnessRegistrationController extends Controller
             'statuses' => $method->statuses(),
             'queueStatus' => $method->queueStatus(),
             'blacklisted' => $blacklisted,
+            'feedback' => $feedback,
             'takenSeats' => $registrations->filter(fn ($r) => $r->status->consumesSlot())->count(),
             'queuedCount' => $registrations->filter(fn ($r) => $r->status->isQueued())->count(),
             'attendedCount' => $registrations->whereNotNull('attended_at')->count(),

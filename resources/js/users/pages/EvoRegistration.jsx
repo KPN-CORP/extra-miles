@@ -1,4 +1,6 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import LanguageToggle from '../components/Layout/LanguageToggle';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -17,6 +19,7 @@ export default function EvoRegistration() {
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const [hasRegistered, setHasRegistered] = useState(false);
+  const { t, i18n } = useTranslation();
   
   useEffect(() => {
     const checkRegistrationAndFetchEvent = async () => {
@@ -62,19 +65,19 @@ export default function EvoRegistration() {
     // No event found after loading
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
-        <p className="text-red-700 text-xl font-semibold mb-4">Event not found.</p>
+        <p className="text-red-700 text-xl font-semibold mb-4">{t('event.notFound')}</p>
         <button
           onClick={() => navigate('/')}
           className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
         >
-          Go Back Home
+          {t('common.goBackHome')}
         </button>
       </div>
     );
   }    
 
   const date = new Date(event.start_date);
-  const month = date.toLocaleString('en-US', { month: 'short' });
+  const month = date.toLocaleString(i18n.resolvedLanguage === 'id' ? 'id-ID' : 'en-US', { month: 'short' });
   const day = date.getDate();
   const year = date.getFullYear();  
 
@@ -90,8 +93,8 @@ export default function EvoRegistration() {
                     <i className="ri-arrow-left-line"></i>
                 </button>
             </div>
-            <div className="flex-2 text-center text-red-700 text-lg font-bold">Employee Volunteer</div>
-            <div className="flex-1" /> {/* Spacer to balance layout */}
+            <div className="flex-2 text-center text-red-700 text-lg font-bold">{t('evo.title')}</div>
+            <div className="flex-1 flex justify-end"><LanguageToggle /></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {event.image && <img className="w-full object-cover rounded-lg" src={getImageUrl(apiUrl, event.image)} />}
@@ -106,13 +109,13 @@ export default function EvoRegistration() {
               <div className="flex flex-col gap-3 text-stone-700">
                 {/* Name */}
                 <div className="grid grid-cols-5 gap-2 items-center">
-                  <p className="font-semibold col-span-1">Name</p>
+                  <p className="font-semibold col-span-1">{t('common.name')}</p>
                   <p className="col-span-4">: {user?.fullname ? `${user.fullname} (${user.employee_id})` : '-'}</p>
                 </div>
 
                 {/* Email */}
                 <div className="grid grid-cols-5 gap-2 items-center">
-                  <p className="font-semibold col-span-1">Email</p>
+                  <p className="font-semibold col-span-1">{t('common.email')}</p>
                   <p className="col-span-4">: {user?.email || '-'}</p>
                 </div>
               </div>

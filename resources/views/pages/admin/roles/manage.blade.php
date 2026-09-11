@@ -6,9 +6,9 @@
     <div class="row">
       <div class="col-md-4">
         <div>
-            <label  for="role_name">Select Permission Role</label>
+            <label  for="role_name">{{ __('Select Permission Role') }}</label>
             <select name="" id="roleName" onchange="getPermissionData(this.value)" class="form-select">
-              <option value="">Select</option>
+              <option value="">{{ __('Select') }}</option>
               @foreach ($roles as $role)
                 <option value="{{ $role->id }}">{{ $role->name }}</option>
               @endforeach

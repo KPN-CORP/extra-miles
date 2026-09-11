@@ -16,14 +16,14 @@
       <div class="row">
         <div class="col-md-4">
           <div class="mb-3">
-              <label for="roleName">Role Name</label>
-              <input class="form-control" type="text" name="roleName" placeholder="Enter role name.." required></div>
+              <label for="roleName">{{ __('Role Name') }}</label>
+              <input class="form-control" type="text" name="roleName" placeholder="{{ __('Enter role name..') }}" required></div>
         </div>
       </div>
         <div class="row mb-3">
           <div class="col-md-8">
             <div class="form-group">
-              <label for="roleName">Restrict Group Company (Keeping blank means no restrictions)</label>
+              <label for="roleName">{{ __('Restrict Group Company (Keeping blank means no restrictions)') }}</label>
               <select class="form-control select2" name="group_company[]" multiple="multiple">
                 @foreach ($groupCompanies as $groupCompany)
                   <option value="{{ $groupCompany }}">{{ $groupCompany }}</option>
@@ -35,7 +35,7 @@
         <div class="row mb-3">
           <div class="col-md-8">
             <div class="form-group">
-              <label for="roleName">Restrict Company (Keeping blank means no restrictions)</label>
+              <label for="roleName">{{ __('Restrict Company (Keeping blank means no restrictions)') }}</label>
               <select class="form-control select2" name="contribution_level_code[]" multiple="multiple">
                 @foreach ($companies as $company)
                   <option value="{{ $company->contribution_level_code }}">{{ $company->contribution_level.' ('.$company->contribution_level_code.')' }}</option>
@@ -47,7 +47,7 @@
         <div class="row mb-3">
           <div class="col-md-8">
             <div class="form-group">
-              <label for="roleName">Restrict Location (Keeping blank means no restrictions)</label>
+              <label for="roleName">{{ __('Restrict Location (Keeping blank means no restrictions)') }}</label>
               <select class="form-control select2" name="work_area_code[]" multiple="multiple">
                 @foreach ($locations as $location)
                   <option value="{{ $location->work_area_code }}">{{ $location->office_area.' ('.$location->group_company.')' }}</option>
@@ -59,7 +59,7 @@
       </div>
       <div class="col-auto">
         <div class="mb-2 text-end">
-          <button type="submit" id="submitButtonRole" class="btn btn-primary"><span class="spinner-border spinner-border-sm me-1 d-none" role="status" aria-hidden="true"></span>Create Role</button>
+          <button type="submit" id="submitButtonRole" class="btn btn-primary"><span class="spinner-border spinner-border-sm me-1 d-none" role="status" aria-hidden="true"></span>{{ __('Create Role') }}</button>
         </div>
       </div>
       </div>
@@ -69,7 +69,7 @@
       <div class="row mb-4">
         <div class="col-md-3 mb-3">
           <div class="list-group" id="list-tab" role="tablist">
-            <a class="list-group-item list-group-item-action active" id="list-setting-list" data-bs-toggle="list" href="#list-setting" role="tab" aria-controls="setting">Settings</a>
+            <a class="list-group-item list-group-item-action active" id="list-setting-list" data-bs-toggle="list" href="#list-setting" role="tab" aria-controls="setting">{{ __('Settings') }}</a>
           </div>
         </div>
         <div class="col-md-9">
@@ -83,7 +83,7 @@
                   <div class="tab-pane fade active show" id="list-setting" role="tabpanel" aria-labelledby="list-setting-list">
                     <ul class="nav">
                       <li class="nav-item">
-                        <a class="nav-link" id="setting-accessibility" data-bs-toggle="list" href="#list-setting-accessibility" role="tab" aria-controls="setting">Accessibility</a>
+                        <a class="nav-link" id="setting-accessibility" data-bs-toggle="list" href="#list-setting-accessibility" role="tab" aria-controls="setting">{{ __('Accessibility') }}</a>
                       </li>
                     </ul>
                     <div class="tab-pane fade p-3 active show" id="list-setting-accessibility" role="tabpanel" aria-labelledby="setting-accessibility">

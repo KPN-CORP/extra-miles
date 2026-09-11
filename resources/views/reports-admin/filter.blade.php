@@ -2,10 +2,10 @@
     <div class="modal-dialog mt-3" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                  <span class="modal-title h4" id="viewFormEmployeeLabel">Filters</span>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <span class="modal-title h4" id="viewFormEmployeeLabel">{{ __('Filters') }}</span>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
               <div class="input-group-md">
-                  <input type="text" id="employee_name" class="form-control" placeholder="Search employee.." hidden>
+                  <input type="text" id="employee_name" class="form-control" placeholder="{{ __('Search employee..') }}" hidden>
               </div>
             </div>
             <form id="admin_report_filter" action="" method="POST">
@@ -18,9 +18,9 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="mb-3">
-                                        <label class="form-label" for="group_company">Group Company</label>
+                                        <label class="form-label" for="group_company">{{ __('Group Company') }}</label>
                                         <select class="form-select select2" name="group_company" id="group_company">
-                                            <option value="">- select group company -</option>
+                                            <option value="">- {{ __('select group company') }} -</option>
                                             @foreach ($groupCompanies as $groupCompany)
                                             <option value="{{ $groupCompany }}">{{ $groupCompany }}</option>
                                             @endforeach
@@ -31,9 +31,9 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="mb-3">
-                                        <label class="form-label" for="company">Company</label>
+                                        <label class="form-label" for="company">{{ __('Company') }}</label>
                                         <select class="form-select select2" name="company" id="company">
-                                            <option value="">- select company -</option>
+                                            <option value="">- {{ __('select company') }} -</option>
                                             @foreach ($companies as $company)
                                             <option value="{{ $company->contribution_level_code }}">{{ $company->contribution_level }}</option>
                                             @endforeach
@@ -44,9 +44,9 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="mb-3">
-                                        <label class="form-label" for="location">Location</label>
+                                        <label class="form-label" for="location">{{ __('Location') }}</label>
                                         <select class="form-select select2" name="location" id="location">
-                                            <option value="">- select location -</option>
+                                            <option value="">- {{ __('select location') }} -</option>
                                             @foreach ($locations as $location)
                                             <option value="{{ $location->work_area }}">{{ $location->area.' ('.$location->company_name.')' }}</option>
                                             @endforeach
@@ -60,7 +60,7 @@
                 <div class="modal-footer">
                     <div class="d-sm-flex justify-content-end">
                         <a class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">{{ __('Cancel') }}</a>
-                        <button type="submit" class="btn btn-primary">Apply</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Apply') }}</button>
                     </div>
                 </div>
             </form>

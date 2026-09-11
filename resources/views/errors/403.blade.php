@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Not Found</title>
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="d-flex align-items-center justify-content-center vh-100">
-            <div class="form-group text-center">
-                <div class="mb-3">
-                    <img @style('width: 50%') src="{{ asset('storage/img/error_403.svg') }}" alt="Page Not Found">
-                </div>
-                <h1 class="h3 mb-5">The page you are looking for seems to be off limits.</h1>
-                <a href="/" class="btn btn-primary px-4" >Return</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+@extends('errors.layout')
+
+@section('code', '403')
+@section('title', __('Access Denied'))
+@section('message', __('The page you are looking for seems to be off limits. If you think you should have access, ask your administrator to review your permissions.'))
+
+@if (isset($exception) && trim($exception->getMessage()) !== '')
+    @section('detail', $exception->getMessage())
+@endif
+
+@section('icon')
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+        stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        <circle cx="12" cy="16.5" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+@endsection

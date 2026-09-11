@@ -125,7 +125,20 @@ $(".select2").select2({
     theme: "bootstrap-5",
 });
 
+// resources/views/loader.blade.php owns the preloader: when it shows and when
+// it hides, including holding it up across a navigation. These two stay only so
+// the long-standing global names keep resolving (the topbar's onclick, and the
+// ajax callers in report.js / layer.js / goal-approval.js); they delegate so a
+// hideLoader() from an ajax handler cannot pull the overlay out from under a
+// navigation that has already started. The jQuery path is the fallback for a
+// page rendered without the partial.
 function showLoader() {
+    if (window.adminPreloader) {
+        window.adminPreloader.show();
+
+        return;
+    }
+
     $("#status").show();
     $("#preloader").show();
 }
@@ -133,11 +146,13 @@ function showLoader() {
 window.showLoader = showLoader;
 
 function hideLoader() {
+    if (window.adminPreloader) {
+        window.adminPreloader.hide();
+
+        return;
+    }
+
     $("#preloader").hide();
 }
 
 window.hideLoader = hideLoader;
-
-window.onload = function () {
-    hideLoader();
-};

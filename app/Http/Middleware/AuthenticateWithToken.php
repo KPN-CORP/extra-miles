@@ -4,9 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthenticateWithToken
@@ -16,19 +15,18 @@ class AuthenticateWithToken
 
         $token = $request->bearerToken();
 
-        if (!$token) {
+        if (! $token) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         try {
-            Log::info('Incoming token:', ['token' => $token]);
             $user = JWTAuth::setToken($token)->authenticate();
 
-            if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            if (! $user) {
+                return response()->json(['error' => 'User not found'], 404);
             }
 
             Auth::login($user);
-            
+
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 401);
         }

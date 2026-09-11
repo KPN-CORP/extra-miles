@@ -21,23 +21,29 @@ class NewsController extends Controller
         $this->today = Carbon::today();
     }
 
-    public function getNews()
+    public function getNews(Request $request)
     {
         try {
-            // Log untuk memeriksa token dan employee_id
-            $payload = JWTAuth::parseToken()->getPayload();
-            $employee_id = $payload->get('employee_id');
-            Log::info('Token payload employee_id: ' . $employee_id);
+            JWTAuth::parseToken()->getPayload();
 
-            $news = News::orderBy('publish_date', 'desc')->get();
+            // Listing views only render these columns. Selecting explicitly keeps
+            // the long `content` HTML out of the response -- the detail endpoint
+            // serves that per article.
+            $query = News::select(
+                'id', 'category', 'title', 'publish_date', 'image', 'businessUnit', 'created_at'
+            )->orderBy('publish_date', 'desc');
 
-            if (!$news) {
-                return response()->json(['error' => 'News not found'], 404);
+            // The dashboard only shows the newest few, so it can ask for a slice
+            // instead of pulling the whole table down and discarding it.
+            $limit = (int) $request->query('limit', 0);
+            if ($limit > 0) {
+                $query->limit($limit);
             }
 
-            return response()->json($news);
+            return response()->json($query->get());
         } catch (\Exception $e) {
-            Log::error('Error getting news: ' . $e->getMessage());
+            Log::error('Error getting news: '.$e->getMessage());
+
             return response()->json(['error' => 'Something went wrong', 'message' => $e->getMessage()], 500);
         }
     }
@@ -49,7 +55,7 @@ class NewsController extends Controller
             $payload = JWTAuth::parseToken()->getPayload();
             $employee_id = $payload->get('employee_id');
             $id = Crypt::decryptString($id);
-            Log::info('Token payload employee_id: ' . $employee_id);
+            Log::info('Token payload employee_id: '.$employee_id);
 
             $news = News::with('newsLikes')->findOrFail($id);
 
@@ -58,7 +64,8 @@ class NewsController extends Controller
 
             return response()->json($news);
         } catch (\Exception $e) {
-            Log::error('Error getting news: ' . $e->getMessage());
+            Log::error('Error getting news: '.$e->getMessage());
+
             return response()->json(['error' => 'Something went wrong', 'message' => $e->getMessage()], 500);
         }
     }
@@ -83,7 +90,8 @@ class NewsController extends Controller
 
             return response()->json(['message' => 'View recorded.']);
         } catch (\Exception $e) {
-            Log::error('Error record news: ' . $e->getMessage());
+            Log::error('Error record news: '.$e->getMessage());
+
             return response()->json(['error' => 'Something went wrong', 'message' => $e->getMessage()], 500);
         }
     }
@@ -114,14 +122,14 @@ class NewsController extends Controller
 
             return response()->json(['message' => 'News liked'], 201);
         } catch (\Exception $e) {
-            Log::error('Error record like: ' . $e->getMessage());
+            Log::error('Error record like: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Something went wrong',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
-
 
     // ✅ Unlike artikel
     public function unlike($id)
@@ -134,9 +142,9 @@ class NewsController extends Controller
 
             return response()->json(['message' => 'Like removed']);
         } catch (\Exception $e) {
-            Log::error('Error record unlike: ' . $e->getMessage());
+            Log::error('Error record unlike: '.$e->getMessage());
+
             return response()->json(['error' => 'Something went wrong', 'message' => $e->getMessage()], 500);
         }
     }
-
 }

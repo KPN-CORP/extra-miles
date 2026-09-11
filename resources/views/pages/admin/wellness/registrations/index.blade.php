@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Wellness Participants'])
+@extends('layouts_.vertical', ['page_title' => __('Wellness Participants')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -24,16 +24,18 @@
         </div>
         <div class="d-flex gap-2">
             <a href="{{ route('wellness.schedules.qr', $schedule->encrypted_id) }}" target="_blank" class="btn btn-outline-dark">
-                <i class="ri-qr-code-line me-1"></i> QR
+                <i class="ri-qr-code-line me-1"></i> {{ __('QR') }}
             </a>
-            <a href="{{ route('wellness.registrations.export', $schedule->encrypted_id) }}" class="btn btn-outline-success">
-                <i class="ri-file-excel-2-line me-1"></i> Export
+            {{-- data-no-loader: this serves a file, the page never navigates, so the
+                 preloader would have nothing to clear it. --}}
+            <a href="{{ route('wellness.registrations.export', $schedule->encrypted_id) }}" class="btn btn-outline-success" data-no-loader>
+                <i class="ri-file-excel-2-line me-1"></i> {{ __('Export') }}
             </a>
             <a href="{{ route('admin.wellness.schedules.index', $schedule->activity->encrypted_id) }}" class="btn btn-outline-secondary">
-                <i class="ri-arrow-left-line me-1"></i> Back
+                <i class="ri-arrow-left-line me-1"></i> {{ __('Back') }}
             </a>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addParticipantModal">
-                <i class="ri-user-add-line me-1"></i> Add Employee
+                <i class="ri-user-add-line me-1"></i> {{ __('Add Employee') }}
             </button>
         </div>
     </div>
@@ -48,10 +50,10 @@
     <div class="row g-3 mb-3">
         @php
             $stats = [
-                ['Confirmed', $takenSeats.' / '.($schedule->quota === null ? '∞' : $schedule->quota), 'ri-check-double-line'],
+                [__('Confirmed'), $takenSeats.' / '.($schedule->quota === null ? '∞' : $schedule->quota), 'ri-check-double-line'],
                 [$queueStatus->label(), $queuedCount, 'ri-list-ordered'],
-                ['Attended', $attendedCount, 'ri-user-follow-line'],
-                ['Blacklisted', ($groups[WellnessRegistrationStatus::Blacklisted->value] ?? collect())->count(), 'ri-forbid-2-line'],
+                [__('Attended'), $attendedCount, 'ri-user-follow-line'],
+                [__('Blacklisted'), ($groups[WellnessRegistrationStatus::Blacklisted->value] ?? collect())->count(), 'ri-forbid-2-line'],
             ];
         @endphp
         @foreach ($stats as [$label, $value, $icon])
@@ -86,6 +88,12 @@
                                 </button>
                             </li>
                         @endforeach
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-feedback" type="button" role="tab">
+                                {{ __('Feedback') }}
+                                <span class="badge bg-secondary ms-1">{{ $feedback->count() }}</span>
+                            </button>
+                        </li>
                     </ul>
 
                     <div class="tab-content">
@@ -108,14 +116,13 @@
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <small class="text-muted">
                                                 @if ($method->autoConfirms())
-                                                    Listed in registration order. A freed seat is confirmed automatically
-                                                    from the top, skipping blacklisted employees.
+                                                    {{ __('Listed in registration order. A freed seat is confirmed automatically from the top, skipping blacklisted employees.') }}
                                                 @else
-                                                    Listed in registration order. Select who gets a seat.
+                                                    {{ __('Listed in registration order. Select who gets a seat.') }}
                                                 @endif
                                             </small>
                                             <button type="submit" class="btn btn-success btn-sm" @disabled($rows->isEmpty())>
-                                                <i class="ri-check-line me-1"></i> Confirm Selected
+                                                <i class="ri-check-line me-1"></i> {{ __('Confirm Selected') }}
                                             </button>
                                         </div>
                                 @endif
@@ -131,18 +138,18 @@
                                                     </th>
                                                     <th style="width:3rem;">#</th>
                                                 @else
-                                                    <th class="no-sort">No</th>
+                                                    <th class="no-sort">{{ __('No') }}</th>
                                                 @endif
-                                                <th>Employee</th>
-                                                <th>Business Unit</th>
-                                                <th>Unit</th>
-                                                <th>Job Level</th>
-                                                <th>Registered</th>
-                                                <th>Via</th>
+                                                <th>{{ __('Employee') }}</th>
+                                                <th>{{ __('Business Unit') }}</th>
+                                                <th>{{ __('Unit') }}</th>
+                                                <th>{{ __('Job Level') }}</th>
+                                                <th>{{ __('Registered') }}</th>
+                                                <th>{{ __('Via') }}</th>
                                                 @if ($status === WellnessRegistrationStatus::Confirmed)
-                                                    <th>Attendance</th>
+                                                    <th>{{ __('Attendance') }}</th>
                                                 @endif
-                                                <th class="no-sort">Action</th>
+                                                <th class="no-sort">{{ __('Action') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -169,7 +176,7 @@
                                                                     {{ $registration->attended_at->format('d M H:i') }}
                                                                 </span>
                                                             @else
-                                                                <span class="badge bg-secondary-subtle text-secondary">Not yet</span>
+                                                                <span class="badge bg-secondary-subtle text-secondary">{{ __('Not yet') }}</span>
                                                             @endif
                                                         </td>
                                                     @endif
@@ -188,7 +195,7 @@
                                                 @if ($isQueueTab)
                                                     <tr>
                                                         <td colspan="{{ $columnCount }}" class="text-center text-muted py-3">
-                                                            No {{ strtolower($status->label()) }} participants.
+                                                            {{ __('No :status participants.', ['status' => strtolower($status->label())]) }}
                                                         </td>
                                                     </tr>
                                                 @endif
@@ -202,6 +209,11 @@
                                 @endif
                             </div>
                         @endforeach
+
+                        {{-- Written by attendees from the mobile app; read-only here. --}}
+                        <div class="tab-pane fade" id="tab-feedback" role="tabpanel">
+                            @include('pages.admin.wellness.registrations._feedback', ['feedback' => $feedback])
+                        </div>
                     </div>
                 </div>
             </div>
@@ -272,7 +284,7 @@
                 search.addEventListener('input', function () {
                     var term = this.value.trim();
                     hidden.value = '';
-                    selected.textContent = 'No employee selected yet.';
+                    selected.textContent = @json(__('No employee selected yet.'));
                     window.clearTimeout(timer);
 
                     if (term.length < 2) {
@@ -293,14 +305,14 @@
                                     item.className = 'list-group-item list-group-item-action';
                                     item.innerHTML = employee.fullname + ' (' + employee.employee_id + ')' +
                                         (employee.blacklisted
-                                            ? ' <span class="badge bg-dark-subtle text-dark">Blacklisted</span>'
+                                            ? ' <span class="badge bg-dark-subtle text-dark">' + @json(__('Blacklisted')) + '</span>'
                                             : '');
                                     item.addEventListener('click', function () {
                                         hidden.value = employee.employee_id;
                                         search.value = employee.fullname;
-                                        selected.textContent = 'Selected: ' + employee.fullname +
+                                        selected.textContent = @json(__('Selected')) + ': ' + employee.fullname +
                                             ' - ' + (employee.group_company || '-') + ' / ' + (employee.unit || '-') +
-                                            (employee.blacklisted ? ' (on the wellness blacklist)' : '');
+                                            (employee.blacklisted ? ' (' + @json(__('on the wellness blacklist')) + ')' : '');
                                         results.innerHTML = '';
                                     });
                                     results.appendChild(item);

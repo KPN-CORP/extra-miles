@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Create Wellness Activity'])
+@extends('layouts_.vertical', ['page_title' => __('Create Wellness Activity')])
 
 @section('css')
     @include('pages.admin.wellness.partials.page-css')
@@ -12,22 +12,17 @@
 
     @include('pages.admin.wellness.partials.errors')
 
-    <form action="{{ route('wellness.activities.store') }}" method="POST" enctype="multipart/form-data">
+    {{-- One form around both tabs, so a single submit creates the activity and
+         its sessions together. The body is shared with the edit screen. --}}
+    <form action="{{ route('wellness.activities.store') }}" method="POST"
+        enctype="multipart/form-data" id="wa_form" novalidate>
         @csrf
 
-        @include('pages.admin.wellness.activities._form', ['activity' => null])
-
-        <div class="d-flex justify-content-between align-items-center gap-2 mt-3">
-            <span class="text-muted small">
-                <i class="ri-information-line me-1"></i>You will add the sessions next.
-            </span>
-            <div class="d-flex gap-2">
-                <a href="{{ route('admin.wellness.activities.index') }}" class="btn btn-light">Cancel</a>
-                <button type="submit" class="btn btn-primary" @disabled($types->isEmpty())>
-                    Save &amp; Add Schedules <i class="ri-arrow-right-line ms-1"></i>
-                </button>
-            </div>
-        </div>
+        @include('pages.admin.wellness.activities._tabbed-form', [
+            'activity' => null,
+            'schedules' => collect(),
+            'submitLabel' => __('Save Activity'),
+        ])
     </form>
 </div>
 @endsection

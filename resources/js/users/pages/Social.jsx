@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import LanguageToggle from "../components/Layout/LanguageToggle";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
@@ -6,8 +8,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/bundle";
 import { FreeMode } from "swiper/modules";
-
-import BannerLoader from "../components/Loader/BannerLoader";
 
 import { useApiUrl } from "../components/context/ApiContext";
 import { showAlert } from "../components/Helper/alertHelper";
@@ -38,7 +38,8 @@ export default function Social() {
   const [latestYoutube, setLatestYoutube] = useState([]);
   const [latestIG, setLatestIG] = useState([]);
   const [latestTiktok, setLatestTiktok] = useState([]);
-  const [loading, setLoading] = useState(true);  
+  const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -142,7 +143,7 @@ export default function Social() {
           >
             <i className="ri-arrow-left-line" />
           </button>
-          <div style={{ flexBasis: "40px" }} /> {/* placeholder for symmetry */}
+          <LanguageToggle variant="onRed" />
         </div>
         <div className="fixed bottom-0 right-0 w-1/2 overflow-hidden z-0 pointer-events-none">
           <img
@@ -159,14 +160,14 @@ export default function Social() {
           transition={{ duration: 0.3, type: "tween", ease: "easeInOut" }}
         >
           <div className="justify-start mb-4">
-            <span className="text-white text-xl font-normal">Our</span>
-            <span className="text-white text-xl font-semibold"> <br /></span><span className="text-white text-2xl font-semibold">Social Media <br /></span>
-            <span className="text-white text-xl font-normal">Presence</span>
+            <span className="text-white text-xl font-normal">{t('social.ourLine1')}</span>
+            <span className="text-white text-xl font-semibold"> <br /></span><span className="text-white text-2xl font-semibold">{t('social.ourLine2')} <br /></span>
+            <span className="text-white text-xl font-normal">{t('social.ourLine3')}</span>
           </div>
 
           {/* Swiper Latest Youtube */}
           <div className="px-2 py-1 origin-top-left bg-white rounded-full inline-flex justify-center items-center overflow-hidden mb-2">
-            <div className="text-center justify-center text-red-700 text-xs font-extrabold">Youtube</div>
+            <div className="text-center justify-center text-red-700 text-xs font-extrabold">{t('social.youtube')}</div>
           </div>
           <div className="overflow-x-scroll whitespace-nowrap mb-4">
             <Swiper
@@ -182,7 +183,7 @@ export default function Social() {
                     <div
                       onClick={() => item.link && window.open(`https://www.youtube.com/watch?v=${item.link}`, '_blank')}
                       className="w-full aspect-[16/9] relative rounded-lg overflow-hidden cursor-pointer group"
-                      aria-label="Open YouTube Video"
+                      aria-label={t('social.openYoutube')}
                     >
                       {/* YouTube Embed */}
                       {item.link ? (
@@ -190,8 +191,12 @@ export default function Social() {
                           <YouTubePlayer key={idx} videoId={item.link} />
                         </div>
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-orange-50 z-10">
-                          <BannerLoader />
+                        // Not a loading state: the list has already resolved, this
+                        // entry just has no video. A skeleton here would animate
+                        // forever because nothing will ever settle it.
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-orange-50 text-stone-400 z-10">
+                          <i className="ri-video-off-line text-2xl" />
+                          <span className="text-[10px] font-medium">{t('social.noVideo')}</span>
                         </div>
                       )}
 
@@ -206,7 +211,7 @@ export default function Social() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Instagram</span>
+              <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">{t('social.instagram')}</span>
               <div className="mt-2 bg-white rounded overflow-hidden">
                 {latestIG.map((item, index) => (
                     item.link ? <InstagramPlayer key={index} postId={item.link} /> : null
@@ -214,7 +219,7 @@ export default function Social() {
               </div>
             </div>
             <div>
-              <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">Tiktok</span>
+              <span className="bg-white text-red-700 font-semibold px-2 py-1 rounded-full text-xs">{t('social.tiktok')}</span>
               <div className="mt-2 bg-white rounded overflow-hidden">
                 {latestTiktok.map((item, index) => (
                   item.link ? <TikTokPlayer key={index} videoId={item.link} /> : null
@@ -224,7 +229,7 @@ export default function Social() {
           </div>
           {/* Footer */}
           <div className="mt-6 text-start space-y-3">
-            <p className="text-sm">Never miss an <span className="font-bold">Update!</span></p>
+            <p className="text-sm">{t('social.neverMiss')} <span className="font-bold">{t('social.update')}</span></p>
             <div className="flex justify-start space-x-4">
               <a href="https://www.linkedin.com/company/kpn-corp" target="_blank" rel="noopener noreferrer">
                 <i className="ri-linkedin-box-fill text-2xl"></i>

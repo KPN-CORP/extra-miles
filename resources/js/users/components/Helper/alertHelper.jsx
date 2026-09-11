@@ -2,12 +2,15 @@
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
+import { translate } from './localeHelper';
+
 const MySwal = withReactContent(Swal);
 
 export const showAlert = (options) => {
     const defaultOptions = {
       icon: 'info',
-      confirmButtonText: 'OK',
+      confirmButtonText: translate('common.ok'),
+      cancelButtonText: translate('common.cancel'),
       reverseButtons: true,
       customClass: {
         confirmButton: 'bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded',

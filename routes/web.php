@@ -1,38 +1,30 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\AdminFallbackController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\DevLoginController;
-use App\Http\Controllers\Auth\ConfirmablePasswordController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\SsoController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\LanguageController;
-use App\Http\Middleware\NotificationMiddleware;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\SurveyController;
-use App\Http\Controllers\SocialController;
-use App\Http\Controllers\LiveContentController;
-use App\Http\Controllers\QuotesController;
 use App\Http\Controllers\EventParticipantController;
 use App\Http\Controllers\FormTemplateController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\LiveContentController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\QuotesController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SocialController;
+use App\Http\Controllers\SpaController;
+use App\Http\Controllers\SsoController;
+use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\WellnessActivityController;
 use App\Http\Controllers\WellnessActivityScheduleController;
 use App\Http\Controllers\WellnessActivityTypeController;
 use App\Http\Controllers\WellnessBlacklistController;
 use App\Http\Controllers\WellnessRegistrationController;
-use App\Livewire\ManageParticipants;
+use Illuminate\Support\Facades\Route;
 
 Route::get('dbauth', [SsoController::class, 'dbauth']);
 Route::get('dbauthlms', [SsoController::class, 'dbauthlms']);
@@ -41,24 +33,19 @@ Route::get('dbauthexpl', [SsoController::class, 'dbauthexpl']);
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
-                ->name('register');
+        ->name('register');
 });
 
-Route::get('/{any?}', function () {
-    return view('user-app');
-})->where('any', '^(?!admin).*$');
+Route::get('/{any?}', SpaController::class)->where('any', '^(?!admin).*$');
 
-Route::get('/images/{filename}', function ($filename) {
-    $path = storage_path('app/public/' . $filename);
-
-    if (!file_exists($path)) {
-        abort(404);
-    }
-
-    return response()->file($path);
-});
+Route::get('/images/{filename}', ImageController::class);
 
 Route::prefix('admin')->group(function () {
+
+    // Reachable without 'auth' so the language can also be changed on the
+    // login screen; the middleware itself only reads a session value.
+    Route::get('language/{locale}', [LanguageController::class, 'switchLanguage'])
+        ->name('language.switch');
 
     Route::middleware('auth', 'locale', 'notification')->group(function () {
 
@@ -83,7 +70,7 @@ Route::prefix('admin')->group(function () {
             Route::delete('/events/{id}/archive', [EventController::class, 'softDelete'])->name('events.softDelete');
             Route::delete('/events/{id}/removeEvoParticipants', [EventController::class, 'removeEvoParticipants'])->name('events.removeEvoParticipants');
             Route::post('/events/{id}/close', [EventController::class, 'closeRegistration'])->name('events.close');
-            Route::post('/events/{id}/toggle-status', [EventController::class, 'toggleStatus'])->name('events.close');
+            Route::post('/events/{id}/toggle-status', [EventController::class, 'toggleStatus'])->name('events.toggle-status');
             Route::get('/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
             Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
             Route::get('/events/{encryptedId}/participants', [EventParticipantController::class, 'listParticipants'])->name('events.participants');
@@ -222,14 +209,14 @@ Route::prefix('admin')->group(function () {
     // Without DEVELOPMENT_MODE=keydevelopment in .env it only bounces the
     // browser to Darwinbox as before; with it, a local login form is rendered
     // so the admin pages can be reached without the SSO handshake.
-    Route::get('login', [DevLoginController::class, 'create'])->name('login');
+    Route::get('login', [DevLoginController::class, 'create'])
+        ->middleware('locale')
+        ->name('login');
     Route::post('login', [DevLoginController::class, 'store'])
         ->middleware('dev.mode')
         ->name('dev.login.store');
 
-    Route::fallback(function () {
-        return view('errors.404');
-    });
+    Route::fallback(AdminFallbackController::class);
 
     require __DIR__.'/auth.php';
 });

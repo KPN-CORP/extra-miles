@@ -22,7 +22,7 @@
     </a>
     
     <!-- Sidebar Hover Menu Toggle Button -->
-    <div class="button-sm-hover" data-bs-toggle="tooltip" data-bs-placement="right" title="Show Full Sidebar">
+    <div class="button-sm-hover" data-bs-toggle="tooltip" data-bs-placement="right" title="{{ __('Show Full Sidebar') }}">
         <i class="ri-checkbox-blank-circle-line align-middle"></i>
     </div>
 
@@ -54,11 +54,11 @@
                 <br>
                 <pre>{{ auth()->user()->getAllPermissions()->pluck('name') }}</pre>
             @endif --}}
-            <li class="side-nav-title">Menu</li>
+            <li class="side-nav-title">{{ __('Menu') }}</li>
             <li class="side-nav-item">
                 <a href="{{ url('/admin/dashboard') }}" class="side-nav-link">
                     <i class="ri-dashboard-3-line"></i>
-                    <span> Dashboard </span>
+                    <span> {{ __('Dashboard') }} </span>
                 </a>
             </li>
             @if(auth()->check())
@@ -67,7 +67,7 @@
                 <li class="side-nav-item">
                     <a href="{{ url('/admin/news') }}" class="side-nav-link">
                         <i class="ri-file-list-2-line"></i>
-                        <span> News Update </span>
+                        <span> {{ __('News Update') }} </span>
                     </a>
                 </li>
                 @endcan
@@ -76,13 +76,13 @@
                 <li class="side-nav-item">
                     <a data-bs-toggle="collapse" href="#sidebarEvent" aria-expanded="false" aria-controls="sidebarEvent" class="side-nav-link">
                         <i class="ri-settings-5-line"></i>
-                        <span>Event Management</span>
+                        <span>{{ __('Event Management') }}</span>
                         <span class="menu-arrow"></span>  
                     </a>
                     <div class="collapse" id="sidebarEvent">
                         <ul class="side-nav-second-level">
                             <li>
-                                <a href="{{ url('/admin/events') }}"> Events </a>
+                                <a href="{{ url('/admin/events') }}"> {{ __('Events') }} </a>
                             </li>
                             @can('viewmenuevo')
                             <li>
@@ -98,20 +98,20 @@
                 <li class="side-nav-item">
                     <a data-bs-toggle="collapse" href="#sidebarWellness" aria-expanded="false" aria-controls="sidebarWellness" class="side-nav-link">
                         <i class="ri-heart-pulse-line"></i>
-                        <span>Wellness</span>
+                        <span>{{ __('Wellness') }}</span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarWellness">
                         <ul class="side-nav-second-level">
                             <li>
-                                <a href="{{ url('/admin/wellness/activities') }}"> Activities </a>
+                                <a href="{{ url('/admin/wellness/activities') }}"> {{ __('Activities') }} </a>
                             </li>
                             <li>
-                                <a href="{{ url('/admin/wellness/blacklist') }}"> Blacklist </a>
+                                <a href="{{ url('/admin/wellness/blacklist') }}"> {{ __('Blacklist') }} </a>
                             </li>
                             @can('viewmenuwellnesstype')
                             <li>
-                                <a href="{{ url('/admin/wellness/types') }}"> Activity Types </a>
+                                <a href="{{ url('/admin/wellness/types') }}"> {{ __('Activity Types') }} </a>
                             </li>
                             @endcan
                         </ul>
@@ -123,7 +123,7 @@
                 <li class="side-nav-item">
                     <a href="{{ url('/admin/survey') }}" class="side-nav-link">
                         <i class="ri-group-line"></i>
-                        <span> Survey/Voting </span>
+                        <span> {{ __('Survey/Voting') }} </span>
                     </a>
                 </li>
                 @endcan
@@ -132,7 +132,7 @@
                 <li class="side-nav-item">
                     <a href="{{ url('/admin/social') }}" class="side-nav-link">
                         <i class="ri-earth-line"></i>
-                        <span> Social Media </span>
+                        <span> {{ __('Social Media') }} </span>
                     </a>
                 </li>
                 @endcan
@@ -141,7 +141,7 @@
                 <li class="side-nav-item">
                     <a href="{{ url('/admin/live') }}" class="side-nav-link">
                         <i class="ri-live-line"></i>
-                        <span> LIVE </span>
+                        <span> {{ __('LIVE') }} </span>
                     </a>
                 </li>
                 @endcan
@@ -150,7 +150,7 @@
                 <li class="side-nav-item">
                     <a href="{{ url('/admin/quotes') }}" class="side-nav-link">
                         <i class="ri-double-quotes-l"></i>
-                        <span> Quotes/Affirmation </span>
+                        <span> {{ __('Quotes/Affirmation') }} </span>
                     </a>
                 </li>
                 @endcan
@@ -159,24 +159,24 @@
                 <li class="side-nav-item">
                     <a href="{{ url('/admin/formbuilder') }}" class="side-nav-link">
                         <i class="ri-ai-generate"></i>
-                        <span> Form Builder </span>
+                        <span> {{ __('Form Builder') }} </span>
                     </a>
                 </li>
                 @endcan
 
                 @can('viewsettingem')
-                    <li class="side-nav-title">Admin</li>
+                    <li class="side-nav-title">{{ __('Admin') }}</li>
                     <li class="side-nav-item">
                         <a data-bs-toggle="collapse" href="#sidebarCharts" aria-expanded="false" aria-controls="sidebarCharts" class="side-nav-link">
                             <i class="ri-admin-line"></i>
-                            <span> Settings </span>
+                            <span> {{ __('Settings') }} </span>
                             <span class="menu-arrow"></span>
                         </a>
                         <div class="collapse" id="sidebarCharts">
                             <ul class="side-nav-second-level">
                                 @can('viewroleem')
                                 <li class="side-nav-item">
-                                    <a href="{{ route('roles') }}">Role</a>
+                                    <a href="{{ route('roles') }}">{{ __('Role') }}</a>
                                 </li>
                                 @endcan
                             </ul>

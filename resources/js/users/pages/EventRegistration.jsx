@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -18,6 +19,7 @@ export default function EventDetails() {
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const [hasRegistered, setHasRegistered] = useState(false);
+  const { t, i18n } = useTranslation();
   
   useEffect(() => {
     const checkRegistrationAndFetchEvent = async () => {
@@ -34,8 +36,8 @@ export default function EventDetails() {
         if (registrationRes.data.registered) {
           showAlert({
             icon: 'warning',
-            title: 'Already Registered',
-            text: 'You are already registered for this event.',
+            title: t('event.alreadyRegistered'),
+            text: t('event.alreadyRegisteredText'),
             timer: 2000,
             showConfirmButton: false,
           }).then(() => {
@@ -74,19 +76,19 @@ export default function EventDetails() {
     // No event found after loading
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
-        <p className="text-red-700 text-xl font-semibold mb-4">Event not found.</p>
+        <p className="text-red-700 text-xl font-semibold mb-4">{t('event.notFound')}</p>
         <button
           onClick={() => navigate('/')}
           className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
         >
-          Go Back Home
+          {t('common.goBackHome')}
         </button>
       </div>
     );
   }    
 
   const date = new Date(event.start_date);
-  const month = date.toLocaleString('en-US', { month: 'short' });
+  const month = date.toLocaleString(i18n.resolvedLanguage === 'id' ? 'id-ID' : 'en-US', { month: 'short' });
   const day = date.getDate();
   const year = date.getFullYear();
   const formattedDate = `${day} ${month} ${year}`;  
@@ -105,7 +107,7 @@ export default function EventDetails() {
                     <i className="ri-arrow-left-line"></i>
                 </button>
             </div>
-            <div className="flex-2 text-center text-red-700 text-lg font-bold">Registration Form</div>
+            <div className="flex-2 text-center text-red-700 text-lg font-bold">{t('event.registrationForm')}</div>
             <div className="flex-1" /> {/* Spacer to balance layout */}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -115,7 +117,7 @@ export default function EventDetails() {
             <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
                 <div className="self-stretch justify-start text-red-700 text-lg font-semibold">{event.title}</div>
                 <div className="flex gap-2">
-                {(Array.isArray(event.businessUnit) ? event.businessUnit : ['All BU']).map((index, i) => (
+                {(Array.isArray(event.businessUnit) ? event.businessUnit : [t('event.allBu')]).map((index, i) => (
                     <div key={i} data-color="light" data-size="H6" data-type="normal" className="bg-white/0">
                         <div className="px-2 py-1 bg-zinc-300 rounded inline-flex justify-start items-center overflow-hidden">
                             <div className="text-center justify-start text-stone-600 text-xs font-medium leading-3">{index}</div>
@@ -146,19 +148,19 @@ export default function EventDetails() {
               <div className="flex flex-col gap-3 text-stone-700">
                 {/* Name */}
                 <div className="grid grid-cols-5 gap-2 items-center">
-                  <p className="font-semibold col-span-1">Name</p>
+                  <p className="font-semibold col-span-1">{t('common.name')}</p>
                   <p className="col-span-4">{user?.fullname || '-'}</p>
                 </div>
 
                 {/* ID */}
                 <div className="grid grid-cols-5 gap-2 items-center">
-                  <p className="font-semibold col-span-1">ID</p>
+                  <p className="font-semibold col-span-1">{t('common.id')}</p>
                   <p className="col-span-4">{user?.employee_id || '-'}</p>
                 </div>
 
                 {/* Email */}
                 <div className="grid grid-cols-5 gap-2 items-center">
-                  <p className="font-semibold col-span-1">Email</p>
+                  <p className="font-semibold col-span-1">{t('common.email')}</p>
                   <p className="col-span-4">{user?.email || '-'}</p>
                 </div>
               </div>

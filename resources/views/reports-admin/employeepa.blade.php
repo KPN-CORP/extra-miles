@@ -7,17 +7,17 @@
                     <thead class="thead-light">
                         <tr class="text-center">
                         <th>#</th>
-                        <th>NIK</th>
-                        <th>Name</th>
-                        <th>DOJ</th>
+                        <th>{{ __('NIK') }}</th>
+                        <th>{{ __('Name') }}</th>
+                        <th>{{ __('DOJ') }}</th>
                         <th>{{ __('Type') }}</th>
-                        <th>Unit</th>
-                        <th>Job</th>
-                        <th>Grade</th>
-                        <th>PT</th>
-                        <th>Locations</th>
-                        <th>BU</th>
-                        <th>Action</th>
+                        <th>{{ __('Unit') }}</th>
+                        <th>{{ __('Job') }}</th>
+                        <th>{{ __('Grade') }}</th>
+                        <th>{{ __('PT') }}</th>
+                        <th>{{ __('Locations') }}</th>
+                        <th>{{ __('BU') }}</th>
+                        <th>{{ __('Action') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,28 +66,28 @@
                 @method('PUT')
 
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="editEmployeeModalLabel">{{ __('Edit Employee') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
                 
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="editEmployeeId" class="form-label">Employee ID</label>
+                            <label for="editEmployeeId" class="form-label">{{ __('Employee ID') }}</label>
                             <input type="text" class="form-control bg-light" id="editEmployeeId" name="employee_id" readonly>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="editFullname" class="form-label">Full Name</label>
+                            <label for="editFullname" class="form-label">{{ __('Full Name') }}</label>
                             <input type="text" class="form-control" id="editFullname" name="fullname" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="editDateOfJoining" class="form-label">Date of Joining</label>
+                            <label for="editDateOfJoining" class="form-label">{{ __('Date of Joining') }}</label>
                             <input type="date" class="form-control" id="editDateOfJoining" name="date_of_joining" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="editContributionLevelCode" class="form-label">Company</label>
+                            <label for="editContributionLevelCode" class="form-label">{{ __('Company') }}</label>
                             <select class="form-control" id="editContributionLevelCode" name="contribution_level_code" required>
                                 @foreach($companies as $company)
                                     <option value="{{ $company->contribution_level_code }}">
@@ -99,7 +99,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="editUnit" class="form-label">Unit</label>
+                            <label for="editUnit" class="form-label">{{ __('Unit') }}</label>
                             {{-- <input type="text" class="form-control" id="editUnit" name="unit" required> --}}
                             <select class="form-control" id="editUnit" name="unit" required>
                                 @foreach($departments as $department)
@@ -110,7 +110,7 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="editDesignationName" class="form-label">Designation</label>
+                            <label for="editDesignationName" class="form-label">{{ __('Designation') }}</label>
                             {{-- <input type="text" class="form-control" id="editDesignationName" name="designation_name" required> --}}
                             <select class="form-control" id="editDesignationName" name="designation_name" required>
                                 @foreach($designations as $designation)
@@ -123,7 +123,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="editJobLevel" class="form-label">Job Level</label>
+                            <label for="editJobLevel" class="form-label">{{ __('Job Level') }}</label>
                             {{-- <input type="text" class="form-control" id="editJobLevel" name="job_level" required> --}}
                             <select class="form-control" id="editJobLevel" name="job_level" required>
                                 @foreach ($jobLevel as $level)
@@ -132,7 +132,7 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="editOfficeArea" class="form-label">Office Area</label>
+                            <label for="editOfficeArea" class="form-label">{{ __('Office Area') }}</label>
                             {{-- <input type="text" class="form-control" id="editOfficeArea" name="office_area" required> --}}
                             <select class="form-control" id="editOfficeArea" name="office_area" required>
                                 @foreach($locations as $location)
@@ -146,8 +146,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('Save Changes') }}</button>
                 </div>
             </form>
         </div>

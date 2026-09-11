@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const VoteProgressBar = ({ percentage = 0 }) => {
+  const { t } = useTranslation();
   const [animatedWidth, setAnimatedWidth] = useState("0%");
 
   useEffect(() => {
@@ -19,7 +21,7 @@ const VoteProgressBar = ({ percentage = 0 }) => {
         style={{ width: animatedWidth }}
       />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-xs font-semibold whitespace-nowrap">
-        {percentage}% votes
+        {t('vote.percentVotes', { percentage })}
       </div>
     </div>
   );

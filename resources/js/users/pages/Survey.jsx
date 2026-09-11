@@ -1,4 +1,6 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+import LanguageToggle from "../components/Layout/LanguageToggle";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -40,6 +42,7 @@ export default function Survey() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedBU, setSelectedBU] = useState("All BU");
     const { token } = useAuth();
+    const { t } = useTranslation();
     
     const mergedData = [
         ...new Map([
@@ -126,8 +129,8 @@ export default function Survey() {
                 } else {
                     showAlert({
                         icon: 'warning',
-                        title: 'Connection Ended',
-                        text: 'Unable to connect to the server. Please try again later.',
+                        title: t('alerts.connectionEnded'),
+                        text: t('alerts.connectionEndedText'),
                         timer: 2500,
                         showConfirmButton: false,
                     });
@@ -164,12 +167,12 @@ export default function Survey() {
         // No event found after loading
         return (
           <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
-            <p className="text-red-700 text-xl font-semibold mb-4">Survey/Vote not found.</p>
+            <p className="text-red-700 text-xl font-semibold mb-4">{t('survey.notFound')}</p>
             <button
               onClick={() => navigate('/')}
               className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
             >
-              Go Back Home
+              {t('common.goBackHome')}
             </button>
           </div>
         );
@@ -224,13 +227,14 @@ export default function Survey() {
                             <i className="ri-arrow-left-line"></i>
                         </button>
                     </div>
+                    <LanguageToggle />
                 </div>
                 <div className="flex items-start justify-between mb-2 px-2 gap-2">
                     <div className="flex-1 inline-flex flex-col justify-center items-start gap-2">
                         <div className="self-stretch inline-flex justify-start items-center gap-1">
-                            <div className="flex-1 justify-start text-red-700 text-lg font-semibold leading-tight">Your Voice Matters</div>
+                            <div className="flex-1 justify-start text-red-700 text-lg font-semibold leading-tight">{t('survey.yourVoiceMatters')}</div>
                         </div>
-                        <div className="self-stretch justify-start text-stone-600 text-sm font-medium leading-tight">Take part in active surveys and vote for your favorites!</div>
+                        <div className="self-stretch justify-start text-stone-600 text-sm font-medium leading-tight">{t('survey.subtitle')}</div>
                     </div>
                     <div className="w-1/3 relative rounded-lg overflow-hidden">
                     <img
@@ -252,7 +256,7 @@ export default function Survey() {
                 <div className="flex flex-col justify-start items-start gap-3 w-full">
                     {mergedData && mergedData.length > 0 ? (
                         mergedData.map((data, index) => {                                
-                            const { daysUntil } = dateTimeHelper(data);  
+                            const { daysUntil, daysUntilLabel } = dateTimeHelper(data);
                             const participated = Array.isArray(data.survey_participant) && data.survey_participant.length > 0;
                                                         
                             return (
@@ -274,7 +278,7 @@ export default function Survey() {
                                             <div className="self-stretch flex flex-col justify-center items-start">
                                                 <div className="self-stretch inline-flex justify-start items-center gap-4">
                                                     <div className="flex justify-start items-center gap-0.5">
-                                                        <div className="justify-start text-stone-600 text-xs font-normal leading-none"><i className="ri-time-line me-1"></i>Ends in: {daysUntil}</div>
+                                                        <div className="justify-start text-stone-600 text-xs font-normal leading-none"><i className="ri-time-line me-1"></i>{t('survey.endsIn', { time: daysUntilLabel })}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -289,7 +293,7 @@ export default function Survey() {
                                             className="px-3 py-2 rounded-lg shadow-md flex justify-center items-center gap-2 overflow-hidden"
                                             style={{ backgroundColor: '#DEBD69' }}
                                         >
-                                            <div className="text-white text-sm font-semibold leading-tight">Join In</div>
+                                            <div className="text-white text-sm font-semibold leading-tight">{t('survey.joinIn')}</div>
                                         </button>
                                         )}
                                 </div>
@@ -298,7 +302,7 @@ export default function Survey() {
                         )
                      : (
                         <div className="w-full justify-center text-center text-white font-medium py-4">
-                            No Survey / Vote available.
+                            {t('survey.none')}
                         </div>
                     )}
                 </div>

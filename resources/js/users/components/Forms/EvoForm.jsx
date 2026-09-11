@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form } from 'formik';
 import { PulseLoader } from 'react-spinners';
 import { useApiUrl } from '../context/ApiContext';
@@ -38,6 +39,7 @@ export default function EvoForm({ encryptedID, registered }) {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quotaStatus, setQuotaStatus] = useState({});
+    const { t } = useTranslation();
     const isReadOnly = !!registered; // kalau registered ada → semua input disabled
 
     useEffect(() => {
@@ -102,12 +104,12 @@ export default function EvoForm({ encryptedID, registered }) {
             const normalizedNumber = `${values.countryCode}${values.whatsapp_number.replace(/^0+/, '')}`;
 
             const result = await showAlert({
-                title: 'Confirmation',
-                html: `Pastikan nomor WhatsApp Anda sudah benar:<br><strong>${normalizedNumber}</strong><br><br>Lanjutkan registrasi?`,
+                title: t('event.whatsappConfirmTitle'),
+                html: t('event.whatsappConfirmHtml', { number: normalizedNumber }),
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, lanjutkan',
-                cancelButtonText: 'Batal',
+                confirmButtonText: t('event.whatsappConfirmYes'),
+                cancelButtonText: t('common.cancel'),
             });
 
             if (!result.isConfirmed) {
@@ -137,14 +139,14 @@ export default function EvoForm({ encryptedID, registered }) {
 
             showAlert({
                 icon: isOK ? 'success' : 'error',
-                title: isOK ? 'Registration Successful' : 'Registration Failed',
+                title: isOK ? t('event.registrationSuccessful') : t('event.registrationFailed'),
                 text: response.data.message,
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => navigate(`/`, { replace: true }));
         } catch (error) {
             console.error("Error submitting form:", error);
-            alert("An error occurred while submitting the form.");
+            alert(t('alerts.submitFormError'));
         } finally {
             setSubmitting(false);
             setIsSubmitting(false);
@@ -173,7 +175,7 @@ export default function EvoForm({ encryptedID, registered }) {
                             {/* PHONE NUMBER */}
                             <div className="mb-6">
                                 <label className="block text-gray-700 mb-2">
-                                    WhatsApp Number <span className="text-red-600">*</span>
+                                    {t('common.whatsappNumber')} <span className="text-red-600">*</span>
                                 </label>
                                 <div className="flex">
                                     <select
@@ -202,7 +204,7 @@ export default function EvoForm({ encryptedID, registered }) {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         disabled={isReadOnly}
-                                        placeholder="phone number"
+                                        placeholder={t('common.phoneNumber')}
                                         className="w-full border rounded-r p-2"
                                     />
                                 </div>
@@ -215,7 +217,7 @@ export default function EvoForm({ encryptedID, registered }) {
                             {/* FORM FIELDS */}
                             <div className="bg-red-700 p-4 mb-6 shadow-md">
                                 <div className="bg-white rounded-lg p-5">
-                                    <h3 className="text-red-700 font-light text-lg mb-4">Registration Form</h3>
+                                    <h3 className="text-red-700 font-light text-lg mb-4">{t('evo.registrationForm')}</h3>
 
                                     {formFields.map((field) => (
                                         <div key={field.name} className="mb-5">
@@ -267,12 +269,12 @@ export default function EvoForm({ encryptedID, registered }) {
                                                                     {option}
                                                                     {/* REGISTRATION STATUS */}
                                                                     {alreadySelected && (
-                                                                        <span className="ml-1 text-xs text-gray-400">(registered)</span>
+                                                                        <span className="ml-1 text-xs text-gray-400">{t('evo.registered')}</span>
                                                                     )}
 
                                                                     {/* QUOTA FULL — only shown if NOT registered */}
                                                                     {!alreadySelected && quotaStatus[option] && (
-                                                                        <span className="ml-1 text-xs text-red-600">(Quota Full)</span>
+                                                                        <span className="ml-1 text-xs text-red-600">{t('evo.quotaFull')}</span>
                                                                     )}
                                                                 </span>
                                                             </label>
@@ -311,12 +313,12 @@ export default function EvoForm({ encryptedID, registered }) {
 
                                                                     {/* REGISTRATION STATUS */}
                                                                     {alreadySelected && (
-                                                                        <span className="ml-1 text-xs text-gray-400">(registered)</span>
+                                                                        <span className="ml-1 text-xs text-gray-400">{t('evo.registered')}</span>
                                                                     )}
 
                                                                     {/* QUOTA FULL — only shown if NOT registered */}
                                                                     {!alreadySelected && quotaStatus[option] && (
-                                                                        <span className="ml-1 text-xs text-red-600">(Quota Full)</span>
+                                                                        <span className="ml-1 text-xs text-red-600">{t('evo.quotaFull')}</span>
                                                                     )}
                                                                 </span>
                                                             </label>
@@ -371,7 +373,7 @@ export default function EvoForm({ encryptedID, registered }) {
                                     {isSubmitting ? (
                                         <PulseLoader size={8} color="#fff" margin={2} speedMultiplier={0.75} />
                                     ) : (
-                                        'Submit'
+                                        t('common.submit')
                                     )}
                                 </button>
                             )}

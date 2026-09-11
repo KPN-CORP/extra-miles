@@ -49,13 +49,13 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-animated dropdown-lg p-0">
                     <form class="p-3">
-                        <input type="search" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                        <input type="search" class="form-control" placeholder="{{ __('Search ...') }}" aria-label="Recipient's username">
                     </form>
                 </div>
             </li>
 
             <li class="d-none">
-                <div class="nav-link" id="light-dark-mode" data-bs-toggle="tooltip" data-bs-placement="left" title="Theme Mode">
+                <div class="nav-link" id="light-dark-mode" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ __('Theme Mode') }}">
                     <i class="ri-moon-line fs-22"></i>
                 </div>
             </li>
@@ -66,30 +66,32 @@
                     <i class="ri-fullscreen-line fs-22"></i>
                 </a>
             </li>
-            <?php 
-                $lang = session('locale') ? session('locale') : env('APP_LOCALE', env('APP_FALLBACK_LOCALE'));
-            ?>
-            {{-- <li class="dropdown">
-                <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                    <img src="{{ asset('storage/img/flags/' . $lang . '.jpg')}}" alt="user-image" class="me-0 me-sm-1" height="12">
-                    <span class="align-middle d-none d-lg-inline-block">{{ $lang == 'id' ? 'Bahasa' : 'English' }}</span> <i class="ri-arrow-down-s-line d-none d-sm-inline-block align-middle"></i>
+            @php
+                // app()->getLocale() already reflects the session value applied
+                // by the 'locale' middleware, and unlike env() it survives
+                // `config:cache` on the cPanel deploy.
+                $lang = app()->getLocale();
+                $languages = ['en' => 'English', 'id' => 'Bahasa Indonesia'];
+            @endphp
+            <li class="dropdown">
+                <a class="nav-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false" title="{{ __('Language') }}">
+                    @include('layouts_.shared.flag', ['code' => $lang, 'uid' => 'current'])
+                    <span class="align-middle d-none d-lg-inline-block ms-1">{{ $languages[$lang] ?? $languages['en'] }}</span>
+                    <i class="ri-arrow-down-s-line d-none d-sm-inline-block align-middle"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated">
-                    <!-- English Option -->
-                    <a href="{{ route('language.switch', ['locale' => 'en']) }}" 
-                       class="dropdown-item {{ $lang === 'en' ? 'd-none' : '' }}" onclick="showLoader()">
-                        <img src="{{ asset('storage/img/flags/en.jpg') }}" alt="English" class="me-1" height="12">
-                        <span class="align-middle">English</span>
-                    </a>
-                
-                    <!-- Bahasa Option -->
-                    <a href="{{ route('language.switch', ['locale' => 'id']) }}"
-                       class="dropdown-item {{ $lang === 'id' ? 'd-none' : '' }}" onclick="showLoader()">
-                        <img src="{{ asset('storage/img/flags/id.jpg') }}" alt="Bahasa" class="me-1" height="12">
-                        <span class="align-middle">Bahasa</span>
-                    </a>
+                    @foreach ($languages as $code => $label)
+                        <a href="{{ route('language.switch', ['locale' => $code]) }}"
+                           class="dropdown-item {{ $lang === $code ? 'active' : '' }}" onclick="showLoader()">
+                            @include('layouts_.shared.flag', ['code' => $code, 'uid' => 'opt-'.$code])
+                            <span class="align-middle ms-1">{{ $label }}</span>
+                            @if ($lang === $code)
+                                <i class="ri-check-line ms-1 align-middle"></i>
+                            @endif
+                        </a>
+                    @endforeach
                 </div>
-            </li> --}}
+            </li>
 
             <li class="dropdown">
                 <a class="nav-link dropdown-toggle arrow-none nav-user px-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
@@ -108,7 +110,7 @@
                     <!-- item-->
                     <a href="{{ route('second', ['auth', 'lock-screen']) }}" class="dropdown-item d-none">
                         <i class="ri-key-2-fill fs-18 align-middle me-1"></i>
-                        <span>Change Password</span>
+                        <span>{{ __('Change Password') }}</span>
                     </a>
 
                     <!-- item-->
@@ -116,7 +118,7 @@
                         @csrf
                         <a onclick="event.preventDefault(); this.closest('form').submit();" class="dropdown-item">
                             <i class="ri-logout-box-line fs-18 align-middle me-1"></i>
-                            <span>Logout</span>
+                            <span>{{ __('Logout') }}</span>
                         </a>
                     </form>
                 </div>
@@ -127,15 +129,15 @@
         <div class="page-title-box mx-2">
             <div class="page-title-right">
                 <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item">{{ $parentLink }}</li>
-                    <li class="breadcrumb-item active">{{ $link }}</li>
+                    <li class="breadcrumb-item">{{ __($parentLink) }}</li>
+                    <li class="breadcrumb-item active">{{ __($link) }}</li>
                 </ol>
             </div>
             <h4 class="page-title">@if (!empty($back))
                 <a href="{{ route($back) }}" class="text-decoration-none me-2">
                     <i class="ri-arrow-left-line"></i>
                 </a>
-            @endif {{ $link }}</h4>
+            @endif {{ __($link) }}</h4>
         </div>
     </div>
 </div>

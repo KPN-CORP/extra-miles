@@ -12,20 +12,20 @@
                 }
 
                 if (typeof window.Swal === 'undefined') {
-                    if (window.confirm(this.dataset.text || 'Are you sure?')) {
+                    if (window.confirm(this.dataset.text || @json(__('Are you sure?')))) {
                         form.submit();
                     }
                     return;
                 }
 
                 window.Swal.fire({
-                    title: this.dataset.title || 'Are you sure?',
-                    text: this.dataset.text || 'This action cannot be undone.',
+                    title: this.dataset.title || @json(__('Are you sure?')),
+                    text: this.dataset.text || @json(__('This action cannot be undone.')),
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ab2f2b',
                     cancelButtonColor: '#aaa',
-                    confirmButtonText: this.dataset.confirm || 'Yes, continue'
+                    confirmButtonText: this.dataset.confirm || @json(__('Yes, continue'))
                 }).then(function (result) {
                     if (result.isConfirmed) {
                         form.submit();

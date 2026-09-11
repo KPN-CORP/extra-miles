@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const CountdownTimer = ({ endDateTime, onEnd }) => {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState({});
   const [eventEnded, setEventEnded] = useState(false);
 
@@ -41,7 +43,7 @@ const CountdownTimer = ({ endDateTime, onEnd }) => {
   return (
     <div className="w-full text-center justify-center">
       {eventEnded || !timeLeft ? (
-        <span>Event has ended.</span>
+        <span>{t('event.hasEnded')}</span>
       ) : (
         <span>
           {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s

@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Live Content'])
+@extends('layouts_.vertical', ['page_title' => __('Live Content')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -7,9 +7,9 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h4 class="page-title mb-0">Live Content</h4>
+        <h4 class="page-title mb-0">{{ __('Live Content') }}</h4>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createLiveModal">
-            Create Live
+            {{ __('Create Live') }}
         </button>
     </div>
     <div class="row">
@@ -23,7 +23,7 @@
                                     id="{{ strtolower(str_replace(' ', '-', $tab)) }}-tab" data-bs-toggle="tab"
                                     data-bs-target="#{{ strtolower(str_replace(' ', '-', $tab)) }}" type="button"
                                     role="tab">
-                                    {{ $tab }}
+                                    {{ __($tab) }}
                                 </button>
                             </li>
                         @endforeach
@@ -35,12 +35,12 @@
                                 <table id="liveActiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Title</th>
-                                            <th>Content Link</th>
-                                            <th>Created Date</th>
-                                            <th>Status</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Content Link') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -50,7 +50,7 @@
                                                 <td>{{ $Live->title }}</td>
                                                 <td>{{ $Live->content_link }}</td>
                                                 <td>{{ $Live->created_at }}</td>
-                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td><span class="badge bg-success">{{ __('Active') }}</span></td>
                                                 <td>
                                                     <button type="button" class="btn btn-outline-danger btn-sm archive-live-btn" data-id="{{ $Live->id }}">
                                                         <i class="ri-archive-line"></i>
@@ -75,11 +75,11 @@
                                 <table id="liveArchiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Title</th>
-                                            <th>Content Link</th>
-                                            <th>Status</th>
-                                            <th>Deleted At</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Content Link') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th>{{ __('Deleted At') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -88,7 +88,7 @@
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $liveA->title }}</td>
                                                 <td>{{ $liveA->content_link }}</td>
-                                                <td><span class="badge bg-danger">Archive</span></td>
+                                                <td><span class="badge bg-danger">{{ __('Archive') }}</span></td>
                                                 <td>{{ $liveA->deleted_at }}</td>
                                             </tr>
                                             @empty
@@ -109,24 +109,24 @@
             <form action="{{ route('live.store') }}" method="POST">
               @csrf
               <div class="modal-header">
-                <h5 class="modal-title" id="createLiveModalLabel">Create New Live Content</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="createLiveModalLabel">{{ __('Create New Live Content') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
               </div>
 
               <div class="modal-body">
                 <div class="mb-3">
-                  <label for="title" class="form-label">Title</label>
+                  <label for="title" class="form-label">{{ __('Title') }}</label>
                   <input type="text" class="form-control" id="title" name="title" required>
                 </div>
                 <div class="mb-3">
-                  <label for="content_link" class="form-label">Content Link</label>
+                  <label for="content_link" class="form-label">{{ __('Content Link') }}</label>
                   <textarea class="form-control" id="content_link" name="content_link" rows="3" required></textarea>
                 </div>
               </div>
 
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
               </div>
 
             </form>

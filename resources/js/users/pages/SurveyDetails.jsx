@@ -1,4 +1,6 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+import LanguageToggle from "../components/Layout/LanguageToggle";
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -39,6 +41,7 @@ export default function VoteList() {
     const [participated, setParticipated] = useState(participate);
     
     const [eventEnded, setEventEnded] = useState(false);
+    const { t } = useTranslation();
       
 
     const [selectedItem, setSelectedItem] = useState(null);
@@ -49,8 +52,8 @@ export default function VoteList() {
 
     const handleVoting = async (index) => {
         await showAlert({
-            title: "Success!",
-            text: `Your response has been recorded. Thanks a bunch for joining the survey!`,
+            title: t('survey.successTitle'),
+            text: t('survey.successText'),
             icon: "success",
             timer: 5000,
             showConfirmButton: false
@@ -69,8 +72,8 @@ export default function VoteList() {
             } catch (err) {
                 showAlert({
                     icon: 'warning',
-                    title: 'Connection Ended',
-                    text: 'Unable to connect to the server. Please try again later.',
+                    title: t('alerts.connectionEnded'),
+                    text: t('alerts.connectionEndedText'),
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
@@ -104,13 +107,13 @@ export default function VoteList() {
         // No event found after loading
         return (
           <div className="flex flex-col items-center justify-center h-screen bg-red-700 p-5">
-            <p className="text-white text-xl font-semibold mb-4">Survey/Vote not found.</p>
+            <p className="text-white text-xl font-semibold mb-4">{t('survey.notFound')}</p>
             <button
               onClick={() => window.history.back()}
               className="px-4 py-2 text-white rounded"
               style={{ backgroundColor: '#DEBD69' }}
             >
-              Go Back Home
+              {t('common.goBackHome')}
             </button>
           </div>
         );
@@ -139,8 +142,8 @@ export default function VoteList() {
                             <i className="ri-arrow-left-line"></i>
                         </button>
                     </div>
-                    <div className="flex-2 text-center text-white text-lg font-bold">Ongoing Survey</div>
-                    <div className="flex-1" /> {/* Spacer to balance layout */}
+                    <div className="flex-2 text-center text-white text-lg font-bold">{t('survey.ongoing')}</div>
+                    <LanguageToggle variant="onRed" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {data.banner && (
@@ -158,29 +161,29 @@ export default function VoteList() {
                         </>
                     )}
                     <div className="flex-col flex w-full text-center justify-center text-white text-2xl font-bold gap-1">
-                        <span className="text-white text-base font-medium">📝 Survey Closes In...</span>
+                        <span className="text-white text-base font-medium">{t('survey.closesIn')}</span>
                         <CountdownTimer
                             endDateTime={`${data.end_date} ${data.time_end}`}
                             onEnd={() => setEventEnded(true)}
                         />
                     </div>
                     <div className="w-full text-justify justify-start">
-                        <p className="text-white text-base font-semibold mb-2">Hi, {data.fullname}!👋</p>
+                        <p className="text-white text-base font-semibold mb-2">{t('survey.greeting', { name: data.fullname })}</p>
                         { participated ? (
-                            <p className="text-white text-sm font-normal">Thanks a bunch for taking part in
-                            <span className="font-semibold"> {data.title}</span> survey!</p>
+                            <p className="text-white text-sm font-normal">{t('survey.thanksParticipating')}
+                            <span className="font-semibold"> {data.title}</span>{t('survey.surveySuffix')}</p>
                         ) : eventEnded ? (
                             <div className="text-white text-base font-semibold">
-                                Survey has closed. Thank you for your interest! 🛑
+                                {t('survey.closed')}
                             </div>
                         ): (
-                            <div className="prose prose-sm leading-relaxed text-white max-w-none [&>p]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1 pl-2 pr-1">Thanks for attending the <span className="font-semibold">{data.title}</span> {parse(data.description)}</div>
+                            <div className="prose prose-sm leading-relaxed text-white max-w-none [&>p]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1 pl-2 pr-1">{t('survey.thanksAttending')} <span className="font-semibold">{data.title}</span> {parse(data.description)}</div>
                         )}
                     </div>
                     <div>
                         {/* Form */}
                         { participated || eventEnded ? (
-                            <button onClick={() => window.history.back()} className="w-full flex flex-col text-center text-red-700 font-medium shadow-lg px-3 py-2 rounded-lg" style={{ backgroundColor: '#DEBD69' }}>Go Back</button>
+                            <button onClick={() => window.history.back()} className="w-full flex flex-col text-center text-red-700 font-medium shadow-lg px-3 py-2 rounded-lg" style={{ backgroundColor: '#DEBD69' }}>{t('common.goBack')}</button>
                         ) : (
                             <SurveyForm participated={participated} setParticipated={setParticipated} />
                         )}

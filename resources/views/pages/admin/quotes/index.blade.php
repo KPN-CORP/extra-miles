@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Quotes & Affirmation'])
+@extends('layouts_.vertical', ['page_title' => __('Quotes & Affirmation')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -7,9 +7,9 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h4 class="page-title mb-0">Quotes &amp; Affirmation</h4>
+        <h4 class="page-title mb-0">{{ __('Quotes & Affirmation') }}</h4>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createQuoteModal">
-            Create Quote
+            {{ __('Create Quote') }}
         </button>
     </div>
     <div class="row">
@@ -23,7 +23,7 @@
                                     id="{{ strtolower(str_replace(' ', '-', $tab)) }}-tab" data-bs-toggle="tab"
                                     data-bs-target="#{{ strtolower(str_replace(' ', '-', $tab)) }}" type="button"
                                     role="tab">
-                                    {{ $tab }}
+                                    {{ __($tab) }}
                                 </button>
                             </li>
                         @endforeach
@@ -35,12 +35,12 @@
                                 <table id="quotesActiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Created Date</th>
-                                            <th>Author</th>
-                                            <th>Quote</th>
-                                            <th>Status</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('Author') }}</th>
+                                            <th>{{ __('Quote') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -50,7 +50,7 @@
                                                 <td>{{ $Quote->created_at }}</td>
                                                 <td>{{ $Quote->author }}</td>
                                                 <td>{{ $Quote->quotes }}</td>
-                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td><span class="badge bg-success">{{ __('Active') }}</span></td>
                                                 <td>
                                                     <a href="#"
                                                         class="btn btn-outline-warning btn-sm edit-quote-btn"
@@ -84,12 +84,12 @@
                                 <table id="quotesArchiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Created Date</th>
-                                            <th>Author</th>
-                                            <th>Quote</th>
-                                            <th>Status</th>
-                                            <th>Archive At</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('Author') }}</th>
+                                            <th>{{ __('Quote') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th>{{ __('Archive At') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -99,7 +99,7 @@
                                                 <td>{{ $Quote->created_at }}</td>
                                                 <td>{{ $Quote->author }}</td>
                                                 <td>{{ $Quote->quotes }}</td>
-                                                <td><span class="badge bg-danger">Archive</span></td>
+                                                <td><span class="badge bg-danger">{{ __('Archive') }}</span></td>
                                                 <td>{{ $Quote->deleted_at }}</td>
                                             </tr>
                                             @empty
@@ -120,24 +120,24 @@
             <form action="{{ route('quotes.store') }}" method="POST">
               @csrf
               <div class="modal-header">
-                <h5 class="modal-title" id="createQuoteModalLabel">Create New Quote</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="createQuoteModalLabel">{{ __('Create New Quote') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
               </div>
 
               <div class="modal-body">
                 <div class="mb-3">
-                  <label for="author" class="form-label">Author</label>
+                  <label for="author" class="form-label">{{ __('Author') }}</label>
                   <input type="text" class="form-control" id="author" name="author" required>
                 </div>
                 <div class="mb-3">
-                  <label for="quote" class="form-label">Quote</label>
+                  <label for="quote" class="form-label">{{ __('Quote') }}</label>
                   <textarea class="form-control" id="quote" name="quote" rows="3" required></textarea>
                 </div>
               </div>
 
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
               </div>
 
             </form>
@@ -151,22 +151,22 @@
               @method('PUT')
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="editQuoteModalLabel">Edit Quote</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <h5 class="modal-title" id="editQuoteModalLabel">{{ __('Edit Quote') }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="edit-author" class="form-label">Author</label>
+                        <label for="edit-author" class="form-label">{{ __('Author') }}</label>
                         <input type="text" name="author" class="form-control" id="edit-author" required>
                     </div>
                     <div class="mb-3">
-                        <label for="edit-quotes" class="form-label">Quote</label>
+                        <label for="edit-quotes" class="form-label">{{ __('Quote') }}</label>
                         <textarea name="quotes" class="form-control" id="edit-quotes" rows="4" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                  <button type="submit" class="btn btn-primary">Update Quote</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                  <button type="submit" class="btn btn-primary">{{ __('Update Quote') }}</button>
                 </div>
               </div>
           </form>

@@ -251,8 +251,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+// app.js is bundled into every admin page, so without this guard the fetch
+// below fires everywhere -- and pages outside goal-setting answer it with HTML,
+// which then fails JSON.parse.
 var firstSelect = document.getElementById("uom"); // Assuming your first select has an ID "uom1"
-populateUoMSelect(firstSelect);
+if (firstSelect) {
+    populateUoMSelect(firstSelect);
+}
 
 function checkEmptyFields(submitType) {
     const alertField = $(".mandatory-field");

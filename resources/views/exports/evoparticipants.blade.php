@@ -1,15 +1,15 @@
 <table>
     <thead>
         <tr>
-            <th>No</th>
-            <th>Program</th>
-            <th>Participant</th>
-            <th>Job Level</th>
-            <th>Department</th>
-            <th>BU</th>
-            <th>Location</th>
-            <th>Submitted At</th>
-            <th>WhatsApp</th>
+            <th>{{ __('No') }}</th>
+            <th>{{ __('Program') }}</th>
+            <th>{{ __('Participant') }}</th>
+            <th>{{ __('Job Level') }}</th>
+            <th>{{ __('Department') }}</th>
+            <th>{{ __('BU') }}</th>
+            <th>{{ __('Location') }}</th>
+            <th>{{ __('Submitted At') }}</th>
+            <th>{{ __('WhatsApp') }}</th>
             {{-- <th>#</th> --}}
         </tr>
     </thead>

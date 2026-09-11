@@ -6,6 +6,7 @@ use App\Enums\WellnessRegistrationSource;
 use App\Enums\WellnessRegistrationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
 
 /**
@@ -74,6 +75,14 @@ class WellnessActivityRegistration extends Model
             ->orderBy('id');
     }
 
+    /**
+     * At most one feedback per registration -- resubmitting overwrites it.
+     */
+    public function feedback()
+    {
+        return $this->hasOne(WellnessActivityFeedback::class, 'wellness_activity_registration_id');
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
@@ -82,6 +91,20 @@ class WellnessActivityRegistration extends Model
     public function hasAttended(): bool
     {
         return $this->attended_at !== null;
+    }
+
+    /**
+     * Feedback is only for people who were actually there, and only once the
+     * session is over -- attendance alone is not enough, because the QR opens
+     * before the session starts.
+     */
+    public function canSubmitFeedback(?Carbon $at = null): bool
+    {
+        $at ??= now();
+
+        return $this->attended_at !== null
+            && $this->schedule !== null
+            && $at->gte($this->schedule->end_at);
     }
 
     public function scopeHoldingSeat($query)

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import LanguageToggle from '../components/Layout/LanguageToggle';
 import { useNavigate } from "react-router-dom"
 import { useApiUrl } from "../components/context/ApiContext"; // Assuming you have a context for API URL
 import EvoSection from '../components/sections/EvoSection'; // Assuming you have a NewsCard component
@@ -17,15 +19,15 @@ const Home = () => {
     const apiUrl = useApiUrl(); // Get the API URL from context
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const { token, user } = useAuth(); 
-    const [loadingBanner, setLoadingBanner] = useState(true);        
+    const { token, user } = useAuth();
+    const { t } = useTranslation();
 
     useEffect(() => {        
         if (!token) {
             showAlert({
                 icon: 'warning',
-                title: 'Session Ended',
-                text: 'Your session has ended.',
+                title: t('alerts.sessionEnded'),
+                text: t('alerts.sessionEndedText'),
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => {
@@ -45,10 +47,6 @@ const Home = () => {
         return <PageLoader />;
       }
 
-    const handleImageLoad = () => {
-        setLoadingBanner(false);
-    };    
-
     return (
         <>
             <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
@@ -65,8 +63,9 @@ const Home = () => {
                     <div className="flex flex-col gap-2">
                     {/* Employee Section */}
                         <div className="flex items-center justify-between">
+                            <LanguageToggle />
                             {user?.fullname && (
-                                <div className="text-red-700 text-xs font-bold">Welcome back, {user?.fullname}!</div>
+                                <div className="text-red-700 text-xs font-bold">{t('home.welcomeBack', { name: user?.fullname })}</div>
                             )}
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Wellness Activity Types'])
+@extends('layouts_.vertical', ['page_title' => __('Wellness Activity Types')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -8,9 +8,9 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h4 class="page-title mb-0">Wellness Activity Types</h4>
+        <h4 class="page-title mb-0">{{ __('Wellness Activity Types') }}</h4>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTypeModal">
-            <i class="ri-add-line me-1"></i> Create Type
+            <i class="ri-add-line me-1"></i> {{ __('Create Type') }}
         </button>
     </div>
 
@@ -23,12 +23,12 @@
                     <ul class="nav nav-tabs mb-3" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#type-active" type="button" role="tab">
-                                Active <span class="badge bg-secondary ms-1">{{ $types->count() }}</span>
+                                {{ __('Active') }} <span class="badge bg-secondary ms-1">{{ $types->count() }}</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#type-archive" type="button" role="tab">
-                                Archive <span class="badge bg-secondary ms-1">{{ $archived->count() }}</span>
+                                {{ __('Archive') }} <span class="badge bg-secondary ms-1">{{ $archived->count() }}</span>
                             </button>
                         </li>
                     </ul>
@@ -39,12 +39,12 @@
                                 <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Name</th>
-                                            <th>Description</th>
-                                            <th>Activities</th>
-                                            <th>Status</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Name') }}</th>
+                                            <th>{{ __('Description') }}</th>
+                                            <th>{{ __('Activities') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -56,7 +56,7 @@
                                                 <td>{{ $type->activities_count }}</td>
                                                 <td>
                                                     <span class="badge {{ $type->is_active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
-                                                        {{ $type->is_active ? 'Active' : 'Inactive' }}
+                                                        {{ $type->is_active ? __('Active') : __('Inactive') }}
                                                     </span>
                                                 </td>
                                                 <td>
@@ -72,7 +72,7 @@
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger btn-sm js-archive"
                                                         data-form="archive-type-{{ $type->id }}"
-                                                        data-text="This activity type will be archived.">
+                                                        data-text="{{ __('This activity type will be archived.') }}">
                                                         <i class="ri-archive-line"></i>
                                                     </button>
                                                     <form id="archive-type-{{ $type->id }}" class="d-none"
@@ -94,11 +94,11 @@
                                 <table class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Name</th>
-                                            <th>Description</th>
-                                            <th>Archived At</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Name') }}</th>
+                                            <th>{{ __('Description') }}</th>
+                                            <th>{{ __('Archived At') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -112,7 +112,7 @@
                                                     <form action="{{ route('wellness.types.restore', $type->encrypted_id) }}" method="POST">
                                                         @csrf
                                                         <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                                            <i class="ri-arrow-go-back-line"></i> Restore
+                                                            <i class="ri-arrow-go-back-line"></i> {{ __('Restore') }}
                                                         </button>
                                                     </form>
                                                 </td>
@@ -136,26 +136,26 @@
                 <form action="{{ route('wellness.types.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title">Create Activity Type</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ __('Create Activity Type') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="create-type-name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <label for="create-type-name" class="form-label">{{ __('Name') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="create-type-name" name="name" maxlength="100" required>
                         </div>
                         <div class="mb-3">
-                            <label for="create-type-description" class="form-label">Description</label>
+                            <label for="create-type-description" class="form-label">{{ __('Description') }}</label>
                             <textarea class="form-control" id="create-type-description" name="description" rows="3"></textarea>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="create-type-active" name="is_active" value="1" checked>
-                            <label class="form-check-label" for="create-type-active">Active</label>
+                            <label class="form-check-label" for="create-type-active">{{ __('Active') }}</label>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                     </div>
                 </form>
             </div>
@@ -170,26 +170,26 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-header">
-                        <h5 class="modal-title">Edit Activity Type</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">{{ __('Edit Activity Type') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="edit-type-name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <label for="edit-type-name" class="form-label">{{ __('Name') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="edit-type-name" name="name" maxlength="100" required>
                         </div>
                         <div class="mb-3">
-                            <label for="edit-type-description" class="form-label">Description</label>
+                            <label for="edit-type-description" class="form-label">{{ __('Description') }}</label>
                             <textarea class="form-control" id="edit-type-description" name="description" rows="3"></textarea>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="edit-type-active" name="is_active" value="1">
-                            <label class="form-check-label" for="edit-type-active">Active</label>
+                            <label class="form-check-label" for="edit-type-active">{{ __('Active') }}</label>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
                     </div>
                 </form>
             </div>

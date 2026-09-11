@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import LanguageToggle from '../components/Layout/LanguageToggle';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import parse from 'html-react-parser';
@@ -7,8 +9,16 @@ import { motion } from 'motion/react';
 import { useApiUrl } from '../components/Context/ApiContext';
 import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
-import PageLoader from '../components/Loader/PageLoader';
+import CardLoader from '../components/Loader/CardLoader';
 import { formatSession, seatLabel, statusStyle } from '../components/Helper/wellnessHelper';
+import {
+    ACTIVITIES_KEY,
+    activityKey,
+    getCached,
+    invalidateWellness,
+    loadWellness,
+    MY_REGISTRATIONS_KEY,
+} from '../components/Helper/wellnessCache';
 
 const pageVariants = {
     initial: { opacity: 0, x: 0 },
@@ -21,46 +31,63 @@ export default function WellnessDetails() {
     const navigate = useNavigate();
     const apiUrl = useApiUrl();
     const { token } = useAuth();
+    const { t } = useTranslation();
 
-    const [activity, setActivity] = useState(null);
-    const [loading, setLoading] = useState(true);
+    // The list page starts this request on tap, so by the time we mount it is
+    // usually already in flight -- or cached, in which case we skip the skeleton.
+    const cacheKey = activityKey(id);
+    const cached = getCached(cacheKey);
+    const [activity, setActivity] = useState(cached ?? null);
+    const [loading, setLoading] = useState(cached === undefined);
     const [submitting, setSubmitting] = useState(null);
 
-    const fetchActivity = useCallback(async () => {
+    const fetchActivity = useCallback(async ({ force = false } = {}) => {
         try {
-            const res = await axios.get(`${apiUrl}/api/wellness/activities/${encodeURIComponent(id)}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setActivity(res.data);
+            setActivity(await loadWellness(cacheKey, apiUrl, token, { force }));
         } catch (err) {
+            // Only bounce out when there is nothing on screen to fall back to.
+            if (getCached(cacheKey) !== undefined) return;
+
             showAlert({
                 icon: 'warning',
-                title: 'Not Available',
-                text: err.response?.data?.error || 'This activity could not be loaded.',
+                title: t('wellness.notAvailable'),
+                text: err.response?.data?.error || t('wellness.activityLoadFailed'),
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => navigate('/wellness'));
         } finally {
             setLoading(false);
         }
-    }, [apiUrl, id, token, navigate]);
+    }, [apiUrl, cacheKey, token, navigate, t]);
 
     useEffect(() => {
         fetchActivity();
     }, [fetchActivity]);
+
+    // Registering or cancelling moves seat counts on the list and adds a row to
+    // My Wellness, so those cached payloads have to go with it.
+    const refreshAfterWrite = () => {
+        invalidateWellness([ACTIVITIES_KEY, MY_REGISTRATIONS_KEY]);
+        fetchActivity({ force: true });
+    };
 
     const handleRegister = async (schedule) => {
         const when = formatSession(schedule);
 
         const confirmed = await showAlert({
             icon: schedule.is_full ? 'warning' : 'question',
-            title: schedule.is_full ? 'Session is full' : 'Register for this session?',
+            title: schedule.is_full
+                ? t('wellness.registerConfirm.fullTitle')
+                : t('wellness.registerConfirm.title'),
             html: schedule.is_full
-                ? `This session is full. You can join the <b>waitlist</b> and we will move you up when a seat frees up.<br/><br/>${when.full}`
-                : `${when.full}${schedule.location ? `<br/>${schedule.location}` : ''}<br/><br/>Your registration will be reviewed by the admin.`,
+                ? t('wellness.registerConfirm.fullHtml', { when: when.full })
+                : t('wellness.registerConfirm.html', {
+                    when: when.full,
+                    location: schedule.location ? `<br/>${schedule.location}` : '',
+                }),
             showCancelButton: true,
-            confirmButtonText: schedule.is_full ? 'Join waitlist' : 'Register',
-            cancelButtonText: 'Not now',
+            confirmButtonText: schedule.is_full ? t('wellness.joinWaitlist') : t('wellness.register'),
+            cancelButtonText: t('wellness.registerConfirm.notNow'),
         });
 
         if (!confirmed.isConfirmed) return;
@@ -76,18 +103,18 @@ export default function WellnessDetails() {
 
             await showAlert({
                 icon: 'success',
-                title: 'Done',
+                title: t('wellness.registerConfirm.doneTitle'),
                 text: res.data.message,
                 timer: 2600,
                 showConfirmButton: false,
             });
 
-            fetchActivity();
+            refreshAfterWrite();
         } catch (err) {
             showAlert({
                 icon: 'error',
-                title: 'Could not register',
-                text: err.response?.data?.error || 'Something went wrong. Please try again.',
+                title: t('wellness.registerConfirm.failedTitle'),
+                text: err.response?.data?.error || t('alerts.genericRetry'),
             });
         } finally {
             setSubmitting(null);
@@ -97,11 +124,11 @@ export default function WellnessDetails() {
     const handleCancel = async (schedule) => {
         const confirmed = await showAlert({
             icon: 'warning',
-            title: 'Cancel your registration?',
-            text: 'Your seat will be released to the next person on the waitlist.',
+            title: t('wellness.cancelConfirm.title'),
+            text: t('wellness.cancelConfirm.text'),
             showCancelButton: true,
-            confirmButtonText: 'Yes, cancel it',
-            cancelButtonText: 'Keep it',
+            confirmButtonText: t('wellness.cancelConfirm.yes'),
+            cancelButtonText: t('wellness.cancelConfirm.no'),
         });
 
         if (!confirmed.isConfirmed) return;
@@ -117,25 +144,55 @@ export default function WellnessDetails() {
 
             await showAlert({
                 icon: 'success',
-                title: 'Cancelled',
-                text: 'Your registration has been cancelled.',
+                title: t('wellness.cancelConfirm.doneTitle'),
+                text: t('wellness.cancelConfirm.doneText'),
                 timer: 2200,
                 showConfirmButton: false,
             });
 
-            fetchActivity();
+            refreshAfterWrite();
         } catch (err) {
             showAlert({
                 icon: 'error',
-                title: 'Could not cancel',
-                text: err.response?.data?.error || 'Something went wrong. Please try again.',
+                title: t('wellness.cancelConfirm.failedTitle'),
+                text: err.response?.data?.error || t('alerts.genericRetry'),
             });
         } finally {
             setSubmitting(null);
         }
     };
 
-    if (loading) return <PageLoader />;
+    const header = (title) => (
+        <div className="flex items-center gap-2">
+            <button onClick={() => navigate('/wellness')} className="text-red-700 text-xl" aria-label={t('wellness.back')}>
+                <i className="ri-arrow-left-line"></i>
+            </button>
+            <div className="flex-1 text-center text-red-700 text-base font-semibold truncate">{title}</div>
+            <LanguageToggle />
+        </div>
+    );
+
+    // Only the body waits -- the page chrome is real from the first frame. A
+    // full-screen splash here read as if the app were relaunching.
+    if (loading) {
+        return (
+            <motion.div
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.25 }}
+                className="w-full min-h-screen bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto"
+            >
+                <div className="px-5 pt-5 pb-24 flex flex-col gap-4">
+                    {header(t('wellness.title'))}
+                    <CardLoader />
+                    <CardLoader />
+                </div>
+            </motion.div>
+        );
+    }
+
     if (!activity) return null;
 
     return (
@@ -148,15 +205,7 @@ export default function WellnessDetails() {
             className="w-full min-h-screen bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto"
         >
             <div className="px-5 pt-5 pb-24 flex flex-col gap-4">
-                <div className="flex items-center gap-2">
-                    <button onClick={() => navigate('/wellness')} className="text-red-700 text-xl" aria-label="Back">
-                        <i className="ri-arrow-left-line"></i>
-                    </button>
-                    <div className="flex-1 text-center text-red-700 text-base font-semibold truncate">
-                        {activity.name}
-                    </div>
-                    <div className="w-6"></div>
-                </div>
+                {header(activity.name)}
 
                 {activity.image && (
                     <img
@@ -181,11 +230,11 @@ export default function WellnessDetails() {
                     )}
                 </div>
 
-                <div className="text-stone-700 text-xs font-semibold">Available Sessions</div>
+                <div className="text-stone-700 text-xs font-semibold">{t('wellness.availableSessions')}</div>
 
                 {activity.schedules.length === 0 ? (
                     <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                        <p className="text-stone-500 text-xs">No upcoming sessions for this activity.</p>
+                        <p className="text-stone-500 text-xs">{t('wellness.noSessions')}</p>
                     </div>
                 ) : (
                     activity.schedules.map((schedule) => {
@@ -228,17 +277,17 @@ export default function WellnessDetails() {
                                             onClick={() => handleCancel(schedule)}
                                             className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-white text-red-700 ring-1 ring-red-700 ring-inset disabled:opacity-50"
                                         >
-                                            {busy ? 'Please wait...' : 'Cancel'}
+                                            {busy ? t('common.pleaseWait') : t('wellness.cancel')}
                                         </button>
                                     ) : !schedule.registration_open ? (
-                                        <span className="text-[10px] text-stone-400">Registration closed</span>
+                                        <span className="text-[10px] text-stone-400">{t('wellness.registrationClosed')}</span>
                                     ) : (
                                         <button
                                             disabled={busy}
                                             onClick={() => handleRegister(schedule)}
                                             className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white shadow-sm disabled:opacity-50"
                                         >
-                                            {busy ? 'Please wait...' : schedule.is_full ? 'Join waitlist' : 'Register'}
+                                            {busy ? t('common.pleaseWait') : schedule.is_full ? t('wellness.joinWaitlist') : t('wellness.register')}
                                         </button>
                                     )}
                                 </div>

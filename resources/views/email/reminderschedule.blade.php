@@ -4,7 +4,7 @@
     {{-- <title>Reminder Schedule</title> --}}
 </head>
 <body>
-    <p><strong>Dear {{ $name }},</strong></p>
+    <p><strong>{{ __('Dear :name,', ['name' => $name]) }}</strong></p>
     {!! $messages !!}
 </body>
 </html>

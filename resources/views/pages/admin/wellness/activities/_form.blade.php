@@ -9,9 +9,9 @@
     // runs ClassicEditor.create('#description'). A plain id="status" or
     // id="description" here silently inherits both.
     $statusHelp = [
-        'draft' => 'Only visible here. Use while you are still setting up schedules.',
-        'active' => 'Listed in the employee app, so people can register.',
-        'inactive' => 'Hidden from the employee app. Existing registrations are kept.',
+        'draft' => __('Only visible here. Use while you are still setting up schedules.'),
+        'active' => __('Listed in the employee app, so people can register.'),
+        'inactive' => __('Hidden from the employee app. Existing registrations are kept.'),
     ];
     $statusIcon = [
         'draft' => 'ri-draft-line',
@@ -25,17 +25,17 @@
     <div class="col-lg-8">
         <div class="card h-100 mb-0">
             <div class="card-header bg-transparent py-2">
-                <h5 class="card-title mb-0 fs-6">Activity Details</h5>
+                <h5 class="card-title mb-0 fs-6">{{ __('Activity Details') }}</h5>
             </div>
             <div class="card-body">
                 <div class="mb-3">
                     <label for="wa_name" class="form-label">
-                        Activity Name <span class="text-danger">*</span>
+                        {{ __('Activity Name') }} <span class="text-danger">*</span>
                     </label>
                     <input type="text"
                         class="form-control @error('name') is-invalid @enderror"
                         id="wa_name" name="name" maxlength="150" required
-                        placeholder="e.g. Morning Yoga"
+                        placeholder="{{ __('e.g. Morning Yoga') }}"
                         value="{{ old('name', $activity?->name) }}">
                     @error('name')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -44,22 +44,22 @@
 
                 <div class="mb-3">
                     <label for="wa_type" class="form-label">
-                        Activity Type <span class="text-danger">*</span>
+                        {{ __('Activity Type') }} <span class="text-danger">*</span>
                     </label>
 
                     @if ($types->isEmpty())
                         <div class="alert alert-warning d-flex align-items-start gap-2 mb-0" role="alert">
                             <i class="ri-error-warning-line mt-1"></i>
                             <div>
-                                <strong>No active activity types yet.</strong>
+                                <strong>{{ __('No active activity types yet.') }}</strong>
                                 <div class="small">
-                                    Every activity belongs to a type, so create one first.
+                                    {{ __('Every activity belongs to a type, so create one first.') }}
                                     @can('viewmenuwellnesstype')
                                         <a href="{{ route('admin.wellness.types.index') }}" class="alert-link">
-                                            Go to Activity Types
+                                            {{ __('Go to Activity Types') }}
                                         </a>
                                     @else
-                                        Ask an administrator to add one.
+                                        {{ __('Ask an administrator to add one.') }}
                                     @endcan
                                 </div>
                             </div>
@@ -67,7 +67,7 @@
                     @else
                         <select class="form-select @error('wellness_activity_type_id') is-invalid @enderror"
                             id="wa_type" name="wellness_activity_type_id" required>
-                            <option value="">Select a type...</option>
+                            <option value="">{{ __('Select a type...') }}</option>
                             @foreach ($types as $type)
                                 <option value="{{ $type->id }}"
                                     @selected(old('wellness_activity_type_id', $activity?->wellness_activity_type_id) == $type->id)>
@@ -83,7 +83,7 @@
 
                 <div class="mb-3">
                     <label class="form-label d-block">
-                        Registration Method <span class="text-danger">*</span>
+                        {{ __('Registration Method') }} <span class="text-danger">*</span>
                     </label>
 
                     @foreach ($methods as $value => $label)
@@ -112,21 +112,20 @@
 
                     @if ($activity && $activity->registrations()->exists())
                         <div class="form-text text-warning">
-                            <i class="ri-alert-line me-1"></i>This activity already has registrations.
-                            Changing the method does not restatus them.
+                            <i class="ri-alert-line me-1"></i>{{ __('This activity already has registrations. Changing the method does not restatus them.') }}
                         </div>
                     @endif
                 </div>
 
                 <div class="mb-0">
-                    <label for="wa_description" class="form-label">Description</label>
+                    <label for="wa_description" class="form-label">{{ __('Description') }}</label>
                     <textarea class="form-control @error('description') is-invalid @enderror"
                         id="wa_description" name="description" rows="8"
-                        placeholder="What is this activity, who is it for, and what should people bring?">{{ old('description', $activity?->description) }}</textarea>
+                        placeholder="{{ __('What is this activity, who is it for, and what should people bring?') }}">{{ old('description', $activity?->description) }}</textarea>
                     @error('description')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="form-text">Shown to employees on the activity page in the app.</div>
+                    <div class="form-text">{{ __('Shown to employees on the activity page in the app.') }}</div>
                 </div>
             </div>
         </div>
@@ -136,7 +135,7 @@
     <div class="col-lg-4">
         <div class="card mb-3">
             <div class="card-header bg-transparent py-2">
-                <h5 class="card-title mb-0 fs-6">Visibility</h5>
+                <h5 class="card-title mb-0 fs-6">{{ __('Visibility') }}</h5>
             </div>
             <div class="card-body">
                 @foreach ($statuses as $value => $label)
@@ -161,19 +160,19 @@
 
         <div class="card mb-0">
             <div class="card-header bg-transparent py-2">
-                <h5 class="card-title mb-0 fs-6">Banner Image</h5>
+                <h5 class="card-title mb-0 fs-6">{{ __('Banner Image') }}</h5>
             </div>
             <div class="card-body">
                 {{-- Preview: the saved banner on edit, swapped live when a new file is picked. --}}
                 <img id="wa_image_preview"
                     src="{{ $activity?->image ? url('/images/'.$activity->image) : '' }}"
-                    alt="Banner preview"
+                    alt="{{ __('Banner preview') }}"
                     class="img-fluid rounded border mb-2 {{ $activity?->image ? '' : 'd-none' }}"
                     style="max-height: 150px;">
 
                 <div id="wa_image_empty" class="text-center text-muted border rounded py-3 mb-2 {{ $activity?->image ? 'd-none' : '' }}">
                     <i class="ri-image-add-line fs-3 d-block"></i>
-                    <span class="small">No banner selected</span>
+                    <span class="small">{{ __('No banner selected') }}</span>
                 </div>
 
                 <input type="file"
@@ -184,9 +183,9 @@
                 @enderror
 
                 <div class="form-text">
-                    JPG or PNG, max 2&nbsp;MB.
+                    {{ __('JPG or PNG, max 2 MB.') }}
                     @if ($activity?->image)
-                        Uploading a new file replaces the current one.
+                        {{ __('Uploading a new file replaces the current one.') }}
                     @endif
                 </div>
             </div>
@@ -195,18 +194,22 @@
 </div>
 
 @push('scripts')
-    {{-- CKEditor is loaded globally by script.blade.php, which also auto-binds
-         to #description. This form deliberately uses its own id and initialises
-         the editor here, so the field does not depend on that global hook. --}}
+    {{-- script.blade.php auto-binds CKEditor to #description. This form
+         deliberately uses its own id and initialises the editor here, so the
+         field does not depend on that global hook. The library itself is fetched
+         on demand through window.ckeditorReady() (also defined there), so list
+         pages never pay for it. --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var textarea = document.getElementById('wa_description');
 
-            if (textarea && typeof ClassicEditor !== 'undefined') {
-                ClassicEditor
-                    .create(textarea, {
-                        toolbar: ['heading', '|', 'bold', 'italic', '|', 'bulletedList', 'numberedList', '|', 'link', '|', 'undo', 'redo'],
-                        removePlugins: ['Image', 'ImageToolbar', 'EasyImage', 'ImageUpload', 'MediaEmbed', 'CKFinder'],
+            if (textarea) {
+                window.ckeditorReady()
+                    .then(function () {
+                        return ClassicEditor.create(textarea, {
+                            toolbar: ['heading', '|', 'bold', 'italic', '|', 'bulletedList', 'numberedList', '|', 'link', '|', 'undo', 'redo'],
+                            removePlugins: ['Image', 'ImageToolbar', 'EasyImage', 'ImageUpload', 'MediaEmbed', 'CKFinder'],
+                        });
                     })
                     .catch(function (error) {
                         // Leaving the plain textarea in place is a fine fallback.

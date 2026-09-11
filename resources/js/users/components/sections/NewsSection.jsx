@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/bundle";
@@ -18,13 +19,17 @@ export default () => {
   const apiUrl = useApiUrl();
   const { token } = useAuth();
   const [latestNews, setLatestNews] = useState([]);
-  const [isImageLoaded, setIsImageLoaded] = useState(false); // State to track image load
+  // Keyed per article: one shared boolean made every slide wait on whichever
+  // image happened to decode first.
+  const [loadedImages, setLoadedImages] = useState({});
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation();
   
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await axios.get(`${apiUrl}/api/news`, {
+        // Server sorts by publish_date desc and returns only the 3 we render.
+        const res = await axios.get(`${apiUrl}/api/news?limit=3`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
@@ -42,18 +47,12 @@ export default () => {
             : [e.businessUnit],
         }));
   
-        // Urutkan berdasarkan created_at (terbaru di atas)
-        const sortedNews = [...newsData].sort((a, b) => new Date(b.publish_date) - new Date(a.publish_date));
-  
-        // Ambil 3 berita terbaru
-        const latest = sortedNews.slice(0, 3);
-  
-        setLatestNews(latest);
+        setLatestNews(newsData);
       } catch (err) {
         showAlert({
           icon: "warning",
-          title: "Connection Ended",
-          text: "Unable to connect to the server. Please try again later.",
+          title: t('alerts.connectionEnded'),
+          text: t('alerts.connectionEndedText'),
           timer: 2500,
           showConfirmButton: false,
         }).then(() => {
@@ -67,6 +66,11 @@ export default () => {
     if (token) fetchNews();
   }, [apiUrl, token]);
 
+  // Settles the skeleton on success *and* failure -- without the error case a
+  // broken image left the loader animating forever over the card.
+  const settleImage = (id) =>
+    setLoadedImages((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
+
   if (loading) {
     return <NewsSectionLoader />;
   }
@@ -75,8 +79,8 @@ export default () => {
     <div className="flex flex-col gap-2">
       {/* Header Section */}
       <div className="flex items-center justify-between">
-        <div className="text-red-700 text-sm font-bold">News Update!</div>
-        <div onClick={() => navigate(`/news`)} className="text-stone-600 text-xs font-medium cursor-pointer">Show All <i className="ri-arrow-right-line"></i></div>
+        <div className="text-red-700 text-sm font-bold">{t('home.newsUpdate')}</div>
+        <div onClick={() => navigate(`/news`)} className="text-stone-600 text-xs font-medium cursor-pointer">{t('common.showAll')} <i className="ri-arrow-right-line"></i></div>
       </div>
 
       {/* Swiper Container */}
@@ -91,7 +95,7 @@ export default () => {
           {/* Slides */}
           {latestNews.map((item) => {
             const newsDate = new Date(item.publish_date);
-            const day = newsDate.toLocaleDateString("id-ID", {
+            const day = newsDate.toLocaleDateString(i18n.resolvedLanguage === "id" ? "id-ID" : "en-US", {
               weekday: "long",
               day: "2-digit",
               month: "long",
@@ -105,16 +109,17 @@ export default () => {
                     {/* Lazy Loaded Image */}
                     <img
                       className={`w-full h-full object-cover transition-opacity duration-300 ${
-                        isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                        loadedImages[item.encrypted_id] ? 'opacity-100' : 'opacity-0'}`}
                       src={getImageUrl(apiUrl, item.image)}
                       alt={item.title}
                       decoding="async"
                       loading="lazy"
-                      onLoad={() => setIsImageLoaded(true)} // Trigger when image loads
+                      onLoad={() => settleImage(item.encrypted_id)}
+                      onError={() => settleImage(item.encrypted_id)}
                     />
 
                     {/* Preloader (only if image not loaded) */}
-                    {!isImageLoaded && (
+                    {!loadedImages[item.encrypted_id] && (
                       <div className="absolute inset-0 flex items-center justify-center bg-orange-50 z-10">
                         <BannerLoader />
                       </div>

@@ -10,6 +10,7 @@ use App\Exceptions\WellnessRegistrationException;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\WellnessActivity;
+use App\Models\WellnessActivityFeedback;
 use App\Models\WellnessActivityRegistration;
 use App\Models\WellnessActivitySchedule;
 use App\Services\WellnessRegistrationService;
@@ -107,7 +108,7 @@ class WellnessController extends Controller
             return $employeeId;
         }
 
-        $registrations = WellnessActivityRegistration::with(['schedule.activity.type'])
+        $registrations = WellnessActivityRegistration::with(['schedule.activity.type', 'feedback'])
             ->forEmployee($employeeId)
             ->whereIn('status', [
                 WellnessRegistrationStatus::Confirmed->value,
@@ -129,6 +130,11 @@ class WellnessController extends Controller
                 'can_check_in' => $registration->status === WellnessRegistrationStatus::Confirmed
                     && $registration->attended_at === null
                     && (bool) $registration->schedule?->isCheckInOpen(),
+                'can_submit_feedback' => $registration->canSubmitFeedback(),
+                'feedback' => $registration->feedback ? [
+                    'message' => $registration->feedback->message,
+                    'submitted_at' => $registration->feedback->submitted_at?->toDateTimeString(),
+                ] : null,
                 'activity' => [
                     'id' => $registration->schedule?->activity?->encrypted_id,
                     'name' => $registration->schedule?->activity?->name,
@@ -259,6 +265,64 @@ class WellnessController extends Controller
             'message' => 'Your attendance has been recorded.',
             'attended_at' => $registration->attended_at?->toDateTimeString(),
             'activity' => $registration->schedule?->activity?->name,
+        ]);
+    }
+
+    /**
+     * Feedback about a session the employee attended. One per registration:
+     * sending it again rewrites what they said rather than adding a second row.
+     */
+    public function submitFeedback(Request $request): JsonResponse
+    {
+        $employeeId = $this->employeeId();
+
+        if ($employeeId instanceof JsonResponse) {
+            return $employeeId;
+        }
+
+        $request->validate([
+            'registration_id' => 'required|string',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        try {
+            $registrationId = (int) Crypt::decryptString($request->input('registration_id'));
+        } catch (DecryptException) {
+            return response()->json(['error' => 'Registration not found'], 404);
+        }
+
+        $registration = WellnessActivityRegistration::with('schedule')->find($registrationId);
+
+        // An employee may only leave feedback on their own registration.
+        if (! $registration || $registration->employee_id !== $employeeId) {
+            return response()->json(['error' => 'Registration not found'], 404);
+        }
+
+        if (! $registration->canSubmitFeedback()) {
+            return response()->json([
+                'error' => 'You can only send feedback for a session you attended, once it has finished.',
+                'reason' => 'feedback_not_allowed',
+            ], 422);
+        }
+
+        $feedback = WellnessActivityFeedback::updateOrCreate(
+            ['wellness_activity_registration_id' => $registration->id],
+            [
+                'wellness_activity_schedule_id' => $registration->wellness_activity_schedule_id,
+                'wellness_activity_id' => $registration->wellness_activity_id,
+                'employee_id' => $registration->employee_id,
+                'fullname' => $registration->fullname,
+                'message' => $request->input('message'),
+                'submitted_at' => now(),
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Thank you! Your feedback has been sent.',
+            'feedback' => [
+                'message' => $feedback->message,
+                'submitted_at' => $feedback->submitted_at?->toDateTimeString(),
+            ],
         ]);
     }
 

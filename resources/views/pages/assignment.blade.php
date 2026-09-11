@@ -1,11 +1,11 @@
 <x-app-layout>
-    @section('title', 'Assignment')
+    @section('title', __('Assignment'))
     <x-slot name="content">
     <!-- Begin Page Content -->
     <div class="container-fluid">
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-end mb-4">
-            <button class="btn btn-primary px-4">Create Assignment</button>
+            <button class="btn btn-primary px-4">{{ __('Create Assignment') }}</button>
         </div>
         <!-- Content Row -->
         <div class="row">
@@ -18,10 +18,10 @@
                           <thead class="thead-light">
                               <tr class="text-center">
                                   <th>#</th>
-                                  <th>Assignment Name</th>
-                                  <th>Assignment Code</th>
-                                  <th>Created On</th>
-                                  <th>Actions</th>
+                                  <th>{{ __('Assignment Name') }}</th>
+                                  <th>{{ __('Assignment Code') }}</th>
+                                  <th>{{ __('Created On') }}</th>
+                                  <th>{{ __('Actions') }}</th>
                               </tr>
                           </thead>
                           <tbody>
@@ -31,8 +31,8 @@
                                     <td>HO_0001</td>
                                     <td>25/05/2024</td>
                                     <td class="text-center">
-                                        <button class="btn btn-sm btn-circle btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-circle btn-outline-danger" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="btn btn-sm btn-circle btn-outline-primary" title="{{ __('Edit') }}"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-circle btn-outline-danger" title="{{ __('Delete') }}"><i class="fas fa-trash-alt"></i></button>
                                     </td>
                               </tr>
                           </tbody>

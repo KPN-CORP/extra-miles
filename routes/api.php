@@ -1,19 +1,18 @@
 <?php
 
+use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Api\EmployeeApiController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\LiveContentController;
+use App\Http\Controllers\Api\MdcTransactionController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\QuotesController;
 use App\Http\Controllers\Api\SocialController;
 use App\Http\Controllers\Api\SurveyVoteController;
+use App\Http\Controllers\Api\VerifyController;
 use App\Http\Controllers\Api\WellnessController;
-use App\Http\Controllers\Api\AuthApiController;
-use App\Http\Controllers\Api\MdcTransactionController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login-api', [AuthApiController::class, 'login']);
@@ -22,9 +21,7 @@ Route::middleware('auth:apiuser')->get('/employees', [EmployeeApiController::cla
 
 Route::get('auth-service', [AuthController::class, 'login']);
 
-Route::middleware('auth:api')->get('/verify', function (Request $request) {
-    return response()->json($request->user());
-});
+Route::middleware('auth:api')->get('/verify', VerifyController::class);
 
 Route::middleware('auth.token')->group(function () {
     Route::get('/profile', [EmployeeController::class, 'profile']);
@@ -62,4 +59,5 @@ Route::middleware('auth.token')->group(function () {
     Route::post('/wellness/registrations', [WellnessController::class, 'register']);
     Route::post('/wellness/registrations/cancel', [WellnessController::class, 'cancel']);
     Route::post('/wellness/check-in', [WellnessController::class, 'checkIn']);
+    Route::post('/wellness/feedback', [WellnessController::class, 'submitFeedback']);
 });

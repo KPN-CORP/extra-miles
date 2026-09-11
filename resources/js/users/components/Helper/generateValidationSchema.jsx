@@ -1,5 +1,7 @@
 import * as Yup from 'yup';
 
+import { translate } from './localeHelper';
+
 export function generateValidationSchema(fields) {
   const shape = {};
   const confirmationPairs = [];
@@ -13,11 +15,11 @@ export function generateValidationSchema(fields) {
       case 'textarea':
         schema = Yup.string();
         if (field.required) {
-          schema = schema.required('This field is required');
+          schema = schema.required(translate('validation.required'));
         }
         if (field.validation?.includes('max')) {
           const max = parseInt(field.validation.split('max:')[1]);
-          schema = schema.max(max, `Max ${max} characters allowed`);
+          schema = schema.max(max, translate('validation.maxChars', { max }));
         }
         break;
 
@@ -25,7 +27,7 @@ export function generateValidationSchema(fields) {
       case 'select':
         schema = Yup.string();
         if (field.required) {
-          schema = schema.required('This field is required');
+          schema = schema.required(translate('validation.required'));
         }
         break;
 
@@ -33,12 +35,12 @@ export function generateValidationSchema(fields) {
         if (Array.isArray(field.options)) {
           schema = Yup.array();
           if (field.required) {
-            schema = schema.min(1, 'This field is required');
+            schema = schema.min(1, translate('validation.required'));
           }
         } else {
           schema = Yup.boolean();
           if (field.required) {
-            schema = schema.oneOf([true], 'This field is required');
+            schema = schema.oneOf([true], translate('validation.required'));
           }
         }
         break;
@@ -70,10 +72,10 @@ export function generateValidationSchema(fields) {
 
   confirmationPairs.forEach(({ field, reason, requiredValue }) => {
     shape[reason] = Yup.string()
-  .max(200, 'Max 200 characters allowed')
+  .max(200, translate('validation.maxChars', { max: 200 }))
   .test(
     'conditional-required',
-    `Wajib diisi jika memilih "${requiredValue}"`,
+    translate('validation.requiredIfSelected', { value: requiredValue }),
     function (value) {
       const fieldValue = this.parent[field];
       if (fieldValue === requiredValue) {
@@ -86,8 +88,8 @@ export function generateValidationSchema(fields) {
 
   // Validasi nomor WhatsApp
   shape['whatsapp_number'] = Yup.string()
-    .required('Whatsapp number is required')
-    .matches(/^[0-9]{6,15}$/, 'Number is invalid');
+    .required(translate('validation.whatsappRequired'))
+    .matches(/^[0-9]{6,15}$/, translate('validation.numberInvalid'));
 
   return Yup.object().shape(shape);
 }

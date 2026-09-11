@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Events'])
+@extends('layouts_.vertical', ['page_title' => __('Events')])
 
 @section('css')
     <style>
@@ -39,21 +39,21 @@
 @section('content')
     <div class="container-fluid">
         <div class="d-flex flex-wrap gap-1 mb-3">
-            <h5><span class="badge bg-secondary fs-4 p-1">Request: {{ $countRequest }}</span></h5>
-            <h5><span class="badge bg-danger fs-4 p-1">Waiting List: {{ $countWaitingList }}</span></h5>
-            <h5><span class="badge bg-success fs-4 p-1">Approved: {{ $countApproved }}</span></h5>
-            <h5><span class="badge bg-warning fs-4 p-1">Confirmation Needed: {{ $countConfirmation }}</span></h5>
-            <h5><span class="badge bg-info fs-4 p-1">Attending: {{ $countAttending }}</span></h5>
-            <h5><span class="badge bg-dark fs-4 p-1">Not Attending: {{ $countNotAttending }} | Canceled: {{ $countCanceled }}
+            <h5><span class="badge bg-secondary fs-4 p-1">{{ __('Request') }}: {{ $countRequest }}</span></h5>
+            <h5><span class="badge bg-danger fs-4 p-1">{{ __('Waiting List') }}: {{ $countWaitingList }}</span></h5>
+            <h5><span class="badge bg-success fs-4 p-1">{{ __('Approved') }}: {{ $countApproved }}</span></h5>
+            <h5><span class="badge bg-warning fs-4 p-1">{{ __('Confirmation Needed') }}: {{ $countConfirmation }}</span></h5>
+            <h5><span class="badge bg-info fs-4 p-1">{{ __('Attending') }}: {{ $countAttending }}</span></h5>
+            <h5><span class="badge bg-dark fs-4 p-1">{{ __('Not Attending') }}: {{ $countNotAttending }} | {{ __('Canceled') }}: {{ $countCanceled }}
                 </span></h5>
             <form action="{{ route('participants.export', $event->id) }}" method="GET" class="align-items-center">
                 <button type="submit" class="btn btn-success fs-4 p-1 align-middle" style="line-height: 1.2; height: 30px;">
-                    <i class="ri-file-excel-2-line"></i> Export Participants
+                    <i class="ri-file-excel-2-line"></i> {{ __('Export Participants') }}
                 </button>
             </form>
             <button type="button" class="btn btn-primary fs-4 p-1 align-middle" style="line-height: 1.2; height: 30px;"
                 data-bs-toggle="modal" data-bs-target="#addParticipantModal">
-                <i class="ri-user-add-line"></i> Add Participant
+                <i class="ri-user-add-line"></i> {{ __('Add Participant') }}
             </button>
         </div>
 
@@ -69,7 +69,7 @@
                                         id="{{ strtolower(str_replace(' ', '-', $tab)) }}-tab" data-bs-toggle="tab"
                                         data-bs-target="#{{ strtolower(str_replace(' ', '-', $tab)) }}" type="button"
                                         role="tab">
-                                        {{ $tab }}
+                                        {{ __($tab) }}
                                     </button>
                                 </li>
                             @endforeach
@@ -79,13 +79,13 @@
                             <div class="tab-pane fade show active" id="request" role="tabpanel">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="card-title">
-                                        Participants Approved: 
+                                        {{ __('Participants Approved') }}: 
                                         <span style="color: {{ $countApproved >= $event->quota ? 'green' : 'red' }};">
                                             {{ $countApproved }}/{{ $event->quota }}
                                             @if($countApproved >= $event->quota)
-                                                (Full)
+                                                ({{ __('Full') }})
                                             @else
-                                                (Remaining {{ $event->quota - $countApproved }})
+                                                ({{ __('Remaining :count', ['count' => $event->quota - $countApproved]) }})
                                             @endif
                                         </span>
                                     </h4>
@@ -98,7 +98,7 @@
                                             </div>
                                             <input type="text" name="customsearch" id="customsearch"
                                                 class="form-control border-dark-subtle border-start-0"
-                                                placeholder="Search.." aria-label="search" aria-describedby="search">
+                                                placeholder="{{ __('Search..') }}" aria-label="search" aria-describedby="search">
                                         </div>
                                     </div>
                                 </div>
@@ -108,10 +108,10 @@
                                     <div class="alert alert-secondary mt-3 d-flex justify-content-between align-items-center" role="alert">
                                         <div>
                                             <input type="checkbox" class="form-check-input me-1" id="selectAll">
-                                            <label for="selectAll" class="form-check-label">Select All Participants</label>
+                                            <label for="selectAll" class="form-check-label">{{ __('Select All Participants') }}</label>
                                         </div>
                                         <button type="submit" id="approveSelectedBtn" class="btn btn-success btn-sm" disabled>
-                                            Approve Selected (0)
+                                            {{ __('Approve Selected') }} (0)
                                         </button>
                                     </div>
                                 
@@ -120,14 +120,14 @@
                                         <table class="table table-hover table-sm" id="scheduleTable" width="100%" cellspacing="0">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th>No</th>
+                                                    <th>{{ __('No') }}</th>
                                                     <th></th>
-                                                    <th>Participant</th>
-                                                    <th>Business Unit</th>
-                                                    <th>Job Level</th>
-                                                    <th>Location</th>
-                                                    <th>Status</th>
-                                                    <th>Action</th>
+                                                    <th>{{ __('Participant') }}</th>
+                                                    <th>{{ __('Business Unit') }}</th>
+                                                    <th>{{ __('Job Level') }}</th>
+                                                    <th>{{ __('Location') }}</th>
+                                                    <th>{{ __('Status') }}</th>
+                                                    <th>{{ __('Action') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -150,7 +150,7 @@
                                                                 @elseif($p->status === 'Confirmation') bg-warning
                                                                 @else bg-danger
                                                                 @endif
-                                                            ">{{ $p->status }}</span>
+                                                            ">{{ __($p->status) }}</span>
                                                         </td>
                                                         <td>
                                                             @if ($p->status == 'Waiting List')
@@ -167,8 +167,8 @@
                                                                     onclick="submitApproveParticipant('{{ route('participants.approve', $p->id) }}')"
                                                                     class="btn btn-sm {{ $countApproved >= $event->quota ? 'btn-secondary' : 'btn-outline-success' }}"
                                                                     {{ $countApproved >= $event->quota ? 'disabled' : '' }}
-                                                                    title="{{ $countApproved >= $event->quota ? 'Full Quota' : 'Approve participant' }}">
-                                                                    Approve
+                                                                    title="{{ $countApproved >= $event->quota ? __('Full Quota') : __('Approve participant') }}">
+                                                                    {{ __('Approve') }}
                                                                 </button>
                                                             @endif
                                                         </td>
@@ -191,7 +191,7 @@
                                                     class="ri-search-line"></i></span>
                                         </div>
                                         <input type="text" name="customsearch2" id="customsearch2"
-                                            class="form-control w-border-dark-subtle border-left-0" placeholder="Search.."
+                                            class="form-control w-border-dark-subtle border-left-0" placeholder="{{ __('Search..') }}"
                                             aria-label="search" aria-describedby="search">
                                     </div>
                                     </div>
@@ -201,13 +201,13 @@
                                         cellspacing="0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>No</th>
-                                                <th>Participant</th>
-                                                <th>Business Unit</th>
-                                                <th>Job Level</th>
-                                                <th>Location</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
+                                                <th>{{ __('No') }}</th>
+                                                <th>{{ __('Participant') }}</th>
+                                                <th>{{ __('Business Unit') }}</th>
+                                                <th>{{ __('Job Level') }}</th>
+                                                <th>{{ __('Location') }}</th>
+                                                <th>{{ __('Status') }}</th>
+                                                <th>{{ __('Action') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -220,9 +220,9 @@
                                                     <td>{{ $p->location }}</td>
                                                     <td>
                                                         @if ($p->status === 'Registered')
-                                                            <span class="badge bg-success">Registered</span>
+                                                            <span class="badge bg-success">{{ __('Registered') }}</span>
                                                         @elseif($p->status === 'Confirmation')
-                                                            <span class="badge bg-warning">Confirmation Needed</span>
+                                                            <span class="badge bg-warning">{{ __('Confirmation Needed') }}</span>
                                                         @endif
                                                     </td>
                                                     <td style="width:18%">
@@ -243,7 +243,7 @@
                                                             }
 
                                                             // Buat pesan default
-                                                            $defaultMessage = urlencode("Halo {$p->employee->fullname}, mohon konfirmasi kehadiran Anda untuk event {$event->title} di {$event->event_location} yang akan datang.");
+                                                            $defaultMessage = urlencode(__('whatsapp_event_reminder', ['name' => $p->employee->fullname, 'event' => $event->title, 'location' => $event->event_location]));
                                                         }
                                                     @endphp
 
@@ -251,19 +251,19 @@
                                                         <a href="https://wa.me/{{ $waNumber }}?text={{ $defaultMessage }}"
                                                         target="_blank"
                                                         class="btn btn-outline-success btn-sm">
-                                                            <i class="bi bi-whatsapp"></i> Remind
+                                                            <i class="bi bi-whatsapp"></i> {{ __('Remind') }}
                                                         </a>
                                                     @else
                                                         <button type="button"
                                                                 class="btn btn-outline-secondary btn-sm" disabled>
-                                                            No Number
+                                                            {{ __('No Number') }}
                                                         </button>
                                                     @endif
                                                         <button type="button"
                                                             class="btn btn-outline-danger btn-sm"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#cancelModal{{ $p->id }}">
-                                                            Canceled
+                                                            {{ __('Canceled') }}
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -274,18 +274,18 @@
                                                         @csrf
                                                         <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="cancelModalLabel{{ $p->id }}">Cancel Reason</h5>
+                                                            <h5 class="modal-title" id="cancelModalLabel{{ $p->id }}">{{ __('Cancel Reason') }}</h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
                                                             <div class="mb-3">
-                                                            <label for="reason{{ $p->id }}" class="form-label">Please provide a reason:</label>
+                                                            <label for="reason{{ $p->id }}" class="form-label">{{ __('Please provide a reason:') }}</label>
                                                             <textarea name="messages" id="reason{{ $p->id }}" class="form-control" rows="3" required></textarea>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                            <button type="submit" class="btn btn-danger">Submit Cancel</button>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                                                            <button type="submit" class="btn btn-danger">{{ __('Submit Cancel') }}</button>
                                                         </div>
                                                         </div>
                                                     </form>
@@ -309,7 +309,7 @@
                                                         class="ri-search-line"></i></span>
                                             </div>
                                             <input type="text" name="customsearch1" id="customsearch1"
-                                                class="form-control w-border-dark-subtle border-left-0" placeholder="Search.."
+                                                class="form-control w-border-dark-subtle border-left-0" placeholder="{{ __('Search..') }}"
                                                 aria-label="search" aria-describedby="search">
                                         </div>
                                     </div>
@@ -319,13 +319,13 @@
                                         cellspacing="0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>No</th>
-                                                <th>Participant</th>
-                                                <th>Business Unit</th>
-                                                <th>Job Level</th>
-                                                <th>Location</th>
-                                                <th>Status</th>
-                                                <th>Attending At</th>
+                                                <th>{{ __('No') }}</th>
+                                                <th>{{ __('Participant') }}</th>
+                                                <th>{{ __('Business Unit') }}</th>
+                                                <th>{{ __('Job Level') }}</th>
+                                                <th>{{ __('Location') }}</th>
+                                                <th>{{ __('Status') }}</th>
+                                                <th>{{ __('Attending At') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -336,7 +336,7 @@
                                                     <td>{{ $p->business_unit }}</td>
                                                     <td>{{ $p->job_level }}</td>
                                                     <td>{{ $p->location }}</td>
-                                                    <td>{{ $p->attending_status }}</td>
+                                                    <td>{{ __($p->attending_status) }}</td>
                                                     <td>{{ $p->attending_at }}</td>
                                                 </tr>
                                             @empty
@@ -357,34 +357,34 @@
             <form action="{{ route('participants.store', $event->id) }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                <h5 class="modal-title" id="addParticipantModalLabel">Add Participant</h5>
+                <h5 class="modal-title" id="addParticipantModalLabel">{{ __('Add Participant') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 
                 <div class="modal-body">
                 <!-- Search Employee -->
                 <div class="col-md-12">
-                    <label for="employeeSearch" class="form-label">Search Employee</label>
-                    <input type="text" class="form-control" id="employeeSearch" placeholder="Type employee name...">
+                    <label for="employeeSearch" class="form-label">{{ __('Search Employee') }}</label>
+                    <input type="text" class="form-control" id="employeeSearch" placeholder="{{ __('Type employee name...') }}">
                     <input type="hidden" name="employee_id" id="employeeId">
                     <div id="employeeList" class="list-group mt-1" style="max-height: 150px; overflow-y: auto; display: none;"></div>
                 </div>
 
                 <!-- Status Select -->
                 <div class="col-md-12">
-                    <label for="status" class="form-label">Status</label>
+                    <label for="status" class="form-label">{{ __('Status') }}</label>
                     <select name="status" id="nextstatus" class="form-control" required>
-                        <option value="">-- Select Status --</option>
-                        <option value="Registered">Registered</option>
-                        <option value="Confirmation">Confirmation</option>
-                        <option value="Waiting List">Waiting List</option>
+                        <option value="">-- {{ __('Select Status') }} --</option>
+                        <option value="Registered">{{ __('Registered') }}</option>
+                        <option value="Confirmation">{{ __('Confirmation') }}</option>
+                        <option value="Waiting List">{{ __('Waiting List') }}</option>
                     </select>
                 </div>
                 </div>
 
                 <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Participant</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('Add Participant') }}</button>
                 </div>
             </form>
             </div>
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     employeeList.style.display = 'block';
                 } else {
-                    employeeList.innerHTML = '<div class="list-group-item">No results found</div>';
+                    employeeList.innerHTML = '<div class="list-group-item">{{ __('No results found') }}</div>';
                     employeeList.style.display = 'block';
                 }
             });

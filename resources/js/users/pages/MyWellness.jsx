@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import LanguageToggle from '../components/Layout/LanguageToggle';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'motion/react';
@@ -9,6 +11,13 @@ import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
 import WellnessQrScannerModal from '../components/Helper/WellnessQrScannerModal';
 import { formatSession, statusStyle } from '../components/Helper/wellnessHelper';
+import {
+    ACTIVITIES_KEY,
+    getCached,
+    invalidateWellness,
+    loadWellness,
+    MY_REGISTRATIONS_KEY,
+} from '../components/Helper/wellnessCache';
 
 const pageVariants = {
     initial: { opacity: 0, x: 0 },
@@ -20,43 +29,53 @@ export default function MyWellness() {
     const navigate = useNavigate();
     const apiUrl = useApiUrl();
     const { token } = useAuth();
+    const { t } = useTranslation();
 
-    const [registrations, setRegistrations] = useState([]);
-    const [loading, setLoading] = useState(true);
+    // Seeded from the cache so a return trip paints straight away and only
+    // revalidates behind the content.
+    const cached = getCached(MY_REGISTRATIONS_KEY);
+    const [registrations, setRegistrations] = useState(cached ?? []);
+    const [loading, setLoading] = useState(cached === undefined);
     const [busyId, setBusyId] = useState(null);
     const [scannerOpen, setScannerOpen] = useState(false);
 
-    const fetchRegistrations = useCallback(async () => {
+    const fetchRegistrations = useCallback(async ({ force = false } = {}) => {
         try {
-            const res = await axios.get(`${apiUrl}/api/wellness/my-registrations`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setRegistrations(res.data);
+            setRegistrations(await loadWellness(MY_REGISTRATIONS_KEY, apiUrl, token, { force }));
         } catch (err) {
+            // Keep whatever is already on screen rather than alerting over it.
+            if (getCached(MY_REGISTRATIONS_KEY) !== undefined) return;
+
             showAlert({
                 icon: 'warning',
-                title: 'Connection Ended',
-                text: 'We could not load your registrations. Please try again.',
+                title: t('alerts.connectionEnded'),
+                text: t('wellness.loadRegistrationsFailed'),
                 timer: 2500,
                 showConfirmButton: false,
             });
         } finally {
             setLoading(false);
         }
-    }, [apiUrl, token]);
+    }, [apiUrl, token, t]);
 
     useEffect(() => {
         fetchRegistrations();
     }, [fetchRegistrations]);
 
+    // Cancelling or checking in frees a seat, which the activity list shows.
+    const refreshAfterWrite = () => {
+        invalidateWellness(ACTIVITIES_KEY);
+        return fetchRegistrations({ force: true });
+    };
+
     const handleCancel = async (registration) => {
         const confirmed = await showAlert({
             icon: 'warning',
-            title: 'Cancel your registration?',
-            text: 'Your seat will be released to the next person on the waitlist.',
+            title: t('wellness.cancelConfirm.title'),
+            text: t('wellness.cancelConfirm.text'),
             showCancelButton: true,
-            confirmButtonText: 'Yes, cancel it',
-            cancelButtonText: 'Keep it',
+            confirmButtonText: t('wellness.cancelConfirm.yes'),
+            cancelButtonText: t('wellness.cancelConfirm.no'),
         });
 
         if (!confirmed.isConfirmed) return;
@@ -72,18 +91,70 @@ export default function MyWellness() {
 
             await showAlert({
                 icon: 'success',
-                title: 'Cancelled',
-                text: 'Your registration has been cancelled.',
+                title: t('wellness.cancelConfirm.doneTitle'),
+                text: t('wellness.cancelConfirm.doneText'),
                 timer: 2200,
                 showConfirmButton: false,
             });
 
-            fetchRegistrations();
+            refreshAfterWrite();
         } catch (err) {
             showAlert({
                 icon: 'error',
-                title: 'Could not cancel',
-                text: err.response?.data?.error || 'Something went wrong. Please try again.',
+                title: t('wellness.cancelConfirm.failedTitle'),
+                text: err.response?.data?.error || t('alerts.genericRetry'),
+            });
+        } finally {
+            setBusyId(null);
+        }
+    };
+
+    // Feedback is only offered on sessions the employee attended and that have
+    // finished -- the backend decides that, `can_submit_feedback` just mirrors it.
+    // Sending it again overwrites what they wrote before.
+    const handleFeedback = async (registration) => {
+        const existing = registration.feedback?.message ?? '';
+
+        const result = await showAlert({
+            icon: 'question',
+            title: existing ? t('wellness.feedback.editTitle') : t('wellness.feedback.title'),
+            text: t('wellness.feedback.text'),
+            input: 'textarea',
+            inputValue: existing,
+            inputPlaceholder: t('wellness.feedback.placeholder'),
+            inputAttributes: { maxlength: 2000 },
+            showCancelButton: true,
+            confirmButtonText: t('wellness.feedback.send'),
+            cancelButtonText: t('wellness.feedback.notNow'),
+            inputValidator: (value) => (value && value.trim() ? undefined : t('wellness.feedback.required')),
+        });
+
+        if (!result.isConfirmed) return;
+
+        setBusyId(registration.id);
+
+        try {
+            await axios.post(
+                `${apiUrl}/api/wellness/feedback`,
+                { registration_id: registration.id, message: result.value.trim() },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            await showAlert({
+                icon: 'success',
+                title: t('wellness.feedback.doneTitle'),
+                text: t('wellness.feedback.doneText'),
+                timer: 2200,
+                showConfirmButton: false,
+            });
+
+            // No seat changed hands, so only this list needs refreshing.
+            fetchRegistrations({ force: true });
+        } catch (err) {
+            showAlert({
+                icon: 'error',
+                title: t('wellness.feedback.failedTitle'),
+                text: err.response?.data?.error || t('alerts.genericRetry'),
             });
         } finally {
             setBusyId(null);
@@ -103,11 +174,11 @@ export default function MyWellness() {
         >
             <div className="px-5 pt-5 pb-24 flex flex-col gap-4">
                 <div className="flex items-center gap-2">
-                    <button onClick={() => navigate('/wellness')} className="text-red-700 text-xl" aria-label="Back">
+                    <button onClick={() => navigate('/wellness')} className="text-red-700 text-xl" aria-label={t('wellness.back')}>
                         <i className="ri-arrow-left-line"></i>
                     </button>
-                    <div className="flex-1 text-center text-red-700 text-base font-semibold">My Wellness</div>
-                    <div className="w-6"></div>
+                    <div className="flex-1 text-center text-red-700 text-base font-semibold">{t('wellness.myTitle')}</div>
+                    <LanguageToggle />
                 </div>
 
                 {checkInAvailable && (
@@ -115,7 +186,7 @@ export default function MyWellness() {
                         onClick={() => setScannerOpen(true)}
                         className="w-full p-3 bg-red-700 rounded-lg shadow-md text-white text-xs font-semibold flex items-center justify-center gap-2"
                     >
-                        <i className="ri-qr-scan-2-line"></i> Scan QR to check in
+                        <i className="ri-qr-scan-2-line"></i> {t('wellness.scanToCheckIn')}
                     </button>
                 )}
 
@@ -127,12 +198,12 @@ export default function MyWellness() {
                 ) : registrations.length === 0 ? (
                     <div className="bg-white rounded-xl p-6 text-center shadow-sm">
                         <i className="ri-calendar-line text-3xl text-stone-300"></i>
-                        <p className="mt-2 text-stone-500 text-xs">You have no wellness registrations yet.</p>
+                        <p className="mt-2 text-stone-500 text-xs">{t('wellness.noRegistrations')}</p>
                         <button
                             onClick={() => navigate('/wellness')}
                             className="mt-3 px-4 py-2 rounded-lg bg-red-700 text-white text-[10px] font-semibold"
                         >
-                            Browse activities
+                            {t('wellness.browseActivities')}
                         </button>
                     </div>
                 ) : (
@@ -175,7 +246,7 @@ export default function MyWellness() {
 
                                     {registration.attended_at && (
                                         <span className="px-2 py-1 rounded-full text-[10px] font-semibold bg-green-100 text-green-700">
-                                            <i className="ri-check-double-line me-1"></i>Attended
+                                            <i className="ri-check-double-line me-1"></i>{t('wellness.attended')}
                                         </span>
                                     )}
 
@@ -186,7 +257,18 @@ export default function MyWellness() {
                                             onClick={() => setScannerOpen(true)}
                                             className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white"
                                         >
-                                            <i className="ri-qr-scan-2-line me-1"></i>Check in
+                                            <i className="ri-qr-scan-2-line me-1"></i>{t('wellness.checkIn')}
+                                        </button>
+                                    )}
+
+                                    {registration.can_submit_feedback && (
+                                        <button
+                                            disabled={busy}
+                                            onClick={() => handleFeedback(registration)}
+                                            className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-white text-red-700 ring-1 ring-red-700 ring-inset disabled:opacity-50"
+                                        >
+                                            <i className="ri-chat-1-line me-1"></i>
+                                            {registration.feedback ? t('wellness.feedback.edit') : t('wellness.feedback.give')}
                                         </button>
                                     )}
 
@@ -196,15 +278,25 @@ export default function MyWellness() {
                                             onClick={() => handleCancel(registration)}
                                             className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-white text-red-700 ring-1 ring-red-700 ring-inset disabled:opacity-50"
                                         >
-                                            {busy ? 'Please wait...' : 'Cancel'}
+                                            {busy ? t('common.pleaseWait') : t('wellness.cancel')}
                                         </button>
                                     )}
                                 </div>
 
+                                {registration.feedback && (
+                                    <div className="mt-2 rounded-lg bg-stone-50 p-2">
+                                        <div className="text-[10px] font-semibold text-stone-600">
+                                            <i className="ri-chat-quote-line me-1"></i>{t('wellness.feedback.yours')}
+                                        </div>
+                                        <p className="mt-0.5 text-[10px] text-stone-500 leading-relaxed whitespace-pre-line">
+                                            {registration.feedback.message}
+                                        </p>
+                                    </div>
+                                )}
+
                                 {registration.status === 'waitlisted' && (
                                     <p className="mt-2 text-[10px] text-stone-500 leading-relaxed">
-                                        You are on the waitlist. If a seat frees up we will move you up automatically,
-                                        and the admin will review your registration.
+                                        {t('wellness.waitlistNote')}
                                     </p>
                                 )}
                             </div>
@@ -216,7 +308,7 @@ export default function MyWellness() {
             <WellnessQrScannerModal
                 isOpen={scannerOpen}
                 onClose={() => setScannerOpen(false)}
-                onScanSuccess={fetchRegistrations}
+                onScanSuccess={refreshAfterWrite}
             />
         </motion.div>
     );

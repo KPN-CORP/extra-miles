@@ -1,19 +1,19 @@
 <table>
     <thead>
     <tr>
-        <th>Employee ID</th>
-        <th>Name</th>
-        <th>Gender</th>
-        <th>DOJ</th>
-        <th>Employment Type</th>
-        <th>Unit</th>
-        <th>Job</th>
-        <th>Grade</th>
-        <th>Company</th>
-        <th>Location</th>
-        <th>Group Company</th>
-        <th>Email</th>
-        <th>Menu Goals</th>
+        <th>{{ __('Employee ID') }}</th>
+        <th>{{ __('Name') }}</th>
+        <th>{{ __('Gender') }}</th>
+        <th>{{ __('DOJ') }}</th>
+        <th>{{ __('Employment Type') }}</th>
+        <th>{{ __('Unit') }}</th>
+        <th>{{ __('Job') }}</th>
+        <th>{{ __('Grade') }}</th>
+        <th>{{ __('Company') }}</th>
+        <th>{{ __('Location') }}</th>
+        <th>{{ __('Group Company') }}</th>
+        <th>{{ __('Email') }}</th>
+        <th>{{ __('Goals Menu') }}</th>
     </tr>
     </thead>
     <tbody>

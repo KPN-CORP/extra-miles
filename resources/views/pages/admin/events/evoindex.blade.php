@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'EVO'])
+@extends('layouts_.vertical', ['page_title' => __('EVO')])
 
 @section('css')
     <style>
@@ -44,13 +44,12 @@
         <div class="card">
             <div class="card-body text-center py-5">
                 <i class="ri-calendar-event-line fs-1 text-muted d-block mb-2"></i>
-                <h5 class="mb-1">No EVO event yet</h5>
+                <h5 class="mb-1">{{ __('No EVO event yet') }}</h5>
                 <p class="text-muted small mb-3">
-                    Create an event with the <strong>EVO</strong> category, and its dashboard,
-                    participants and report will appear here.
+                    {!! __('Create an event with the :category category, and its dashboard, participants and report will appear here.', ['category' => '<strong>EVO</strong>']) !!}
                 </p>
                 <a href="{{ route('admin.events.create') }}" class="btn btn-primary">
-                    <i class="ri-add-line me-1"></i> Create Event
+                    <i class="ri-add-line me-1"></i> {{ __('Create Event') }}
                 </a>
             </div>
         </div>
@@ -62,14 +61,14 @@
                     <i class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}
                 </span>
                 <span class="me-3">
-                    <i class="ri-time-line me-1"></i><span id="currentTime"></span> WIB
+                    <i class="ri-time-line me-1"></i><span id="currentTime"></span> {{ __('WIB') }}
                 </span>
             </div>
         </div>
 
         <div class="d-flex gap-2">
             <a href="{{ route('admin.evo.manage', $data->id) }}" class="btn btn-primary">
-                Manage Event
+                {{ __('Manage Event') }}
             </a>
 
             {{-- 🔽 NEW: tombol buka modal export --}}
@@ -77,7 +76,7 @@
                     class="btn btn-outline-success"
                     data-bs-toggle="modal"
                     data-bs-target="#evoExportModal">
-                <i class="ri-file-excel-2-line"></i> Export Report
+                <i class="ri-file-excel-2-line"></i> {{ __('Export Report') }}
             </button>
         </div>
     </div>
@@ -123,7 +122,7 @@
 
                         <div class="tab-pane fade @if ($loop->first) show active @endif" id="{{ $tabId }}" role="tabpanel">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="badge badge-outline-secondary px-1">{{ $participants->count() }} Participants</span>
+                            <span class="badge badge-outline-secondary px-1">{{ __(':count Participants', ['count' => $participants->count()]) }}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <div class="col">
@@ -142,7 +141,7 @@
                                         </span>
                                         <input type="text" name="customsearch" id="customsearch"
                                                 class="form-control border-start-0"
-                                                placeholder="Search.." aria-label="search">
+                                                placeholder="{{ __('Search..') }}" aria-label="{{ __('search') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -152,15 +151,15 @@
                             <table class="table table-hover table-sm align-middle" id="scheduleTable" width="100%">
                             <thead class="table-light">
                                 <tr>
-                                <th>No</th>
-                                <th>Participant</th>
-                                <th>Job Level</th>
-                                <th>Department</th>
-                                <th>BU</th>
-                                <th>Location</th>
-                                <th>Submitted At</th>
-                                <th>WhatsApp</th>
-                                <th>Action</th>
+                                <th>{{ __('No') }}</th>
+                                <th>{{ __('Participant') }}</th>
+                                <th>{{ __('Job Level') }}</th>
+                                <th>{{ __('Department') }}</th>
+                                <th>{{ __('BU') }}</th>
+                                <th>{{ __('Location') }}</th>
+                                <th>{{ __('Submitted At') }}</th>
+                                <th>{{ __('WhatsApp') }}</th>
+                                <th>{{ __('Action') }}</th>
                                 {{-- <th>#</th> --}}
                                 </tr>
                             </thead>
@@ -179,7 +178,7 @@
                                     $questionList = is_array($question) ? implode(', ', $question) : $question;
 
                                     // pesan WhatsApp berdasarkan tab aktif
-                                    $message = "Halo, perkenalkan saya $username dari tim Corporate Communication KPN Corp, ingin konfirmasi keikutsertaannya di program *$option*.";
+                                    $message = __('whatsapp_evo_confirmation', ['name' => $username, 'program' => $option]);
                                     $encodedMessage = urlencode($message);
                                 @endphp
 
@@ -212,7 +211,7 @@
                                             <button type="button"
                                                     class="btn btn-outline-danger btn-sm btn-remove-participant"
                                                     data-id="{{ $p->id }}"
-                                                    title="Remove Participant">
+                                                    title="{{ __('Remove Participant') }}">
                                                 <i class="ri-delete-bin-line"></i>
                                             </button>
                                         </form>
@@ -239,24 +238,24 @@
           <form method="GET" action="{{ route('evo.export') }}">
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Pilih Program</label>
+                    <label class="form-label fw-semibold">{{ __('Select Program') }}</label>
                     <select name="option" class="form-select mb-1" required>
-                        <option value="all">All Programs</option>
+                        <option value="all">{{ __('All Programs') }}</option>
                         @foreach($programs as $program)
                             <option value="{{ urlencode($program) }}">{{ $program }}</option>
                         @endforeach
                     </select>
                     <small class="text-muted">
-                        * List berdasarkan seluruh program EVO, termasuk program lama.
+                        {{ __('* The list covers every EVO program, including past programs.') }}
                     </small>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('Close') }}</button>
 
                 <button type="submit" class="btn btn-success">
-                    <i class="ri-file-excel-2-line"></i> Export
+                    <i class="ri-file-excel-2-line"></i> {{ __('Export') }}
                 </button>
             </div>
         </form>

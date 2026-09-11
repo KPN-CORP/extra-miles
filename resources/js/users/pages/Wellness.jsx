@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import LanguageToggle from '../components/Layout/LanguageToggle';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { motion } from 'motion/react';
 
 import { useApiUrl } from '../components/Context/ApiContext';
@@ -8,6 +9,14 @@ import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
 import { formatSession, seatLabel } from '../components/Helper/wellnessHelper';
+import {
+    ACTIVITIES_KEY,
+    activityKey,
+    getCached,
+    loadWellness,
+    MY_REGISTRATIONS_KEY,
+    prefetchWellness,
+} from '../components/Helper/wellnessCache';
 
 const pageVariants = {
     initial: { opacity: 0, x: 0 },
@@ -19,40 +28,63 @@ export default function Wellness() {
     const navigate = useNavigate();
     const apiUrl = useApiUrl();
     const { token } = useAuth();
+    const { t } = useTranslation();
 
-    const [activities, setActivities] = useState([]);
-    const [types, setTypes] = useState([]);
+    // Seeded from the cache when we have been here before, so a repeat visit
+    // paints the list immediately and only revalidates in the background.
+    const cached = getCached(ACTIVITIES_KEY);
+    const [activities, setActivities] = useState(cached ?? []);
     const [selectedType, setSelectedType] = useState('All');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(cached === undefined);
 
     useEffect(() => {
-        const fetchActivities = async () => {
-            try {
-                const res = await axios.get(`${apiUrl}/api/wellness/activities`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+        let active = true;
 
-                setActivities(res.data);
-                setTypes(['All', ...new Set(res.data.map((a) => a.type).filter(Boolean))]);
-            } catch (err) {
+        loadWellness(ACTIVITIES_KEY, apiUrl, token)
+            .then((data) => {
+                if (active) setActivities(data);
+            })
+            .catch(() => {
+                // Stale data on screen beats an alert over content that still reads fine.
+                if (!active || getCached(ACTIVITIES_KEY) !== undefined) return;
+
                 showAlert({
                     icon: 'warning',
-                    title: 'Connection Ended',
-                    text: 'We could not load the wellness activities. Please try again.',
+                    title: t('alerts.connectionEnded'),
+                    text: t('wellness.loadFailed'),
                     timer: 2500,
                     showConfirmButton: false,
                 });
-            } finally {
-                setLoading(false);
-            }
-        };
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
 
-        fetchActivities();
-    }, [apiUrl, token]);
+        return () => {
+            active = false;
+        };
+    }, [apiUrl, token, t]);
+
+    const types = useMemo(
+        () => ['All', ...new Set(activities.map((a) => a.type).filter(Boolean))],
+        [activities]
+    );
 
     const visible = selectedType === 'All'
         ? activities
         : activities.filter((activity) => activity.type === selectedType);
+
+    // Start the detail request on tap so it runs during the route exit
+    // animation rather than after the detail page has finished mounting.
+    const openActivity = (id) => {
+        prefetchWellness(activityKey(id), apiUrl, token);
+        navigate(`/wellness/${encodeURIComponent(id)}`);
+    };
+
+    const openMyRegistrations = () => {
+        prefetchWellness(MY_REGISTRATIONS_KEY, apiUrl, token);
+        navigate('/wellness/my-registrations');
+    };
 
     return (
         <motion.div
@@ -66,21 +98,22 @@ export default function Wellness() {
             <div className="px-5 pt-5 pb-24 flex flex-col gap-4">
                 {/* Header */}
                 <div className="flex items-center gap-2">
-                    <button onClick={() => navigate(-1)} className="text-red-700 text-xl" aria-label="Back">
+                    <button onClick={() => navigate(-1)} className="text-red-700 text-xl" aria-label={t('wellness.back')}>
                         <i className="ri-arrow-left-line"></i>
                     </button>
-                    <div className="flex-1 text-center text-red-700 text-base font-semibold">Wellness</div>
+                    <div className="flex-1 text-center text-red-700 text-base font-semibold">{t('wellness.title')}</div>
                     <button
-                        onClick={() => navigate('/wellness/my-registrations')}
+                        onClick={() => openMyRegistrations()}
                         className="text-red-700 text-xl"
-                        aria-label="My registrations"
+                        aria-label={t('wellness.myRegistrations')}
                     >
                         <i className="ri-calendar-check-line"></i>
                     </button>
+                    <LanguageToggle className="ms-2" />
                 </div>
 
                 <p className="text-stone-600 text-xs leading-relaxed">
-                    Join a wellness session, keep an eye on your seat, and check in with the QR code on the day.
+                    {t('wellness.intro')}
                 </p>
 
                 {/* Type filter */}
@@ -96,7 +129,7 @@ export default function Wellness() {
                                         : 'bg-white text-red-700 ring-1 ring-red-700 ring-inset'
                                 }`}
                             >
-                                {type}
+                                {type === 'All' ? t('wellness.allTypes') : type}
                             </button>
                         ))}
                     </div>
@@ -112,7 +145,7 @@ export default function Wellness() {
                     <div className="bg-white rounded-xl p-6 text-center shadow-sm">
                         <i className="ri-heart-pulse-line text-3xl text-stone-300"></i>
                         <p className="mt-2 text-stone-500 text-xs">
-                            No wellness activities are open right now. Please check back later.
+                            {t('wellness.empty')}
                         </p>
                     </div>
                 ) : (
@@ -123,7 +156,7 @@ export default function Wellness() {
                         return (
                             <button
                                 key={activity.id}
-                                onClick={() => navigate(`/wellness/${encodeURIComponent(activity.id)}`)}
+                                onClick={() => openActivity(activity.id)}
                                 className="w-full bg-white rounded-xl shadow-sm p-3 flex gap-3 text-left"
                             >
                                 <div className="w-16 shrink-0 rounded-lg bg-red-700 text-white flex flex-col items-center justify-center py-2">
@@ -147,7 +180,7 @@ export default function Wellness() {
                                     )}
                                     {activity.upcoming_count > 1 && (
                                         <div className="mt-1 text-[10px] text-stone-400">
-                                            +{activity.upcoming_count - 1} more session(s)
+                                            {t('wellness.moreSessions', { count: activity.upcoming_count - 1 })}
                                         </div>
                                     )}
                                 </div>

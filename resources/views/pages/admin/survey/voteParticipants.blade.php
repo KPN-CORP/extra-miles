@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Survey/Voting'])
+@extends('layouts_.vertical', ['page_title' => __('Survey/Voting')])
 
 @section('css')
     <style>
@@ -27,7 +27,7 @@
     <div class="card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
-          <h5>Total Participant : <span class="text-danger">{{ $survey->survey_participant_count }}</span></h5>
+          <h5>{{ __('Total Participant') }} : <span class="text-danger">{{ $survey->survey_participant_count }}</span></h5>
           <div class="d-flex gap-2">
               {{-- <select id="statusFilter" class="form-select" style="width: 150px;">
                   <option value="All">All Status</option>
@@ -35,7 +35,7 @@
                   <option value="Not Yet">Not Yet</option>
               </select> 
               <input type="text" id="searchInput" style="width: 200px;" class="form-control" placeholder="Search..." />--}}
-              <a href="{{ route('survey.export', ['survey_id' => $survey->id]) }}" class="btn btn-outline-success" title="Download Report" style="display: none;"><i class="ri-file-excel-line"></i></a>
+              <a href="{{ route('survey.export', ['survey_id' => $survey->id]) }}" class="btn btn-outline-success" title="{{ __('Download Report') }}" style="display: none;" data-no-loader><i class="ri-file-excel-line"></i></a>
           </div>
         </div>
       </div>
@@ -87,7 +87,7 @@
                                 </div>
                               </div>
                               <div class="ms-2 text-nowrap">
-                                  <small>Vote Count : {{ $count }} </small>
+                                  <small>{{ __('Vote Count') }} : {{ $count }} </small>
                               </div>
                             </div>
                         @endforeach
@@ -103,7 +103,7 @@
                 </div>
             @endforeach
         @else
-            <p class="text-muted fst-italic">Form schema belum tersedia.</p>
+            <p class="text-muted fst-italic">{{ __('The form schema is not available yet.') }}</p>
         @endif
       </div>
     </div>

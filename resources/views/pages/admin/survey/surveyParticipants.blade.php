@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Survey/Voting'])
+@extends('layouts_.vertical', ['page_title' => __('Survey/Voting')])
 
 @section('css')
     <style>
@@ -27,15 +27,15 @@
     <div class="card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
-          <h5>Total Participant : <span class="text-danger">{{ $survey->survey_participant_count }}</span> / {{ $survey->quota }}</h5>
+          <h5>{{ __('Total Participant') }} : <span class="text-danger">{{ $survey->survey_participant_count }}</span> / {{ $survey->quota }}</h5>
           <div class="d-flex gap-2">
               <select id="statusFilter" class="form-select" style="width: 150px;">
-                  <option value="All">All Status</option>
-                  <option value="Submitted">Submitted</option>
-                  <option value="Not Yet">Not Yet</option>
+                  <option value="All">{{ __('All Status') }}</option>
+                  <option value="Submitted">{{ __('Submitted') }}</option>
+                  <option value="Not Yet">{{ __('Not Yet') }}</option>
               </select>
-              <input type="text" id="searchInput" class="form-control" placeholder="Search..." />
-              <a href="{{ route('survey.export', ['survey_id' => $survey->id]) }}" class="btn btn-outline-success" title="Download Report"><i class="ri-file-excel-line"></i></a>
+              <input type="text" id="searchInput" class="form-control" placeholder="{{ __('Search...') }}" />
+              <a href="{{ route('survey.export', ['survey_id' => $survey->id]) }}" class="btn btn-outline-success" title="{{ __('Download Report') }}" data-no-loader><i class="ri-file-excel-line"></i></a>
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@
                 <div class="d-flex justify-content-between">
                     <strong>{{ $participant->fullname }}</strong>
                     <span class="badge {{ $participant->form_data ? 'bg-success' : 'bg-danger' }}">
-                        {{ $participant->form_data ? 'Submitted' : 'Not Yet' }}
+                        {{ $participant->form_data ? __('Submitted') : __('Not Yet') }}
                     </span>
                 </div>
                 @if ($participant->form_data && $participant->created_at)
@@ -107,7 +107,7 @@
                           </p>
                       @endforeach
                   @else
-                      <p class="text-muted fst-italic">Belum mengisi form.</p>
+                      <p class="text-muted fst-italic">{{ __('This participant has not filled in the form yet.') }}</p>
                   @endif
                 </div>
             </div>

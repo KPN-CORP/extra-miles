@@ -1,4 +1,6 @@
 import React from "react";
+import { Trans, useTranslation } from "react-i18next";
+import LanguageToggle from "../components/Layout/LanguageToggle";
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -38,6 +40,7 @@ export default function VoteList() {
     const [participated, setParticipated] = useState(participate);
     
     const [eventEnded, setEventEnded] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -51,8 +54,8 @@ export default function VoteList() {
             } catch (err) {
                 showAlert({
                     icon: 'warning',
-                    title: 'Connection Ended',
-                    text: 'Unable to connect to the server. Please try again later.',
+                    title: t('alerts.connectionEnded'),
+                    text: t('alerts.connectionEndedText'),
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
@@ -107,8 +110,8 @@ export default function VoteList() {
                             <i className="ri-arrow-left-line"></i>
                         </button>
                     </div>
-                    <div className="flex-2 text-center text-white text-lg font-bold">Let's Vote</div>
-                    <div className="flex-1" /> {/* Spacer to balance layout */}
+                    <div className="flex-2 text-center text-white text-lg font-bold">{t('vote.letsVote')}</div>
+                    <LanguageToggle variant="onRed" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {data.banner && (
@@ -126,7 +129,7 @@ export default function VoteList() {
                         </>
                     )}
                     <div className="flex-col flex w-full text-center justify-center text-white text-2xl font-bold gap-1">
-                        <span className="text-white text-base font-medium">🗳️ Voting Ends In...</span>
+                        <span className="text-white text-base font-medium">{t('vote.endsIn')}</span>
                         <CountdownTimer
                             endDateTime={`${data.end_date} ${data.time_end}`}
                             onEnd={() => setEventEnded(true)}
@@ -134,11 +137,11 @@ export default function VoteList() {
                     </div>
                     {participated ? (
                     <p className="text-white text-base font-normal">
-                        Thanks for voting, you voted, we noted <span className="font-semibold">{data.title}</span> gonna be lit! 🔥
+                        <Trans i18nKey="vote.thanksVoting" values={{ title: data.title }} components={[<span className="font-semibold" key="t" />]} />
                     </p>
                     ) : eventEnded ? (
                     <div className="text-white text-base font-semibold">
-                        Voting has ended. Thank you for your interest! 🛑
+                        {t('vote.ended')}
                     </div>
                     ) : (
                     <div className="w-full text-justify justify-start">
@@ -150,7 +153,7 @@ export default function VoteList() {
                         <>
                             <div className="mb-2">
                             <p className="text-white font-medium text-sm">
-                                📹Before you vote, make sure to watch this video:
+                                {t('vote.watchVideo')}
                             </p>
                             </div>
                             <YouTubePlayer videoId={data.content_link} />
@@ -165,7 +168,7 @@ export default function VoteList() {
                                 rel="noopener noreferrer"
                                 className="text-white underline font-medium text-sm"
                             >
-                                📎 Click here for more information
+                                {t('vote.moreInfo')}
                             </a>
                             </div>
                         </>
@@ -183,7 +186,7 @@ export default function VoteList() {
                                 className="w-full px-5 py-2.5 rounded-lg shadow-md text-sm font-semibold text-red-700"
                                 style={{ backgroundColor: '#DEBD69' }}
                                 >
-                                Go Back
+                                {t('common.goBack')}
                                 </button>
                             </div> 
                         )

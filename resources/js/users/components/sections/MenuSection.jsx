@@ -1,22 +1,33 @@
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { useApiUrl } from "../context/ApiContext";
 import LiveContent from "../../pages/LiveContent";
 import { useAuth } from "../context/AuthContext";
 import { showAlert } from "../Helper/alertHelper";
+import {
+  ACTIVITIES_KEY,
+  MY_REGISTRATIONS_KEY,
+  prefetchWellness,
+} from "../Helper/wellnessCache";
 
 export default () => {
 
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { token } = useAuth();
   const apiUrl = useApiUrl();
+  const { t } = useTranslation();
 
-  const handleNavigate = (e, path) => {
+  // AnimatePresence runs mode="wait", so the target page only mounts once this
+  // one has finished animating out. Warming the wellness endpoints here lets the
+  // request run during that animation instead of after it.
+  const handleNavigate = (e, path, prefetchKey = null) => {
+    if (prefetchKey) prefetchWellness(prefetchKey, apiUrl, token);
+
     const rect = e.currentTarget.getBoundingClientRect();
     const bounds = {
       top: rect.top,
@@ -28,30 +39,10 @@ export default () => {
   };
   
   useEffect(() => {
-    
     if (!token) {
       navigate("/")
-    } else {
-      // Ambil data user dari backend via API Gateway      
-      axios
-        .get(`${apiUrl}/api/user`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          setUser(res.data)
-        })
-        .catch((err) => {
-          console.error(err)
-          localStorage.removeItem("token")
-          navigate("/")
-        })
-        .finally(() => {
-          setLoading(false)
-        })
     }
-  }, [navigate])
+  }, [navigate, token])
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -74,8 +65,8 @@ export default () => {
 
   const handleOffAir = async () => {
       await showAlert({
-          title: "Content Not Available",
-          text: `Please check back later, thankyou!`,
+          title: t('menu.contentNotAvailable'),
+          text: t('menu.contentNotAvailableText'),
           icon: "info",
           timer: 2500,
           showConfirmButton: false
@@ -86,7 +77,7 @@ return (
     <div className="self-stretch flex flex-col justify-start items-start gap-3">
         <div className="self-stretch inline-flex justify-center items-start gap-3">
           <button onClick={(e) => handleNavigate(e, "/event")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
-            🎉 Upcoming Events
+            {t('menu.upcomingEvents')}
           </button>
           <button
             onClick={() => {
@@ -100,32 +91,32 @@ return (
               ${data.content_link ? 'bg-white text-red-700 ring-1 ring-red-700 ring-inset' : 'bg-red-700 text-white'}`}
           >
             <span className={`${data.content_link ? 'on-pulse' : 'off-pulse'} me-1`}></span>
-            LIVE NOW{data.content_link ? '!' : ''}
+            {data.content_link ? t('menu.liveNowActive') : t('menu.liveNow')}
           </button>
         </div>
         <div className="self-stretch inline-flex justify-center items-start gap-3">
           <button onClick={(e) => handleNavigate(e, "/survey")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
-              🗳️ Your Voice Matters!
+              {t('menu.yourVoiceMatters')}
           </button>
           <button onClick={(e) => handleNavigate(e, "/social")} className="flex-1 min-w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
-              🔗 Social Media
+              {t('menu.socialMedia')}
           </button>
         </div>
         <div className="self-stretch inline-flex justify-center items-start gap-3">
-          <button onClick={(e) => handleNavigate(e, "/wellness")} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
-              💚 Wellness
+          <button onClick={(e) => handleNavigate(e, "/wellness", ACTIVITIES_KEY)} className="flex-1 min-w-fit w-fit p-3 bg-red-700 rounded-lg shadow-md flex justify-center items-center gap-2 text-white text-[10px] font-semibold">
+              {t('menu.wellness')}
           </button>
-          <button onClick={(e) => handleNavigate(e, "/wellness/my-registrations")} className="flex-1 min-w-fit p-3 bg-white text-red-700 ring-1 ring-red-700 ring-inset rounded-lg shadow-md flex justify-center items-center gap-2 text-[10px] font-semibold">
-              🗓️ My Wellness
+          <button onClick={(e) => handleNavigate(e, "/wellness/my-registrations", MY_REGISTRATIONS_KEY)} className="flex-1 min-w-fit p-3 bg-white text-red-700 ring-1 ring-red-700 ring-inset rounded-lg shadow-md flex justify-center items-center gap-2 text-[10px] font-semibold">
+              {t('menu.myWellness')}
           </button>
         </div>
         <LiveContent isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} id={data.content_link}>
-          <h2 className="text-lg font-semibold mb-4">Live Event Info</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('menu.liveEventInfo')}</h2>
           <button
             onClick={() => setIsModalOpen(false)}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
-            Tutup
+            {t('common.close')}
           </button>
         </LiveContent>
     </div>

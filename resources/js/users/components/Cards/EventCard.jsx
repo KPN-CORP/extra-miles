@@ -1,4 +1,5 @@
 import React, {useEffect} from "react";
+import { useTranslation } from "react-i18next";
 import { useApiUrl } from "../context/ApiContext";
 import { showAlert } from "../Helper/alertHelper";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +10,7 @@ import { useLocation } from "react-router-dom";
 const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
   const apiUrl = useApiUrl();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const { day, month, year, startTime, endTime, isOngoing, totalDay, endDay, endMonth, endYear } = dateTimeHelper(event); 
   
@@ -93,9 +95,9 @@ const EventCard = ({ event, onAction, buttonText, buttonClass }) => {
             } else {
               showAlert({
                 icon: 'info',
-                title: 'Event Not Started',
-                text: 'This event has not started yet.',
-                confirmButtonText: 'OK',
+                title: t('event.notStarted'),
+                text: t('event.notStartedText'),
+                confirmButtonText: t('common.ok'),
                 customClass: {
                   popup: 'rounded-lg',
                   confirmButton: 'bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded'

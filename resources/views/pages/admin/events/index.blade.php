@@ -1,4 +1,4 @@
-@extends('layouts_.vertical', ['page_title' => 'Events'])
+@extends('layouts_.vertical', ['page_title' => __('Events')])
 
 @section('css')
     @include('layouts_.shared.admin-datatable-css')
@@ -8,13 +8,13 @@
 <div class="container-fluid">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
-            <h4 class="page-title mb-1">Events</h4>
+            <h4 class="page-title mb-1">{{ __('Events') }}</h4>
             <div class="text-muted small">
                 <span class="me-3"><i class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}</span>
-                <span><i class="ri-time-line me-1"></i><span id="currentTime"></span> WIB</span>
+                <span><i class="ri-time-line me-1"></i><span id="currentTime"></span> {{ __('WIB') }}</span>
             </div>
         </div>
-        <a href="{{ route('admin.events.create') }}" class="btn btn-primary">Create Event</a>
+        <a href="{{ route('admin.events.create') }}" class="btn btn-primary">{{ __('Create Event') }}</a>
     </div>
     <div class="row">
         <div class="col-12">
@@ -27,7 +27,7 @@
                                     id="{{ strtolower(str_replace(' ', '-', $tab)) }}-tab" data-bs-toggle="tab"
                                     data-bs-target="#{{ strtolower(str_replace(' ', '-', $tab)) }}" type="button"
                                     role="tab">
-                                    {{ $tab }}
+                                    {{ __($tab) }}
                                 </button>
                             </li>
                         @endforeach
@@ -39,14 +39,14 @@
                                 <table id="eventsOpenTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Category</th>
-                                            <th>Created Date</th>
-                                            <th>Title</th>
-                                            <th>Total Register</th>
-                                            <th>Status</th>
-                                            <th class="no-sort">Barcode</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Total Register') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th class="no-sort">{{ __('Barcode') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -74,39 +74,39 @@
                                                         text-bg-light
                                                     @endif
                                                 ">
-                                                    {{ $event->status }}
+                                                    {{ __($event->status) }}
                                                 </span>
                                             </td>
                                             <td>
                                                 {{-- Show QR --}}
                                                 @if($event->status != 'Draft')
                                                     <a href="{{ route('event.qrpng', \Illuminate\Support\Facades\Crypt::encryptString($event->id)) }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                                        Print QR
+                                                        {{ __('Print QR') }}
                                                     </a>
                                                 @endif
                                             </td>
                                             <td>
                                                 {{-- List Participants --}}
                                                 @if($event->status != 'Draft')
-                                                    <a href="{{ route('events.participants', \Illuminate\Support\Facades\Crypt::encryptString($event->id)) }}" class="btn btn-outline-info btn-sm" title="List Participants">
+                                                    <a href="{{ route('events.participants', \Illuminate\Support\Facades\Crypt::encryptString($event->id)) }}" class="btn btn-outline-info btn-sm" title="{{ __('List Participants') }}">
                                                         <i class="ri-eye-line"></i>
                                                     </a>
                                                 @endif
 
                                                 {{-- Close Registration --}}
                                                 @if($event->status === 'Ongoing' || $event->status == 'Open Registration')
-                                                    <form id="close-form-{{ $event->id }}" action="{{ route('events.close', $event->id) }}" method="POST" class="d-inline">
+                                                    <form id="close-form-{{ $event->id }}" action="{{ route('events.toggle-status', $event->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         <button type="button" class="btn btn-outline-secondary btn-sm btn-close-reg"
-                                                            data-id="{{ $event->id }}" data-action="close" title="Close Registration">
+                                                            data-id="{{ $event->id }}" data-action="close" title="{{ __('Close Registration') }}">
                                                             <i class="ri-close-line"></i>
                                                         </button>
                                                     </form>
                                                 @elseif($event->status === 'Full Booked')
-                                                    <form id="close-form-{{ $event->id }}" action="{{ route('events.close', $event->id) }}" method="POST" class="d-inline">
+                                                    <form id="close-form-{{ $event->id }}" action="{{ route('events.toggle-status', $event->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         <button type="button" class="btn btn-outline-success btn-sm btn-close-reg"
-                                                            data-id="{{ $event->id }}" data-action="open" title="Open Registration">
+                                                            data-id="{{ $event->id }}" data-action="open" title="{{ __('Open Registration') }}">
                                                             <i class="ri-checkbox-circle-line"></i>
                                                         </button>
                                                     </form>
@@ -114,7 +114,7 @@
 
                                                 @if($event->status === 'Draft' || $event->status === 'Full Booked' || $event->status == 'Open Registration')
                                                     {{-- Edit Event --}}
-                                                    <a href="{{ route('events.edit', $event->id) }}" class="btn btn-outline-warning btn-sm" title="Edit Event">
+                                                    <a href="{{ route('events.edit', $event->id) }}" class="btn btn-outline-warning btn-sm" title="{{ __('Edit Event') }}">
                                                         <i class="ri-edit-box-line"></i>
                                                     </a>
 
@@ -123,7 +123,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button" class="btn btn-outline-danger btn-sm btn-archive"
-                                                            data-id="{{ $event->id }}" title="Archive Event">
+                                                            data-id="{{ $event->id }}" title="{{ __('Archive Event') }}">
                                                             <i class="ri-archive-line"></i>
                                                         </button>
                                                     </form>
@@ -143,13 +143,13 @@
                                 <table id="eventsClosedTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Category</th>
-                                            <th>Created Date</th>
-                                            <th>Title</th>
-                                            <th>Total Register</th>
-                                            <th>Status</th>
-                                            <th class="no-sort">Action</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Total Register') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -177,13 +177,13 @@
                                                         text-bg-light
                                                     @endif
                                                 ">
-                                                    {{ $event->status }}
+                                                    {{ __($event->status) }}
                                                 </span>
                                             </td>
                                             <td>
                                                 {{-- List Participants --}}
                                                 @if($event->status != 'Draft'  && $event->participants_count>0)
-                                                    <a href="{{ route('events.participants', \Illuminate\Support\Facades\Crypt::encryptString($event->id)) }}" class="btn btn-outline-info btn-sm" title="List Participants">
+                                                    <a href="{{ route('events.participants', \Illuminate\Support\Facades\Crypt::encryptString($event->id)) }}" class="btn btn-outline-info btn-sm" title="{{ __('List Participants') }}">
                                                         <i class="ri-eye-line"></i>
                                                     </a>
                                                 @endif
@@ -202,14 +202,14 @@
                                 <table id="eventsArchiveTable" class="table table-hover table-sm nowrap w-100 align-middle js-datatable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="no-sort">No</th>
-                                            <th>Category</th>
-                                            <th>Created Date</th>
-                                            <th>Title</th>
-                                            <th>Total Register</th>
-                                            <th>Status</th>
-                                            <th class="no-sort">Action</th>
-                                            <th>Archive Date</th>
+                                            <th class="no-sort">{{ __('No') }}</th>
+                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Total Register') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th class="no-sort">{{ __('Action') }}</th>
+                                            <th>{{ __('Archive Date') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -237,13 +237,13 @@
                                                         text-bg-light
                                                     @endif
                                                 ">
-                                                    {{ $event->status }}
+                                                    {{ __($event->status) }}
                                                 </span>
                                             </td>
                                             <td>
                                                 {{-- List Participants --}}
                                                 @if($event->status != 'Draft' && $event->participants_count>0)
-                                                    <a href="{{ route('events.participants', \Illuminate\Support\Facades\Crypt::encryptString($event->id)) }}" class="btn btn-outline-info btn-sm" title="List Participants">
+                                                    <a href="{{ route('events.participants', \Illuminate\Support\Facades\Crypt::encryptString($event->id)) }}" class="btn btn-outline-info btn-sm" title="{{ __('List Participants') }}">
                                                         <i class="ri-eye-line"></i>
                                                     </a>
                                                 @endif
@@ -267,8 +267,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-3">
                 <div class="modal-header">
-                    <h5 class="modal-title w-100 text-center" id="qrModalLabel">QR Code</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title w-100 text-center" id="qrModalLabel">{{ __('QR Code') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
                 <div class="modal-body text-center">
                     <div class="d-flex justify-content-center py-2">

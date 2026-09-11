@@ -1,6 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function NewsCard({ image, date, title, tags = [] }) {
+
+const { t } = useTranslation();
     
 const MAX_VISIBLE_TAGS = 3;
 
@@ -26,7 +29,7 @@ return (
                     return (
                         <span
                             key={idx}
-                            title={isOverflowBadge ? `${tags.length - (MAX_VISIBLE_TAGS - 1)} more` : tag}
+                            title={isOverflowBadge ? t('news.moreTags', { count: tags.length - (MAX_VISIBLE_TAGS - 1) }) : tag}
                             className={`text-[10px] ${isOverflowBadge ? "bg-gray-300" : "bg-gray-200"} text-gray-700 px-1 py-0 rounded-md inline-block max-w-[88px] truncate`}
                         >
                             {tag}

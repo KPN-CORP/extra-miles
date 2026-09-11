@@ -9,7 +9,7 @@
     <div class="fw-semibold">
         {{ $registration->fullname ?: '-' }}
         @if ($onBlacklist)
-            <i class="ri-forbid-2-line text-dark" title="On the wellness blacklist"></i>
+            <i class="ri-forbid-2-line text-dark" title="{{ __('On the wellness blacklist') }}"></i>
         @endif
     </div>
     <small class="text-muted">{{ $registration->employee_id }}</small>

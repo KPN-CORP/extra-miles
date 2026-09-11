@@ -1,21 +1,21 @@
 <table>
     <thead>
     <tr>
-        <th>Employee ID</th>
-        <th>Employee Name</th>
-        <th>Category</th>
-        <th>KPI</th>
-        <th>Target</th>
-        <th>Uom</th>
-        <th>Weightage</th>
-        <th>Type</th>
-        <th>Form Status</th>
-        <th>Approval Status</th>
-        <th>Current Approver</th>
-        <th>Current Approver ID</th>
-        <th>Initiated By</th>
-        <th>Initiated By ID</th>
-        <th>Period</th>
+        <th>{{ __('Employee ID') }}</th>
+        <th>{{ __('Employee Name') }}</th>
+        <th>{{ __('Category') }}</th>
+        <th>{{ __('KPI') }}</th>
+        <th>{{ __('Target') }}</th>
+        <th>{{ __('Uom') }}</th>
+        <th>{{ __('Weightage') }}</th>
+        <th>{{ __('Type') }}</th>
+        <th>{{ __('Form Status') }}</th>
+        <th>{{ __('Approval Status') }}</th>
+        <th>{{ __('Current Approver') }}</th>
+        <th>{{ __('Current Approver ID') }}</th>
+        <th>{{ __('Initiated By') }}</th>
+        <th>{{ __('Initiated By ID') }}</th>
+        <th>{{ __('Period') }}</th>
     </tr>
     </thead>
     <tbody>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useApiUrl } from '../components/context/ApiContext';
@@ -18,6 +19,7 @@ export default function NewsDetails({ onLike }) {
   const navigate = useNavigate();
   const [skipExit, setSkipExit] = useState(false);
   const { direction } = useNavigationDirection();
+  const { t, i18n } = useTranslation();
   
   const pageVariants = {
     initial: { opacity: 0, x: "100%" },     // Masuk dari kanan
@@ -83,19 +85,19 @@ export default function NewsDetails({ onLike }) {
   if (!news) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
-        <p className="text-red-700 text-xl font-semibold mb-4">News not found.</p>
+        <p className="text-red-700 text-xl font-semibold mb-4">{t('news.notFound')}</p>
         <button
           onClick={() => navigate('/')}
           className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
         >
-          Go Back Home
+          {t('common.goBackHome')}
         </button>
       </div>
     );
   }
 
   const newsDate = new Date(news.publish_date);
-  const day = newsDate.toLocaleDateString("id-ID", {
+  const day = newsDate.toLocaleDateString(i18n.resolvedLanguage === "id" ? "id-ID" : "en-US", {
     weekday: "long",
     day: "2-digit",
     month: "long",
@@ -134,7 +136,7 @@ export default function NewsDetails({ onLike }) {
                 <i className="ri-arrow-left-line"></i>
             </button>
         </div>
-        <div className="flex-2 text-center text-red-700 text-lg font-bold">News</div>
+        <div className="flex-2 text-center text-red-700 text-lg font-bold">{t('news.title')}</div>
         <div className="flex-1" /> {/* Spacer to balance layout */}
     </div>
     <motion.div
@@ -175,7 +177,7 @@ export default function NewsDetails({ onLike }) {
     </div>
     <div className="w-full inline-flex flex-col justify-center items-center gap-3 mb-2">
         <div className="justify-start text-red-700 text-sm font-bold font-['Montserrat'] leading-none">
-          <p>Show your love if you liked this!</p>
+          <p>{t('news.showLove')}</p>
         </div>
         <NewsInteraction
           newsIdEncrypted={news?.encrypted_id} // yang dikirim dari backend, misalnya via Crypt
