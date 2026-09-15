@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "../context/AuthContext";
-import { PulseLoader } from "react-spinners";
-import { showAlert } from "../Helper/alertHelper";
+import { useAuth } from "../Context/AuthContext";
+import { useApiUrl } from "../Context/ApiContext";
 import axios from "axios";
 
 export default () => {
 
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const { token } = useAuth();  
-  const [datas, setData] = useState([]);
+  const apiUrl = useApiUrl();
+  const { token } = useAuth();
+  const [datas, setData] = useState({});
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,21 +19,13 @@ export default () => {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-            });                
-            
+            });
+
             setData(res.data);
         } catch (err) {
-            showAlert({
-                icon: 'warning',
-                title: t('alerts.connectionEnded'),
-                text: t('alerts.connectionEndedText'),
-                timer: 2500,
-                showConfirmButton: false,
-            }).then(() => {
-                // console.log(err);
-                
-                // window.location.href = "https://kpncorporation.darwinbox.com/";
-            });
+            // Kutipan hanya pemanis halaman -- kalau gagal, blok ini cukup
+            // disembunyikan tanpa mengganggu pengguna dengan alert.
+            console.log(err);
         } finally {
             setLoading(false);
         }
@@ -44,16 +33,38 @@ export default () => {
     if(token) {
         fetchData();
     }
-  }, [token]);
+  }, [apiUrl, token]);
 
   if (loading) {
-    return <PulseLoader className='w-full justify-center text-center' margin={2} size={8} color="#FFF" speedMultiplier={0.75} />;
-  }  
+    return <div className="h-24 rounded-2xl skeleton" />;
+  }
+
+  if (!datas?.quotes) {
+    return null;
+  }
 
   return (
-    <div className="w-60 flex flex-col justify-start items-start gap-1">
-        <div className="self-stretch justify-start text-stone-800 text-sm leading-none">“{datas.quotes}”</div>
-        <div className="justify-start text-stone-500 text-sm font-normal leading-none italic">- {datas.author}</div>
-    </div>
+    // Blok kutipan duduk di permukaan tint yang sama dengan tile Quick Access,
+    // jadi halaman punya dua bahasa yang jelas: kartu putih untuk data, blok
+    // tint untuk suara brand. Garis aksen di tepi kiri sengaja dibuang -- itu
+    // pola lama yang membuat kutipan terlihat seperti callout dokumentasi.
+    <figure className="relative m-0 overflow-hidden rounded-2xl bg-brand-75 px-5 pt-7 pb-5">
+      {/* Tanda kutip besar sebagai tekstur, bukan ikon. Ditaruh di belakang
+          teks dengan warna brand yang jauh lebih terang. */}
+      <i
+        className="ri-double-quotes-l absolute -left-1 -top-2 text-[64px] leading-none text-brand-200"
+        aria-hidden="true"
+      />
+
+      <blockquote className="relative m-0 text-brand-850 text-[14px] font-medium leading-[1.65]">
+        {datas.quotes}
+      </blockquote>
+
+      {datas.author && (
+        <figcaption className="relative mt-3 text-brand-850/70 text-[11px] font-semibold italic leading-snug">
+          &mdash; {datas.author}
+        </figcaption>
+      )}
+    </figure>
   );
 };

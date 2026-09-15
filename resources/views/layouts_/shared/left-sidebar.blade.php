@@ -103,17 +103,17 @@
                     </a>
                     <div class="collapse" id="sidebarWellness">
                         <ul class="side-nav-second-level">
+                            @can('viewmenuwellnesstype')
+                            <li>
+                                <a href="{{ url('/admin/wellness/types') }}"> {{ __('Activity Types') }} </a>
+                            </li>
+                            @endcan
                             <li>
                                 <a href="{{ url('/admin/wellness/activities') }}"> {{ __('Activities') }} </a>
                             </li>
                             <li>
                                 <a href="{{ url('/admin/wellness/blacklist') }}"> {{ __('Blacklist') }} </a>
                             </li>
-                            @can('viewmenuwellnesstype')
-                            <li>
-                                <a href="{{ url('/admin/wellness/types') }}"> {{ __('Activity Types') }} </a>
-                            </li>
-                            @endcan
                         </ul>
                     </div>
                 </li>

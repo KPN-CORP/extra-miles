@@ -1,8 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useApiUrl } from '../components/context/ApiContext';
-import { useAuth } from '../components/context/AuthContext';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useApiUrl } from '../components/Context/ApiContext';
+import { useAuth } from '../components/Context/AuthContext';
+import { useEffect } from 'react';
 import { SyncLoader } from 'react-spinners';
 import { useTranslation } from 'react-i18next';
 
@@ -11,14 +10,18 @@ function ConfirmLogin() {
   const location = useLocation();
   const navigate = useNavigate();
   const apiUrl = useApiUrl();
-  const [error, setError] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const token = searchParams.get('token');
 
-    // Example using Fetch API (instead of axios) in ConfirmLogin.js
+    // `replace` di semua cabang: URL /login-success?token=... tidak boleh
+    // tertinggal di riwayat. Sebelumnya tombol back membawa pengguna kembali ke
+    // token yang sudah mati, gagal lagi, dan berputar di halaman gagal login.
+    const fail = (reason) =>
+      navigate(`/login-failed?error=${encodeURIComponent(reason)}`, { replace: true });
+
     const validateToken = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/verify`, {
@@ -30,44 +33,35 @@ function ConfirmLogin() {
         });
 
         if (response.ok) { // response.ok is true for 2xx status codes
-          // const data = await response.json(); // Only if you expect a JSON body
           saveToken(token);
-          navigate('/');
-        } else {
-          const errorData = await response.json().catch(() => ({ message: `Server error: ${response.status}` }));
-          console.error("Token verification failed:", response.status, errorData);
-          setError(true);
-          navigate(`/login-failed?error=${encodeURIComponent(errorData.message || 'Token verification failed.')}`);
+          navigate('/', { replace: true });
+          return;
         }
+
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: `Server error: ${response.status}` }));
+
+        console.error('Token verification failed:', response.status, errorData);
+        fail(errorData.message || t('login.verificationFailed'));
       } catch (err) {
-        console.error("Network or unexpected error:", err);
-        setError(true);
-        navigate(`/login-failed?error=${encodeURIComponent('Network error or unexpected issue. Please try again.')}`);
+        console.error('Network or unexpected error:', err);
+        fail(t('login.networkIssue'));
       }
     };
 
     if (token && token.startsWith('eyJ')) {
       validateToken();
     } else {
-      setError(true);
+      // Tanpa token yang berbentuk JWT tidak ada yang bisa diverifikasi.
+      // Dulu ini berhenti di layar statis tanpa jalan keluar.
+      fail(t('login.missingToken'));
     }
-  }, [location, navigate, saveToken, apiUrl]);
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-red-100 overflow-hidden">
-        <h1 className="mb-4 text-red-700 text-4xl font-bold italic">{t('app.brand')}</h1>
-        <p className="text-center text-red-700 text-lg font-semibold">
-          {t('app.serviceUnavailable')}
-        </p>
-        <p className="text-sm text-gray-700 mt-2">{t('app.tryAgainInAMoment')}</p>
-      </div>
-    );
-  }
+  }, [location, navigate, saveToken, apiUrl, t]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 overflow-hidden">
-      <h1 className="mb-4 text-red-700 text-4xl font-bold italic">{t('app.brand')}</h1>
+    <div className="app-surface app-bg flex flex-col items-center justify-center overflow-hidden">
+      <h1 className="mb-4 text-brand-700 text-4xl font-bold italic tracking-wide">{t('app.brand')}</h1>
       <SyncLoader color="#B91C1C" size={15} />
     </div>
   );

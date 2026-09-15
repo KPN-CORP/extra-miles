@@ -132,6 +132,31 @@ No GitHub Actions or GitLab CI pipeline files were found in the repository. Depl
 - Before committing PHP changes, run Pint.
 - Before deploying frontend changes, ensure the Vite build succeeds.
 
+### Local Sign-In Without SSO
+
+Both frontends normally authenticate through Darwinbox, which a developer machine
+cannot reach. Setting `DEVELOPMENT_MODE=keydevelopment` in `.env` exposes two local
+stand-ins; without it they 404 and both entry points behave exactly as in production.
+
+- `GET /admin/login` renders a local form instead of bouncing to Darwinbox
+  (`Auth\DevLoginController`). Sign in as any `kpncorp` user by Employee ID or email.
+  The password field is optional, because most SSO accounts have no usable hash.
+- `GET /dev/mobile-login` mints a JWT for an employee and redirects to
+  `/login-success?token=...`, the same landing route the real auth-service uses
+  (`Auth\DevMobileLoginController`). Tick "Show the token instead of opening the app"
+  to get the raw JWT for curl. The token carries `sub`, `employee_id` and `fullname`,
+  the only claims the API reads — `employee_id` especially, since every mobile
+  endpoint takes it from the payload rather than from the authenticated user.
+
+Two things to get right when testing the employee app:
+
+- The SPA only renders on a touch device narrower than 768px. Turn on the browser's
+  device emulation *before* signing in, or you land on the "Mobile Only" screen and
+  the token is never stored.
+- `VITE_API_URL` is read when Vite starts or builds, not per request. If `APP_URL`
+  does not match the host and port you are actually serving on, every API call from
+  the SPA goes to the wrong origin and fails.
+
 ## 6. Suggested First Steps for the New PIC
 
 - Review the main Laravel routes in `routes/web.php` and `routes/api.php`

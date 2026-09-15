@@ -12,14 +12,17 @@ import { FreeMode } from "swiper/modules";
 import BannerLoader from "../components/Loader/BannerLoader";
 import NewsCard from "../components/Cards/NewsCard";
 
-import { useApiUrl } from "../components/context/ApiContext";
+import AppShell from "../components/Layout/AppShell";
+import AppHeader from "../components/Layout/AppHeader";
+import { useApiUrl } from "../components/Context/ApiContext";
 import { showAlert } from "../components/Helper/alertHelper";
-import { useAuth } from "../components/context/AuthContext";
+import { useAuth } from "../components/Context/AuthContext";
 import { getImageUrl } from "../components/Helper/imagePath";
 
 import { motion } from "motion/react";
 import NewsLoader from "../components/Loader/NewsLoader";
 import { useNavigationDirection } from "../components/Context/NavigationProvider";
+import { SSO_URL } from '../components/Helper/ssoRedirect';
 
 export default function News() {
   const navigate = useNavigate();
@@ -109,7 +112,7 @@ export default function News() {
           if (document.referrer) {
             window.history.back();
           } else {
-            window.location.href = 'https://kpncorporation.darwinbox.com/';
+            window.location.href = SSO_URL;
           }
 
         });
@@ -153,7 +156,8 @@ export default function News() {
   };
 
   if (loading) return (
-    <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen">
+    <AppShell nav>
+      <AppHeader title={t('news.title')} trailing={<LanguageToggle />} />
       <motion.div
         variants={pageVariants}
         initial="initial"
@@ -163,27 +167,15 @@ export default function News() {
       >
         <NewsLoader />
       </motion.div>
-    </div>
+    </AppShell>
   ) 
 
   return (
         <>
-          <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-5">
-              <button
-                onClick={() => navigate(`/`)}
-                className="text-red-700 text-xl font-bold flex items-center gap-1 pr-4"
-              >
-                <i className="ri-arrow-left-line" />
-              </button>
-              <div className="text-center text-red-700 text-lg font-bold flex-grow">
-                {t('news.title')}
-              </div>
-              <LanguageToggle />
-              <div style={{ flexBasis: "40px" }} /> {/* placeholder for symmetry */}
-            </div>
+          <AppShell nav>
+            <AppHeader title={t('news.title')} trailing={<LanguageToggle />} />
             <motion.div
+                className="px-5 pt-4"
                 variants={pageVariants2}
                 initial="initial"
                 animate="animate"
@@ -346,7 +338,7 @@ export default function News() {
               </div>
           </div>
         </motion.div>
-          </div>
+          </AppShell>
 
           {/* Modal Filter */}
           {isModalOpen && (

@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useAuth } from './AuthContext';
+import { SSO_URL } from '../Helper/ssoRedirect';
 
 const ProfileContext = createContext();
 
@@ -33,7 +34,7 @@ export const ProfileProvider = ({ children }) => {
         if (document.referrer) {
           window.history.back();
         } else {
-          window.location.href = 'https://kpncorporation.darwinbox.com/';
+          window.location.href = SSO_URL;
         }
 
       });

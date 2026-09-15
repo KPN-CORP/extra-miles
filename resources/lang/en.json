@@ -101,5 +101,16 @@
     "Extra Miles is briefly offline while we ship an update. Please check back shortly.": "Extra Miles is briefly offline while we ship an update. Please check back shortly.",
     "Back to Home": "Back to Home",
     "Go Back": "Go Back",
-    "If the problem keeps happening, please contact your administrator.": "If the problem keeps happening, please contact your administrator."
+    "If the problem keeps happening, please contact your administrator.": "If the problem keeps happening, please contact your administrator.",
+    "development_mode_banner": ":flag is set in :env, so this local sign-in page exists in place of the Darwinbox SSO handshake. Remove :code from :env and the route 404s again.",
+    "Mobile Development Login": "Mobile Development Login",
+    "employee app": "employee app",
+    "dev_mobile_gate_banner": "The employee app only renders on a touch device narrower than 768px. Turn on device emulation (:shortcut) before signing in, or you will land on the \u201cMobile Only\u201d screen and the token will never be stored.",
+    "Employee ID / Email": "Employee ID / Email",
+    "The employee whose session you want to borrow.": "The employee whose session you want to borrow.",
+    "Show the token instead of opening the app": "Show the token instead of opening the app",
+    "Open the employee app": "Open the employee app",
+    "Bearer token": "Bearer token",
+    "dev_mobile_token_hint": "Send it as an Authorization: Bearer header, or paste it into the SPA with :storage and reload.",
+    "Go to the admin development login": "Go to the admin development login"
 }

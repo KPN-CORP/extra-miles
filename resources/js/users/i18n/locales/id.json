@@ -32,6 +32,14 @@
     "footer": "© 2025 KPN Corporation - HCIS. Seluruh hak cipta dilindungi.",
     "language": "Bahasa"
   },
+  "nav": {
+    "primary": "Navigasi utama",
+    "home": "Beranda",
+    "events": "Event",
+    "news": "Berita",
+    "wellness": "Wellness",
+    "survey": "Survei"
+  },
   "alerts": {
     "connectionEnded": "Koneksi Terputus",
     "connectionEndedText": "Tidak dapat terhubung ke server. Silakan coba lagi nanti.",
@@ -45,21 +53,35 @@
     "genericRetry": "Terjadi kesalahan. Silakan coba lagi.",
     "submitFormError": "Terjadi kesalahan saat mengirim formulir."
   },
+  "login": {
+    "failedTitle": "Login Gagal",
+    "failedFallback": "Sesi Anda tidak dapat diverifikasi. Silakan masuk kembali dari portal.",
+    "verificationFailed": "Sesi Anda tidak dapat diverifikasi.",
+    "networkIssue": "Server tidak dapat dihubungi. Silakan coba lagi beberapa saat lagi.",
+    "missingToken": "Halaman ini dibuka tanpa sesi yang sah. Silakan mulai dari portal.",
+    "backToPortal": "Kembali ke Portal",
+    "redirecting": "Mengalihkan dalam {{count}} detik...",
+    "redirecting_one": "Mengalihkan dalam {{count}} detik..."
+  },
   "home": {
-    "welcomeBack": "Selamat datang kembali, {{name}}!",
-    "newsUpdate": "Berita Terbaru!"
+    "newsUpdate": "Berita Terbaru!",
+    "quickAccess": "Akses Cepat",
+    "bannerAlt": "Extra Mile 2.0 - Exceeding Limits, Building Loyalty"
   },
   "menu": {
-    "upcomingEvents": "🎉 Event Mendatang",
-    "liveNow": "SEDANG LIVE",
+    "upcomingEvents": "Event\nMendatang",
+    "liveNow": "Sedang\nLive",
     "liveNowActive": "SEDANG LIVE!",
-    "yourVoiceMatters": "🗳️ Suaramu Berarti!",
-    "socialMedia": "🔗 Media Sosial",
-    "wellness": "💚 Wellness",
+    "yourVoiceMatters": "Suaramu\nBerarti",
+    "socialMedia": "Media\nSosial",
+    "wellness": "Wellness",
     "myWellness": "🗓️ Wellness Saya",
     "liveEventInfo": "Info Event Live",
     "contentNotAvailable": "Konten Belum Tersedia",
-    "contentNotAvailableText": "Silakan cek kembali nanti, terima kasih!"
+    "contentNotAvailableText": "Silakan cek kembali nanti, terima kasih!",
+    "liveBadge": "LIVE",
+    "offAir": "Tidak siaran",
+    "evoProgram": "Program\nEVO"
   },
   "evoBanner": {
     "readyToEvolve": "Siap Berkembang?",
@@ -70,16 +92,21 @@
     "line1": "Aset Berita",
     "line2": "& Event",
     "title": "Buka Aset Berita & Event di Google Drive",
-    "ariaLabel": "Aset Berita & Event - buka folder Google Drive"
+    "ariaLabel": "Aset Berita & Event - buka folder Google Drive",
+    "subtitle": "Buka folder bersama di Google Drive"
   },
   "activity": {
-    "waitingForResponse": "Menunggu Konfirmasi Anda ⏳",
+    "waitingForResponse": "Menunggu Konfirmasi Anda",
     "confirmationDeadline": "Jika kami tidak menerima konfirmasi Anda hingga H-2 (dua hari sebelum acara), kursi Anda akan otomatis dibatalkan dan diberikan kepada peserta di daftar tunggu.",
     "allCaughtUp": "Semua sudah beres! 🎉 Tidak ada undangan yang menunggu saat ini. Nantikan event berikutnya!",
-    "invitedToJoin": "Event yang Mengundang Anda 👀",
+    "invitedToJoin": "Event yang Mengundang Anda",
     "noPendingEvent": "Belum ada event yang menunggu saat ini. Nantikan event berikutnya!",
     "confirm": "Konfirmasi",
-    "scan": "Pindai"
+    "scan": "Pindai",
+    "allCaughtUpTitle": "Semua sudah beres",
+    "allCaughtUpText": "Tidak ada undangan yang menunggu saat ini. Nantikan event berikutnya!",
+    "attended": "Kehadiran tercatat",
+    "myEventsTitle": "Event Saya"
   },
   "event": {
     "upcomingEvents": "Event Mendatang",
@@ -155,9 +182,11 @@
     "categories": "Kategori:",
     "allCategories": "Semua Kategori",
     "showLove": "Tunjukkan dukungan Anda jika menyukai berita ini!",
-    "moreTags": "{{count}} lainnya"
+    "moreTags": "{{count}} lainnya",
+    "empty": "Cek lagi beritanya nanti ya!"
   },
   "social": {
+    "title": "Media Sosial",
     "ourLine1": "Kehadiran",
     "ourLine2": "Media Sosial",
     "ourLine3": "Kami",
@@ -213,7 +242,7 @@
     "back": "Kembali",
     "myRegistrations": "Pendaftaran saya",
     "allTypes": "Semua",
-    "empty": "Belum ada aktivitas wellness yang dibuka saat ini. Silakan cek kembali nanti.",
+    "empty": "Cek lagi aktivitas wellness nanti.",
     "moreSessions": "+{{count}} sesi lainnya",
     "availableSessions": "Sesi Tersedia",
     "noSessions": "Belum ada sesi mendatang untuk aktivitas ini.",
@@ -276,7 +305,8 @@
       "checkingIn": "Sedang memproses check-in...",
       "keepInFrame": "Pastikan kode QR sepenuhnya berada di dalam bingkai.",
       "failed": "Kami tidak dapat mencatat kehadiran Anda."
-    }
+    },
+    "noSessionsOnDate": "Tidak ada sesi wellness pada tanggal ini. Pilih hari lain."
   },
   "evo": {
     "title": "Employee Volunteer",
@@ -294,5 +324,17 @@
     "requiredIfSelected": "Wajib diisi jika memilih \"{{value}}\"",
     "whatsappRequired": "Nomor WhatsApp wajib diisi",
     "numberInvalid": "Nomor tidak valid"
+  },
+  "myEvents": {
+    "searchPlaceholder": "Cari event atau lokasi",
+    "filterAwaiting": "Belum dijawab",
+    "filterConfirmed": "Sudah dikonfirmasi"
+  },
+  "filters": {
+    "byDate": "Filter tanggal",
+    "clearDate": "Hapus tanggal",
+    "reset": "Atur ulang filter",
+    "noMatches": "Tidak ada yang cocok",
+    "noMatchesText": "Coba tanggal atau filter lain."
   }
 }

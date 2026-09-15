@@ -7,13 +7,16 @@ import axios from 'axios';
 
 import 'react-calendar/dist/Calendar.css';
 import '../../../css/calendar-custom.css';
-import { useApiUrl } from "../components/context/ApiContext";
+import AppShell from "../components/Layout/AppShell";
+import AppHeader from "../components/Layout/AppHeader";
+import { useApiUrl } from "../components/Context/ApiContext";
 import { showAlert } from "../components/Helper/alertHelper";
-import { useAuth } from "../components/context/AuthContext";
+import { useAuth } from "../components/Context/AuthContext";
 import { dateTimeHelper } from "../components/Helper/dateTimeHelper";
 import { getImageUrl } from "../components/Helper/imagePath";
 import SurveyLoader from "../components/Loader/SurveyLoader";
 import { motion } from "motion/react";
+import { zoomFrom } from '../components/Helper/zoomTransition';
 
 const pageVariants = {
     initial: { opacity: 0, x: 0 },     // Masuk dari kanan
@@ -33,7 +36,9 @@ export default function Survey() {
     const location = useLocation();
     const bounds = location.state?.bounds;
 
-    const [initialStyle, setInitialStyle] = useState(null);
+    // Diturunkan saat render, bukan state: tanpa bounds nilainya identitas,
+    // jadi halaman tetap tampil (hanya tanpa animasi zoom dari tile).
+    const initialStyle = zoomFrom(bounds);
   
     const [datas, setData] = useState([]);
     const [dataEventParticipant, setDataEventParticipant] = useState([]);
@@ -145,28 +150,13 @@ export default function Survey() {
             fetchData();
         }
 
-        if (bounds) {
-            const scaleX = bounds.width / window.innerWidth;
-            const scaleY = bounds.height / window.innerHeight;
-            const offsetX = bounds.left + bounds.width / 2 - window.innerWidth / 2;
-            const offsetY = bounds.top + bounds.height / 2 - window.innerHeight / 2;
-      
-            setInitialStyle({
-              scaleX,
-              scaleY,
-              offsetX,
-              offsetY,
-              borderRadius: 16,
-            });
-          }
     }, [token, bounds]);
     
-    if (!initialStyle) return null; 
 
     if (!datas) {
         // No event found after loading
         return (
-          <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
+          <div className="flex flex-col items-center justify-center app-surface app-bg p-5">
             <p className="text-red-700 text-xl font-semibold mb-4">{t('survey.notFound')}</p>
             <button
               onClick={() => navigate('/')}
@@ -179,7 +169,11 @@ export default function Survey() {
     }  
   
     return (
-        <div className="w-full min-h-screen flex flex-col bg-gradient-to-br from-stone-50 to-orange-200">
+        <AppShell nav>
+        <AppHeader
+            title={t('survey.yourVoiceMatters')}
+            trailing={<LanguageToggle />}
+        />
         <motion.div
         initial={{
             opacity: 0,
@@ -206,7 +200,7 @@ export default function Survey() {
             borderRadius: initialStyle.borderRadius,
           }}
           transition={{ duration: 0.5, type: "tween", ease: "easeInOut" }}
-          className="w-full min-h-screen flex flex-col bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto"
+          className="w-full flex flex-col"
         >
         {
             <>
@@ -216,31 +210,20 @@ export default function Survey() {
             animate="animate"
             exit="exit"
             transition={{ duration: 0.5, type: "tween", ease: "easeInOut" }}
-            className="p-5"
+            className="px-5 pt-4"
             >
-                <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1">
-                        <button
-                            onClick={() => navigate(`/`)}
-                            className="text-red-700 text-xl font-bold flex items-center gap-1 pr-2 py-1"
-                        >
-                            <i className="ri-arrow-left-line"></i>
-                        </button>
-                    </div>
-                    <LanguageToggle />
-                </div>
-                <div className="flex items-start justify-between mb-2 px-2 gap-2">
-                    <div className="flex-1 inline-flex flex-col justify-center items-start gap-2">
-                        <div className="self-stretch inline-flex justify-start items-center gap-1">
-                            <div className="flex-1 justify-start text-red-700 text-lg font-semibold leading-tight">{t('survey.yourVoiceMatters')}</div>
-                        </div>
-                        <div className="self-stretch justify-start text-stone-600 text-sm font-medium leading-tight">{t('survey.subtitle')}</div>
-                    </div>
-                    <div className="w-1/3 relative rounded-lg overflow-hidden">
-                    <img
-                        className="w-full h-full object-cover"
-                        src={getImageUrl(apiUrl, 'assets/images/surveys/banner-survey-img.png')}
-                        alt="Banner"
+                {/* Judul sudah ada di AppHeader, jadi blok ini menyisakan
+                    penjelasan singkat dan ilustrasinya saja. */}
+                <div className="flex items-center justify-between gap-3 bg-white rounded-2xl shadow-card p-3">
+                    <p className="flex-1 text-stone-600 text-xs leading-relaxed">
+                        {t('survey.subtitle')}
+                    </p>
+                    <div className="w-24 shrink-0 aspect-[4/3] rounded-xl overflow-hidden bg-stone-100">
+                        <img
+                            className="w-full h-full object-cover"
+                            src={getImageUrl(apiUrl, 'assets/images/surveys/banner-survey-img.png')}
+                            alt=""
+                            aria-hidden="true"
                         />
                     </div>
                 </div>
@@ -310,6 +293,6 @@ export default function Survey() {
             </>
         }
         </motion.div>
-        </div>
+        </AppShell>
     );
 }

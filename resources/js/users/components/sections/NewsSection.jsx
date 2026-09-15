@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/bundle";
-import { FreeMode } from "swiper/modules";
-import BannerLoader from "../Loader/BannerLoader";
 import { getImageUrl } from "../Helper/imagePath";
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from "../context/AuthContext";
-import { useApiUrl } from "../context/ApiContext";
+import { useAuth } from "../Context/AuthContext";
+import { useApiUrl } from "../Context/ApiContext";
 import axios from "axios";
 import { showAlert } from "../Helper/alertHelper";
+import SectionHeader from "../Layout/SectionHeader";
+import EmptyState from "../Layout/EmptyState";
 import NewsSectionLoader from "../Loader/NewsSectionLoader";
 
 export default () => {
@@ -24,7 +21,7 @@ export default () => {
   const [loadedImages, setLoadedImages] = useState({});
   const [loading, setLoading] = useState(true);
   const { t, i18n } = useTranslation();
-  
+
   useEffect(() => {
     const fetchNews = async () => {
       try {
@@ -32,7 +29,7 @@ export default () => {
         const res = await axios.get(`${apiUrl}/api/news?limit=3`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-  
+
         // Preprocess businessUnit
         const newsData = res.data.map((e) => ({
           ...e,
@@ -46,7 +43,7 @@ export default () => {
               })
             : [e.businessUnit],
         }));
-  
+
         setLatestNews(newsData);
       } catch (err) {
         showAlert({
@@ -56,13 +53,13 @@ export default () => {
           timer: 2500,
           showConfirmButton: false,
         }).then(() => {
-          console.log(err);          
+          console.log(err);
         });
       } finally {
         setLoading(false);
       }
     };
-  
+
     if (token) fetchNews();
   }, [apiUrl, token]);
 
@@ -76,70 +73,64 @@ export default () => {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* Header Section */}
-      <div className="flex items-center justify-between">
-        <div className="text-red-700 text-sm font-bold">{t('home.newsUpdate')}</div>
-        <div onClick={() => navigate(`/news`)} className="text-stone-600 text-xs font-medium cursor-pointer">{t('common.showAll')} <i className="ri-arrow-right-line"></i></div>
-      </div>
+    <section className="flex flex-col gap-3">
+      <SectionHeader
+        title={t('home.newsUpdate')}
+        actionLabel={t('common.showAll')}
+        onAction={() => navigate('/news')}
+      />
 
-      {/* Swiper Container */}
-      <div className="overflow-x-scroll whitespace-nowrap">
-        <Swiper
-          modules={[FreeMode]}
-          spaceBetween={15}
-          slidesPerView={2}
-          followFinger={true}
-          speed={600}
-        >
-          {/* Slides */}
+      {latestNews.length === 0 ? (
+        <EmptyState icon="ri-newspaper-line" description={t('news.empty')} />
+      ) : (
+        // Baris geser dengan snap: kartu berikutnya sedikit terlihat sebagai
+        // petunjuk bahwa daftar masih bisa digeser.
+        <div className="snap-row no-scrollbar -mx-5 px-5 pb-1">
           {latestNews.map((item) => {
             const newsDate = new Date(item.publish_date);
             const day = newsDate.toLocaleDateString(i18n.resolvedLanguage === "id" ? "id-ID" : "en-US", {
-              weekday: "long",
               day: "2-digit",
-              month: "long",
+              month: "short",
               year: "numeric",
             });
+
             return (
-              <SwiperSlide key={item.encrypted_id}>
-                <div onClick={() => navigate(`/news/${item.encrypted_id}`)} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 aspect-[4/3] relative rounded-lg overflow-hidden">
-                  {/* Container for Image + Loader */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {/* Lazy Loaded Image */}
-                    <img
-                      className={`w-full h-full object-cover transition-opacity duration-300 ${
-                        loadedImages[item.encrypted_id] ? 'opacity-100' : 'opacity-0'}`}
-                      src={getImageUrl(apiUrl, item.image)}
-                      alt={item.title}
-                      decoding="async"
-                      loading="lazy"
-                      onLoad={() => settleImage(item.encrypted_id)}
-                      onError={() => settleImage(item.encrypted_id)}
-                    />
+              <button
+                key={item.encrypted_id}
+                type="button"
+                onClick={() => navigate(`/news/${item.encrypted_id}`)}
+                className="tap w-[74%] max-w-[280px] text-left"
+              >
+                <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-card bg-stone-100">
+                  <img
+                    className={`w-full h-full object-cover transition-opacity duration-300 ${
+                      loadedImages[item.encrypted_id] ? 'opacity-100' : 'opacity-0'}`}
+                    src={getImageUrl(apiUrl, item.image)}
+                    alt={item.title}
+                    decoding="async"
+                    loading="lazy"
+                    onLoad={() => settleImage(item.encrypted_id)}
+                    onError={() => settleImage(item.encrypted_id)}
+                  />
 
-                    {/* Preloader (only if image not loaded) */}
-                    {!loadedImages[item.encrypted_id] && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-orange-50 z-10">
-                        <BannerLoader />
-                      </div>
-                    )}
-                  </div>
+                  {!loadedImages[item.encrypted_id] && (
+                    <div className="absolute inset-0 skeleton" />
+                  )}
 
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
 
-                  {/* Content */}
-                  <div className="p-2 absolute bottom-0 left-0 right-0 text-white pointer-events-none z-10">
-                    <div className="text-[10px] font-medium leading-[10px]">{day}</div>
-                    <div className="text-xs font-semibold leading-3">{item.title}</div>
+                  <div className="absolute inset-x-0 bottom-0 p-3 text-white pointer-events-none">
+                    <span className="inline-block mb-1.5 px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold backdrop-blur-sm">
+                      {day}
+                    </span>
+                    <p className="text-[15px] font-extrabold tracking-[-0.014em] leading-[1.28] clamp-2">{item.title}</p>
                   </div>
                 </div>
-              </SwiperSlide>
+              </button>
             );
           })}
-        </Swiper>
-      </div>
-    </div>
+        </div>
+      )}
+    </section>
   );
 };

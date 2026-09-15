@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useApiUrl } from '../components/context/ApiContext';
-import { useAuth } from '../components/context/AuthContext';
+import { useApiUrl } from '../components/Context/ApiContext';
+import { useAuth } from '../components/Context/AuthContext';
+import AppHeader from '../components/Layout/AppHeader';
 import { getImageUrl } from '../components/Helper/imagePath';
 import NewsLoader from '../components/Loader/NewsLoader';
 import { motion } from "motion/react";
@@ -69,7 +70,7 @@ export default function NewsDetails({ onLike }) {
 
   
   if (loading) return (
-    <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen">
+    <div className="w-full relative app-surface app-bg overflow-auto">
       <motion.div
         variants={pageVariants}
         initial="initial"
@@ -84,7 +85,7 @@ export default function NewsDetails({ onLike }) {
 
   if (!news) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
+      <div className="flex flex-col items-center justify-center app-surface app-bg p-5">
         <p className="text-red-700 text-xl font-semibold mb-4">{t('news.notFound')}</p>
         <button
           onClick={() => navigate('/')}
@@ -125,21 +126,10 @@ export default function NewsDetails({ onLike }) {
 
 
   return (
-    <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
-    {/* Header Section */}
-    <div className="flex items-center justify-between mb-5">
-        <div className="flex-1">
-            <button
-                onClick={() => window.history.back()}
-                className="text-red-700 text-xl font-bold flex items-start gap-1 pr-4"
-            >
-                <i className="ri-arrow-left-line"></i>
-            </button>
-        </div>
-        <div className="flex-2 text-center text-red-700 text-lg font-bold">{t('news.title')}</div>
-        <div className="flex-1" /> {/* Spacer to balance layout */}
-    </div>
+    <div className="w-full relative app-surface app-bg overflow-auto">
+    <AppHeader title={t('news.title')} backTo="/news" />
     <motion.div
+        className="app-container px-5 pt-4 pb-10"
         variants={pageVariants2}
         initial="initial"
         animate="animate"

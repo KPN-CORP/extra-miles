@@ -1,24 +1,37 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useApiUrl } from "../context/ApiContext";
 
 export default () => {
 
-  const apiUrl = useApiUrl();
   const { t } = useTranslation();
 
   return (
+    // Chip biru langit yang lama adalah satu-satunya warna non-brand yang
+    // tersisa di halaman ini, jadi diganti garis dan teks merah brand -- sama
+    // seperti tombol "News & Events Assets" di tampilan lama, tapi tetap berupa
+    // baris supaya mudah dipindai bersama kartu lain.
     <a
       href="https://drive.google.com/drive/folders/1zmDJ_yE6zL4itNi-XcG8IO6sFfhAQRdA"
       target="_blank"
       rel="noopener noreferrer"
       title={t('assets.title')}
-      className="inline-flex w-fit px-6 py-1 rounded-lg ring-1 ring-red-700 justify-center items-center shadow-lg bg-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
       aria-label={t('assets.ariaLabel')}
+      className="tap w-full bg-white rounded-2xl ring-[1.5px] ring-brand-700 shadow-card p-3 flex items-center gap-3"
     >
-      <div className="text-center text-red-700 text-xs sm:text-sm font-bold leading-tight">
-        {t('assets.line1')}<br />{t('assets.line2')}
-      </div>
+      <span className="w-11 h-11 shrink-0 rounded-2xl grid place-items-center bg-brand-75 text-brand-700 text-[22px]">
+        <i className="ri-folder-image-fill" aria-hidden="true" />
+      </span>
+
+      <span className="flex-1 min-w-0">
+        <span className="block text-brand-700 text-[14px] font-extrabold tracking-[-0.012em] leading-tight">
+          {t('assets.line1')} {t('assets.line2')}
+        </span>
+        <span className="block text-stone-500 text-[11px] leading-tight mt-0.5 clamp-1">
+          {t('assets.subtitle')}
+        </span>
+      </span>
+
+      <i className="ri-arrow-right-up-line text-brand-700 text-lg shrink-0" aria-hidden="true" />
     </a>
   );
 };

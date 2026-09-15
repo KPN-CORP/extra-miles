@@ -1,28 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import LanguageToggle from '../components/Layout/LanguageToggle';
-import { useNavigate } from "react-router-dom"
-import { useApiUrl } from "../components/context/ApiContext"; // Assuming you have a context for API URL
-import EvoSection from '../components/sections/EvoSection'; // Assuming you have a NewsCard component
-import NewsSection from '../components/sections/NewsSection'; // Assuming you have a NewsCard component
-import MenuSection from '../components/sections/MenuSection'; // Assuming you have a NewsCard component
-import axios from 'axios';
+
+import AppShell from '../components/Layout/AppShell';
+import HomeHero from '../components/sections/HomeHero';
+import NewsSection from '../components/sections/NewsSection';
+import MenuSection from '../components/sections/MenuSection';
 import ActivitySection from '../components/sections/ActivitySection';
 import QuoteSection from '../components/sections/QuoteSection';
 import AssetSection from '../components/sections/AssetSection';
 import { showAlert } from '../components/Helper/alertHelper';
-import { useAuth } from '../components/context/AuthContext';
+import { useAuth } from '../components/Context/AuthContext';
 import PageLoader from '../components/Loader/PageLoader';
-import { getImageUrl } from '../components/Helper/imagePath';
+import { SSO_URL } from '../components/Helper/ssoRedirect';
 
 const Home = () => {
-    const apiUrl = useApiUrl(); // Get the API URL from context
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
-    const { token, user } = useAuth();
+    const { token } = useAuth();
     const { t } = useTranslation();
 
-    useEffect(() => {        
+    useEffect(() => {
         if (!token) {
             showAlert({
                 icon: 'warning',
@@ -32,52 +28,39 @@ const Home = () => {
                 showConfirmButton: false,
             }).then(() => {
                 if (document.referrer) {
-                window.history.back();
+                    window.history.back();
                 } else {
-                window.location.href = 'https://kpncorporation.darwinbox.com/';
+                    window.location.href = SSO_URL;
                 }
             });
             return;
-        } else {
-            setLoading(false);
-        }    
-      }, []);
+        }
 
-      if (loading) {
+        setLoading(false);
+    }, []);
+
+    if (loading) {
         return <PageLoader />;
-      }
+    }
 
     return (
-        <>
-            <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
-                <div className="fixed bottom-0 right-0 w-44 h-40 overflow-hidden">
-                    <img
-                    className="w-full h-full object-cover"
-                    src={getImageUrl(apiUrl, 'assets/images/Element Extra Mile 1.png')}
-                    alt="attribute"
-                    loading="eager" 
-                    />
-                </div>
-                <img className={`w-full h-36 left-0 top-0 absolute`} src={getImageUrl(apiUrl, 'assets/images/img-banner.png')} />
-                <div className="w-full px-5 py-4 left-0 top-[150px] absolute rounded-tl-[30px] rounded-tr-[30px] flex flex-col gap-6 overflow-hidden">
-                    <div className="flex flex-col gap-2">
-                    {/* Employee Section */}
-                        <div className="flex items-center justify-between">
-                            <LanguageToggle />
-                            {user?.fullname && (
-                                <div className="text-red-700 text-xs font-bold">{t('home.welcomeBack', { name: user?.fullname })}</div>
-                            )}
-                        </div>
-                    </div>
-                    {user?.hasEvoPermission && <EvoSection />}
-                    <NewsSection />
-                    <MenuSection />
-                    <ActivitySection />
-                    <QuoteSection />
-                    <AssetSection />
-                </div>
+        <AppShell nav watermark>
+            {/* Sapaan + identitas karyawan, menyatu dengan tepi atas layar.
+                Tanpa sudut membulat dan tanpa bayangan: potongan diagonal pita
+                sapaan yang jadi pemisahnya, dan bayangan sepanjang garis miring
+                justru terbaca seperti salah render. */}
+            <HomeHero />
+
+            <div className="px-5 pt-2.5 flex flex-col gap-6">
+                {/* Berita paling depan: isinya yang paling sering berubah.
+                    Quick Access sudah dihafal karyawan, jadi boleh di bawahnya. */}
+                <NewsSection />
+                <MenuSection />
+                <ActivitySection limit={2} />
+                <QuoteSection />
+                <AssetSection />
             </div>
-        </>
+        </AppShell>
     );
 };
 

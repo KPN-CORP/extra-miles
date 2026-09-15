@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import LanguageToggle from '../components/Layout/LanguageToggle';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { motion } from 'motion/react';
 
+import AppShell from '../components/Layout/AppShell';
+import AppHeader from '../components/Layout/AppHeader';
 import { useApiUrl } from '../components/Context/ApiContext';
 import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
@@ -18,12 +19,6 @@ import {
     loadWellness,
     MY_REGISTRATIONS_KEY,
 } from '../components/Helper/wellnessCache';
-
-const pageVariants = {
-    initial: { opacity: 0, x: 0 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 0 },
-};
 
 export default function MyWellness() {
     const navigate = useNavigate();
@@ -164,27 +159,17 @@ export default function MyWellness() {
     const checkInAvailable = registrations.some((r) => r.can_check_in);
 
     return (
-        <motion.div
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.25 }}
-            className="w-full min-h-screen bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto"
-        >
-            <div className="px-5 pt-5 pb-24 flex flex-col gap-4">
-                <div className="flex items-center gap-2">
-                    <button onClick={() => navigate('/wellness')} className="text-red-700 text-xl" aria-label={t('wellness.back')}>
-                        <i className="ri-arrow-left-line"></i>
-                    </button>
-                    <div className="flex-1 text-center text-red-700 text-base font-semibold">{t('wellness.myTitle')}</div>
-                    <LanguageToggle />
-                </div>
+        <AppShell nav>
+            <AppHeader
+                title={t('wellness.myTitle')}
+                trailing={<LanguageToggle />}
+            />
 
+            <div className="px-5 pt-4 flex flex-col gap-4">
                 {checkInAvailable && (
                     <button
                         onClick={() => setScannerOpen(true)}
-                        className="w-full p-3 bg-red-700 rounded-lg shadow-md text-white text-xs font-semibold flex items-center justify-center gap-2"
+                        className="tap w-full p-3 bg-brand-700 rounded-2xl shadow-float text-white text-xs font-semibold flex items-center justify-center gap-2"
                     >
                         <i className="ri-qr-scan-2-line"></i> {t('wellness.scanToCheckIn')}
                     </button>
@@ -310,6 +295,6 @@ export default function MyWellness() {
                 onClose={() => setScannerOpen(false)}
                 onScanSuccess={refreshAfterWrite}
             />
-        </motion.div>
+        </AppShell>
     );
 }

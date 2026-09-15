@@ -7,10 +7,13 @@ import axios from 'axios';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../../../css/calendar-custom.css';
-import { useApiUrl } from "../components/context/ApiContext";
+import AppShell from "../components/Layout/AppShell";
+import AppHeader from "../components/Layout/AppHeader";
+import LanguageToggle from "../components/Layout/LanguageToggle";
+import { useApiUrl } from "../components/Context/ApiContext";
 import { BarLoader, PuffLoader, SyncLoader } from "react-spinners";
 import { showAlert } from "../components/Helper/alertHelper";
-import { useAuth } from "../components/context/AuthContext";
+import { useAuth } from "../components/Context/AuthContext";
 import PageLoader from "../components/Loader/PageLoader";
 import { dateTimeHelper } from "../components/Helper/dateTimeHelper";
 import { getImageUrl } from "../components/Helper/imagePath";
@@ -18,6 +21,7 @@ import { useSwipeable } from 'react-swipeable';
 import { AnimatePresence, motion } from "motion/react";
 import CardLoader from "../components/Loader/CardLoader";
 import { useNavigationDirection } from "../components/Context/NavigationProvider";
+import { zoomFrom } from '../components/Helper/zoomTransition';
 
 const pageVariants = {
     initial: { opacity: 0, x: 0 },     // Masuk dari kanan
@@ -32,7 +36,9 @@ export default function Event() {
     const { direction } = useNavigationDirection();
     const [skipExit, setSkipExit] = useState(false);        
 
-    const [initialStyle, setInitialStyle] = useState(null);
+    // Diturunkan saat render, bukan state: tanpa bounds nilainya identitas,
+    // jadi halaman tetap tampil (hanya tanpa animasi zoom dari tile).
+    const initialStyle = zoomFrom(bounds);
     const [events, setEvent] = useState([]);
     const [loading, setLoading] = useState(true);
     const apiUrl = useApiUrl();
@@ -105,20 +111,6 @@ export default function Event() {
         if(token) {
             fetchEvent();
         }
-        if (bounds) {
-            const scaleX = bounds.width / window.innerWidth;
-            const scaleY = bounds.height / window.innerHeight;
-            const offsetX = bounds.left + bounds.width / 2 - window.innerWidth / 2;
-            const offsetY = bounds.top + bounds.height / 2 - window.innerHeight / 2;
-      
-            setInitialStyle({
-              scaleX,
-              scaleY,
-              offsetX,
-              offsetY,
-              borderRadius: 16,
-            });
-          }
     }, [apiUrl, token, bounds]);
     
     const handleDateChange = (date) => {
@@ -156,10 +148,13 @@ export default function Event() {
         return matchCategory && matchDate && matchYear;
     });    
 
-    if (!initialStyle) return null; 
   
     return (
-        <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
+        <AppShell nav>
+        <AppHeader
+            title={t('event.upcomingEvents')}
+            trailing={<LanguageToggle />}
+        />
         <motion.div
         initial={direction < 0 ? {} : {
             opacity: 0,
@@ -186,19 +181,8 @@ export default function Event() {
             borderRadius: initialStyle.borderRadius,
           }}
           transition={{ duration: 0.5, type: "tween", ease: "easeInOut" }}
+          className="px-5 pt-4"
         >
-        <div className="flex items-center justify-between mb-2">
-            <div className="flex-1">
-                <button
-                    onClick={() => navigate(`/`)}
-                    className="text-red-700 text-xl font-bold flex items-center gap-1 px-2 py-1"
-                >
-                    <i className="ri-arrow-left-line"></i>
-                </button>
-            </div>
-            <div className="flex-2 text-center text-red-700 text-lg font-bold">{t('event.upcomingEvents')}</div>
-            <div className="flex-1" /> {/* Spacer to balance layout */}
-        </div>
         {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Left Column: Calendar */}
@@ -370,6 +354,6 @@ export default function Event() {
             </AnimatePresence>
         </div>
         </motion.div>
-        </div>
+        </AppShell>
     );
 }

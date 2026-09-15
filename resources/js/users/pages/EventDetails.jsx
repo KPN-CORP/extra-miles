@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { useApiUrl } from '../components/context/ApiContext';
-import { useAuth } from '../components/context/AuthContext';
+import { useApiUrl } from '../components/Context/ApiContext';
+import { useAuth } from '../components/Context/AuthContext';
+import AppHeader from "../components/Layout/AppHeader";
 import { showAlert } from '../components/Helper/alertHelper';
 import PageLoader from '../components/Loader/PageLoader';
 import EventLoader from '../components/Loader/EventLoader';
@@ -12,6 +13,7 @@ import { dateTimeHelper } from '../components/Helper/dateTimeHelper';
 import { getImageUrl } from '../components/Helper/imagePath';
 import { motion } from "motion/react";
 import parse from "html-react-parser";
+import { zoomFrom } from '../components/Helper/zoomTransition';
 
 const pageVariants = {
   initial: { opacity: 0, y: "50%" },     // Masuk dari kanan
@@ -29,7 +31,9 @@ export default function EventDetails() {
   const [skipExit, setSkipExit] = useState(false);
   const { t } = useTranslation();
 
-  const [initialStyle, setInitialStyle] = useState(null);
+  // Diturunkan saat render, bukan state: tanpa bounds nilainya identitas,
+  // jadi halaman tetap tampil (hanya tanpa animasi zoom dari tile).
+  const initialStyle = zoomFrom(bounds);
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,20 +62,6 @@ export default function EventDetails() {
 
     fetchEvent();
 
-    if (bounds) {
-      const scaleX = bounds.width / window.innerWidth;
-      const scaleY = bounds.height / window.innerHeight;
-      const offsetX = bounds.left + bounds.width / 2 - window.innerWidth / 2;
-      const offsetY = bounds.top + bounds.height / 2 - window.innerHeight / 2;
-
-      setInitialStyle({
-        scaleX,
-        scaleY,
-        offsetX,
-        offsetY,
-        borderRadius: 16,
-      });
-    }
   }, [apiUrl, id, token, bounds]);
 
   const confirmAlertConfig = {
@@ -148,10 +138,9 @@ export default function EventDetails() {
     }
   };
 
-  if (!initialStyle) return null; 
 
   if (loading) return (
-  <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen">
+  <div className="w-full relative app-surface app-bg overflow-auto">
     <motion.div
       variants={pageVariants}
       initial="initial"
@@ -166,7 +155,7 @@ export default function EventDetails() {
 
   if (!event) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
+      <div className="flex flex-col items-center justify-center app-surface app-bg p-5">
         <p className="text-red-700 text-xl font-semibold mb-4">{t('event.notFound')}</p>
         <button
           onClick={() => navigate('/')}
@@ -206,26 +195,15 @@ export default function EventDetails() {
   const statusColor = getStatusColor();
   
   return (
-  <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
+  <div className="w-full relative app-surface app-bg overflow-auto">
+    <AppHeader title={t('event.upcomingEvents')} backTo="/event" />
     <motion.div
+      className="app-container px-5 pt-4 pb-10"
       variants={pageVariants}
       animate="animate"
       exit="exit"
       transition={{ duration: 0.3, type: "tween", ease: "easeOut" }}
     >
-              {/* Header Section */}
-              <div className="flex items-center justify-between mb-2">
-                  <div className="flex-1">
-                      <button
-                          onClick={() => window.history.back()}
-                          className="text-red-700 text-xl font-bold flex items-center gap-1 px-2 py-1"
-                      >
-                          <i className="ri-arrow-left-line"></i>
-                      </button>
-                  </div>
-                  <div className="flex-2 text-center text-red-700 text-lg font-bold">{t('event.upcomingEvents')}</div>
-                  <div className="flex-1" /> {/* Spacer to balance layout */}
-              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <img
                       src={getImageUrl(apiUrl, event.image)}

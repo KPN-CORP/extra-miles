@@ -1,16 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import EventCard from "../Cards/EventCard";
-import { useApiUrl } from "../context/ApiContext";
+import MyEventCard from "../Cards/MyEventCard";
+import { useApiUrl } from "../Context/ApiContext";
 import { showAlert } from "../Helper/alertHelper";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../Context/AuthContext";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import ActivityLoader from "../Loader/ActivityLoader";
 import QRScannerModal from '../Helper/QrScannerModal';
-import { dateTimeHelper } from "../Helper/dateTimeHelper";
+import SectionHeader from "../Layout/SectionHeader";
+import EmptyState from "../Layout/EmptyState";
+import {
+  bySoonest,
+  hasAttended,
+  isAwaitingResponse,
+  isConfirmedUpcoming,
+} from "../Helper/eventRules";
 
-const ActivitySection = () => {
+// Halaman tujuan "Show All". Bukan /event: halaman itu memuat /api/events
+// (seluruh event, dengan filter kalender), bukan daftar milik karyawan ini.
+const ALL_PATH = '/my-events';
+
+/**
+ * `limit` membatasi jumlah kartu per bagian dan memunculkan tautan "Show All".
+ * Beranda selalu memakainya; /my-events punya daftar tergabung sendiri dengan
+ * filter, jadi tidak memanggil komponen ini.
+ */
+const ActivitySection = ({ limit = null }) => {
   const apiUrl = useApiUrl();
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
@@ -19,7 +35,6 @@ const ActivitySection = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const bounds = location.state?.bounds;
 
   // Fungsi fetch dipisah agar bisa dipanggil ulang
   const fetchEvent = async () => {
@@ -47,134 +62,101 @@ const ActivitySection = () => {
   };
 
   useEffect(() => {
-    if (bounds) {
-        const scaleX = bounds.width / window.innerWidth;
-        const scaleY = bounds.height / window.innerHeight;
-        const offsetX = bounds.left + bounds.width / 2 - window.innerWidth / 2;
-        const offsetY = bounds.top + bounds.height / 2 - window.innerHeight / 2;
-  
-        setInitialStyle({
-          scaleX,
-          scaleY,
-          offsetX,
-          offsetY,
-          borderRadius: 16,
-        });
-      }
-      fetchEvent();
-  }, [bounds]);
+    fetchEvent();
+  }, []);
 
-  const handleConfirm = async (event) => {
-
-    navigate(`/event/${event.encrypted_id}`, {
-          state: {
-            bounds: {
-              width: bounds?.width ?? null,
-              height: bounds?.height ?? null,
-              top: bounds?.top ?? null,
-              left: bounds?.left ?? null
-            }
-          }
-        });
-    
-  };
-  
+  const handleConfirm = (event) => navigate(`/event/${event.encrypted_id}`);
 
   const handleScanQR = (event) => {
-    if (event.event_participant?.[0]?.attending_status !== 'Attending') {
+    if (!hasAttended(event)) {
       setIsQRModalOpen(true);
       setSelectedEvent(event);
     }
   };
 
-  const confirmationEvents = events.filter(
-    (event) => event.event_participant?.[0]?.status === "Confirmation"
-  );
-
-  const registeredEvents = events.filter(
-    (event) =>
-      event.event_participant?.[0]?.status === "Registered" &&
-    !dateTimeHelper(event).isClosed
-  );
+  const registeredEvents = events.filter(isConfirmedUpcoming).sort(bySoonest);
 
   if (loading) {
     return <ActivityLoader />;
   }
 
+  const pending = events.filter(isAwaitingResponse).sort(bySoonest);
+
+  const visiblePending = limit ? pending.slice(0, limit) : pending;
+  const visibleRegistered = limit ? registeredEvents.slice(0, limit) : registeredEvents;
+
+  // Tautan hanya muncul kalau memang ada yang tersembunyi.
+  const showAllFor = (count) =>
+    limit && count > limit
+      ? { actionLabel: t('common.showAll'), onAction: () => navigate(ALL_PATH) }
+      : {};
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {/* Section 1: Waiting for Your Response */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center text-red-700 text-sm font-bold leading-tight">
-          {t('activity.waitingForResponse')}
-        </div>
-        {confirmationEvents.length > 0 ? (
+      <section className="flex flex-col gap-3">
+        <SectionHeader
+          title={t('activity.waitingForResponse')}
+          badge={pending.length}
+          {...showAllFor(pending.length)}
+        />
+
+        {pending.length > 0 ? (
           <>
-            <div className="p-2 bg-rose-200 rounded outline outline-1 outline-offset-[-1px] outline-red-200 mb-2">
-              <div className="text-red-900 text-xs font-normal leading-none">
+            <div className="flex gap-2 p-3 rounded-2xl bg-amber-50 border border-amber-200">
+              <i className="ri-alarm-warning-line text-amber-600 text-base shrink-0" aria-hidden="true" />
+              <p className="text-amber-900 text-[11.5px] leading-relaxed">
                 {t('activity.confirmationDeadline')}
-              </div>
+              </p>
             </div>
-            {confirmationEvents
-              .filter((event) => event.status === "Open Registration" || event.status === "Full Booked")
-              .map((event) => (
-                <EventCard
+
+            <div className="flex flex-col gap-2">
+              {visiblePending.map((event) => (
+                <MyEventCard
                   key={event.encrypted_id}
                   event={event}
-                  onAction={handleConfirm}
-                  buttonText={t('activity.confirm')}
-                  buttonClass="bg-yellow-400 text-white text-sm font-semibold"
+                  onConfirm={handleConfirm}
+                  onScan={handleScanQR}
                 />
               ))}
+            </div>
           </>
         ) : (
-          <div className="p-2 bg-green-200 rounded outline outline-1 outline-offset-[-1px] outline-green-400 mb-2">
-            <div className="text-green-700 text-xs font-normal leading-none">
-              {t('activity.allCaughtUp')}
-            </div>
-          </div>
+          <EmptyState
+            tone="success"
+            icon="ri-checkbox-circle-line"
+            title={t('activity.allCaughtUpTitle')}
+            description={t('activity.allCaughtUpText')}
+          />
         )}
-      </div>
+      </section>
 
-      {/* Section 2: Events You’re Invited To Join */}
-      <div className="self-stretch flex flex-col justify-start items-start gap-2">
-          <div className="flex-1 justify-center text-red-700 text-sm font-bold leading-tight">
-            {t('activity.invitedToJoin')}
-          </div>
+      {/* Section 2: Events You're Invited To Join */}
+      <section className="flex flex-col gap-3">
+        <SectionHeader
+          title={t('activity.invitedToJoin')}
+          badge={registeredEvents.length}
+          {...showAllFor(registeredEvents.length)}
+        />
+
         {registeredEvents.length > 0 ? (
-          <div className="w-full flex flex-col justify-start items-start gap-2">
-            {registeredEvents.map((event) => {
-              const eventDate = new Date(event.start_date);
-              const today = new Date();
-              const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
-              const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-              const eventDay = eventDateOnly <= todayOnly;              
-
-              return (
-                <EventCard
-                  key={event.encrypted_id}
-                  event={event}
-                  onAction={handleScanQR}
-                  buttonText={
-                    <>
-                      {t('activity.scan')} <i className="ms-1 ri-qr-scan-line"></i>
-                    </>
-                  }
-                  buttonClass={`${
-                    eventDay ? "bg-red-700" : "bg-stone-300"
-                  } text-white text-xs font-medium`}
-                />
-              );
-            })}
+          <div className="flex flex-col gap-2">
+            {visibleRegistered.map((event) => (
+              <MyEventCard
+                key={event.encrypted_id}
+                event={event}
+                onConfirm={handleConfirm}
+                onScan={handleScanQR}
+              />
+            ))}
           </div>
         ) : (
-          <div className="p-2 bg-stone-100 rounded outline outline-1 outline-offset-[-1px] outline-stone-300 mb-2">
-            <div className="text-stone-700 text-xs font-normal leading-none">
-              {t('activity.noPendingEvent')}
-            </div>
-          </div>
+          <EmptyState
+            icon="ri-calendar-2-line"
+            description={t('activity.noPendingEvent')}
+          />
         )}
-      </div>
+      </section>
 
       <QRScannerModal
         isOpen={isQRModalOpen}

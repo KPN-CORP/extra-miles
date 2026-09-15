@@ -52,10 +52,35 @@
     border: none;
   }
   
+  /* Oranye lama sudah di luar palet sejak brand-nya disatukan ke merah
+     wordmark. Dipakai di /event dan /my-events. */
   .react-calendar__tile--active {
-    background: #f97316;
+    background: #c00000;
     color: white;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
+  }
+
+  /* Titik penanda hari yang punya jadwal (lihat DateFilter markedDates). */
+  .has-sessions-dot {
+    display: block;
+    width: 4px;
+    height: 4px;
+    margin: 2px auto 0;
+    border-radius: 999px;
+    background: #c00000;
+  }
+
+  .react-calendar__tile--active .has-sessions-dot {
+    background: #ffffff;
+  }
+
+  .react-calendar__tile--now {
+    background: #ffe7e7;
+    border-radius: 0.5rem;
+  }
+
+  .react-calendar__tile--now.react-calendar__tile--active {
+    background: #c00000;
   }
   
 
@@ -100,3 +125,152 @@
     animation: pop 0.4s ease-out forwards;
   }
   
+/* ==========================================================================
+   Fondasi tampilan aplikasi mobile (employee app)
+   Token dan utility di bawah ini dipakai oleh AppShell / AppHeader / BottomNav
+   supaya seluruh halaman punya jarak aman, latar, dan umpan balik sentuh yang
+   sama tanpa mengulang kelas panjang di tiap komponen.
+   ========================================================================== */
+
+:root {
+    /* Notch iPhone / gesture bar Android. Fallback 0px untuk browser lama. */
+    --app-safe-top: env(safe-area-inset-top, 0px);
+    --app-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --app-header-h: 56px;
+    --app-nav-h: 62px;
+}
+
+html,
+body {
+    /* Menghindari "bounce" putih di atas/bawah saat scroll di iOS. */
+    overscroll-behavior-y: none;
+    background-color: #faf8f7;
+}
+
+body {
+    /* Long-press di tombol tidak memunculkan menu seleksi teks ala browser. */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* Latar aplikasi. Satu sumber kebenaran supaya gradient tidak ditulis ulang. */
+/* Tinggi minimum satu layar. 100dvh menjaga nilainya tetap benar saat address
+   bar browser mobile muncul/hilang. */
+.app-surface {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* Latar rata, bukan gradient. Gradient peach yang lama beradu dengan merah
+   brand dan membuat kartu putih terlihat keruh; warna rata membiarkan bayangan
+   hangat (shadow-card) yang mengangkat kartu, dan menahan enam tile merah di
+   Quick Access supaya tidak saling berebut perhatian. */
+.app-bg {
+    background-color: #faf8f7;
+}
+
+/* Kolom konten: lebar penuh di ponsel, terkunci di tengah pada layar lebih besar. */
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    margin-inline: auto;
+}
+
+/* Padding aman untuk area yang menempel di tepi layar. */
+.pt-safe {
+    padding-top: var(--app-safe-top);
+}
+
+.pb-safe {
+    padding-bottom: var(--app-safe-bottom);
+}
+
+/* Ruang bawah agar konten terakhir tidak tertutup bottom navigation. */
+.pb-nav {
+    padding-bottom: calc(var(--app-nav-h) + var(--app-safe-bottom) + 20px);
+}
+
+/* Umpan balik sentuh: kartu/tombol menekan sedikit saat ditekan. */
+.tap {
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.16s ease, opacity 0.16s ease, box-shadow 0.16s ease;
+}
+
+.tap:active {
+    transform: scale(0.97);
+    opacity: 0.92;
+}
+
+/* Scroll horizontal ala aplikasi: snap ke kartu, tanpa scrollbar terlihat. */
+.snap-row {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-inline: 1.25rem;
+}
+
+.snap-row > * {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+}
+
+.no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Header & bottom bar transparan-buram. */
+.app-blur {
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+}
+
+/* Potong teks pada baris ke-n (judul kartu berita, nama aktivitas, dll). */
+.clamp-1,
+.clamp-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.clamp-1 {
+    -webkit-line-clamp: 1;
+}
+
+.clamp-2 {
+    -webkit-line-clamp: 2;
+}
+
+/* Placeholder saat gambar/teks masih dimuat. */
+.skeleton {
+    background-image: linear-gradient(90deg, #f5f5f4 25%, #ecebe9 37%, #f5f5f4 63%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Hormati preferensi "kurangi animasi" di sistem pengguna. */
+@media (prefers-reduced-motion: reduce) {
+    .tap,
+    .animate-marquee,
+    .animate-ping,
+    .skeleton,
+    .on-pulse {
+        animation: none !important;
+        transition: none !important;
+    }
+}

@@ -55,6 +55,13 @@ class WellnessController extends Controller
                 'type' => $activity->type?->name,
                 'upcoming_count' => $schedules->get($activity->id)?->count() ?? 0,
                 'next_session' => $schedules->get($activity->id)?->first(),
+                // Seluruh sesi mendatang, bukan hanya yang terdekat: halaman
+                // /wellness memfilter dengan kalender, jadi ia perlu tahu semua
+                // tanggal yang punya sesi -- dan saat satu tanggal dipilih,
+                // kartunya menampilkan sesi tanggal itu, bukan sesi terdekat.
+                // schedulesFor() sudah mengumpulkan semuanya; sebelumnya hanya
+                // dibuang setelah diambil yang pertama.
+                'sessions' => $schedules->get($activity->id)?->values() ?? [],
             ])->values()
         );
     }

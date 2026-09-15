@@ -66,7 +66,9 @@ Shared admin partials live in `resources/views/layouts_/shared/`. List pages use
 
 Entry `resources/js/users/main.jsx` → `app.jsx`, mounted into `#root` by `resources/views/user-app.blade.php`. `app.jsx` gates the entire app behind a mobile check (`max-width: 768px` **and** touch support) and renders a "Mobile Only" screen on desktop — expect a blank-looking app when testing in a desktop browser without device emulation. Routes are declared in `AnimatedRoutes`; providers are `ApiProvider` (base URL) → `AuthProvider` (token + profile) → `NavigationProvider`.
 
-Note that imports mix `./components/context/...` and `./components/Context/...`; the directory on disk is `Context`. This survives on Windows/macOS but is a case-sensitivity hazard if a build ever runs on Linux.
+Imports of the context providers are all spelled `./components/Context/...`, matching the directory on disk — keep it that way, because the lowercase spelling that used to appear here only works on Windows/macOS and breaks a build on a case-sensitive filesystem.
+
+**Page chrome.** Every screen is built from `components/Layout/`: `AppShell` (page background, 480px centred column, safe-area padding, route transition, and — with `nav` — the `BottomNav` tab bar and the bottom padding that clears it), `AppHeader` (sticky top bar with back button, title, and a `trailing` slot), plus `SectionHeader` and `EmptyState`. Tab destinations (`/`, `/event`, `/news`, `/wellness`, `/survey`) render `<AppShell nav>`; drill-down pages get `AppHeader` without the tab bar. Do not hand-roll a back button or a page background — the gradient, the `100dvh` height, `env(safe-area-inset-*)` and the `.tap` press feedback all live in `resources/css/global.css` behind `app-surface` / `app-bg` / `pb-nav` / `tap`. Brand red is the `brand-*` scale in `tailwind.config.js` (`brand-700` is the old `red-700`); older files still say `red-700`.
 
 ### Wellness module
 

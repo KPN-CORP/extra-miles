@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminFallbackController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\DevLoginController;
+use App\Http\Controllers\Auth\DevMobileLoginController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
@@ -36,9 +37,26 @@ Route::middleware('guest')->group(function () {
         ->name('register');
 });
 
-Route::get('/{any?}', SpaController::class)->where('any', '^(?!admin).*$');
+// Local stand-in for the Darwinbox -> auth-service handshake that gives the
+// employee SPA its JWT. Registered above the catch-all below, which would
+// otherwise swallow the path and render the SPA shell instead. Both routes
+// 404 without DEVELOPMENT_MODE=keydevelopment in .env.
+Route::middleware('dev.mode')->group(function () {
+    Route::get('dev/mobile-login', [DevMobileLoginController::class, 'create'])
+        ->name('dev.mobile.login');
+    Route::post('dev/mobile-login', [DevMobileLoginController::class, 'store'])
+        ->name('dev.mobile.login.store');
+});
 
+// Gambar unggahan, dilayani dari storage/app/public.
+//
+// HARUS di atas catch-all SPA di bawahnya. Constraint catch-all itu ikut
+// mencocokkan garis miring, jadi ketika route ini ditaruh sesudahnya setiap
+// /images/... ditelan SpaController dan tag <img> menerima HTML shell -- yang
+// tampil sebagai gambar rusak. Itu sebabnya banner aktivitas wellness kosong.
 Route::get('/images/{filename}', ImageController::class);
+
+Route::get('/{any?}', SpaController::class)->where('any', '^(?!admin).*$');
 
 Route::prefix('admin')->group(function () {
 

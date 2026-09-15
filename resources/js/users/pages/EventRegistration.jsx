@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useApiUrl } from '../components/context/ApiContext';
+import { useApiUrl } from '../components/Context/ApiContext';
 import EventForm from '../components/Forms/EventForm';
-import { useAuth } from '../components/context/AuthContext';
+import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
+import AppHeader from '../components/Layout/AppHeader';
 import { getImageUrl } from '../components/Helper/imagePath';
 import EventLoader from '../components/Loader/EventLoader';
 
@@ -75,7 +76,7 @@ export default function EventDetails() {
   if (!event) {
     // No event found after loading
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
+      <div className="flex flex-col items-center justify-center app-surface app-bg p-5">
         <p className="text-red-700 text-xl font-semibold mb-4">{t('event.notFound')}</p>
         <button
           onClick={() => navigate('/')}
@@ -96,20 +97,9 @@ export default function EventDetails() {
   const endTime = event.time_end ? event.time_end.replace(/:/g, ':').slice(0, 5) : 'end';
 
   return (
-    <div className="w-full h-screen relative bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto min-h-screen p-5">
-        {/* Header Section */}
-        <div className="flex items-center justify-between mb-4">
-            <div className="flex-1">
-                <button
-                    onClick={() => window.history.back()}
-                    className="text-red-700 text-xl font-bold flex items-center gap-1 ps-1 p-3"
-                >
-                    <i className="ri-arrow-left-line"></i>
-                </button>
-            </div>
-            <div className="flex-2 text-center text-red-700 text-lg font-bold">{t('event.registrationForm')}</div>
-            <div className="flex-1" /> {/* Spacer to balance layout */}
-        </div>
+    <div className="w-full relative app-surface app-bg overflow-auto">
+      <AppHeader title={t('event.registrationForm')} backTo="/event" />
+      <div className="app-container px-5 pt-4 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {event.image && <img className="w-full object-cover rounded-lg" src={getImageUrl(apiUrl, event.image)} />}
 
@@ -170,6 +160,7 @@ export default function EventDetails() {
               <EventForm />
             </div>
         </div>
+      </div>
     </div>
   );
 }

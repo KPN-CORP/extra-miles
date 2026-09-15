@@ -1,15 +1,16 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import LanguageToggle from "../components/Layout/LanguageToggle";
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import AppHeader from "../components/Layout/AppHeader";
+import { useLocation, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import 'react-calendar/dist/Calendar.css';
 import '../../../css/calendar-custom.css';
-import { useApiUrl } from "../components/context/ApiContext";
+import { useApiUrl } from "../components/Context/ApiContext";
 import { showAlert } from "../components/Helper/alertHelper";
-import { useAuth } from "../components/context/AuthContext";
+import { useAuth } from "../components/Context/AuthContext";
 import { getImageUrl } from "../components/Helper/imagePath";
 import SurveyForm from '../components/Forms/SurveyForm';
 import BannerLoader from "../components/Loader/BannerLoader";
@@ -17,6 +18,7 @@ import SurveyLoader from "../components/Loader/SurveyLoader";
 import { motion } from "motion/react";
 import CountdownTimer from "../components/Helper/countdownTImer";
 import parse from "html-react-parser";
+import { SSO_URL } from '../components/Helper/ssoRedirect';
 
 const pageVariants = {
     // initial: { opacity: 0, x: 0 },     // Masuk dari kanan
@@ -29,7 +31,6 @@ const pageVariants = {
 
 export default function VoteList() {
 
-    const navigate = useNavigate();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingBanner, setLoadingBanner] = useState(true);
@@ -80,7 +81,7 @@ export default function VoteList() {
                     if (document.referrer) {
                     window.history.back();
                     } else {
-                    window.location.href = 'https://kpncorporation.darwinbox.com/';
+                    window.location.href = SSO_URL;
                     }
 
                 });
@@ -97,7 +98,7 @@ export default function VoteList() {
     
     if (loading) {
         return (
-            <div className="w-full h-screen relative bg-red-700 overflow-auto min-h-screen">
+            <div className="w-full relative app-surface bg-brand-700 overflow-auto">
                 <SurveyLoader />
             </div>
         );
@@ -106,7 +107,7 @@ export default function VoteList() {
     if (!data) {
         // No event found after loading
         return (
-          <div className="flex flex-col items-center justify-center h-screen bg-red-700 p-5">
+          <div className="flex flex-col items-center justify-center app-surface bg-brand-700 p-5">
             <p className="text-white text-xl font-semibold mb-4">{t('survey.notFound')}</p>
             <button
               onClick={() => window.history.back()}
@@ -124,27 +125,21 @@ export default function VoteList() {
     };
   
     return (
-        <div className="w-full h-screen relative bg-red-700 overflow-auto min-h-screen p-5">
+        <div className="w-full relative app-surface bg-brand-700 overflow-auto">
+            <AppHeader
+                title={t('survey.ongoing')}
+                variant="solid"
+                backTo="/survey"
+                trailing={<LanguageToggle variant="onRed" />}
+            />
             <motion.div
+                className="app-container px-5 pt-4 pb-10"
                 variants={pageVariants}
                 initial="initial"
                 animate="animate"
                 exit="exit"
                 transition={{ duration: 0.3, ease: "easeInOut" }}
             >
-            {/* Header Section */}
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex-1">
-                        <button
-                            onClick={() => window.history.back()}
-                            className="text-white text-xl font-bold flex items-center gap-1 pr-2 py-1"
-                        >
-                            <i className="ri-arrow-left-line"></i>
-                        </button>
-                    </div>
-                    <div className="flex-2 text-center text-white text-lg font-bold">{t('survey.ongoing')}</div>
-                    <LanguageToggle variant="onRed" />
-                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {data.banner && (
                         <>

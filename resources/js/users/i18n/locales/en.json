@@ -32,6 +32,14 @@
     "footer": "© 2025 KPN Corporation - HCIS. All rights reserved.",
     "language": "Language"
   },
+  "nav": {
+    "primary": "Main navigation",
+    "home": "Home",
+    "events": "Events",
+    "news": "News",
+    "wellness": "Wellness",
+    "survey": "Survey"
+  },
   "alerts": {
     "connectionEnded": "Connection Ended",
     "connectionEndedText": "Unable to connect to the server. Please try again later.",
@@ -45,21 +53,35 @@
     "genericRetry": "Something went wrong. Please try again.",
     "submitFormError": "An error occurred while submitting the form."
   },
+  "login": {
+    "failedTitle": "Login Failed",
+    "failedFallback": "We could not verify your session. Please sign in again from the portal.",
+    "verificationFailed": "Your session could not be verified.",
+    "networkIssue": "We could not reach the server. Please try again in a moment.",
+    "missingToken": "This page was opened without a valid session. Please start from the portal.",
+    "backToPortal": "Back to Portal",
+    "redirecting": "Redirecting in {{count}} seconds...",
+    "redirecting_one": "Redirecting in {{count}} second..."
+  },
   "home": {
-    "welcomeBack": "Welcome back, {{name}}!",
-    "newsUpdate": "News Update!"
+    "newsUpdate": "News Update!",
+    "quickAccess": "Quick Access",
+    "bannerAlt": "Extra Mile 2.0 - Exceeding Limits, Building Loyalty"
   },
   "menu": {
-    "upcomingEvents": "🎉 Upcoming Events",
-    "liveNow": "LIVE NOW",
+    "upcomingEvents": "Upcoming\nEvents",
+    "liveNow": "Live\nNow",
     "liveNowActive": "LIVE NOW!",
-    "yourVoiceMatters": "🗳️ Your Voice Matters!",
-    "socialMedia": "🔗 Social Media",
-    "wellness": "💚 Wellness",
+    "yourVoiceMatters": "Your\nVoice Matters",
+    "socialMedia": "Social\nMedia",
+    "wellness": "Wellness",
     "myWellness": "🗓️ My Wellness",
     "liveEventInfo": "Live Event Info",
     "contentNotAvailable": "Content Not Available",
-    "contentNotAvailableText": "Please check back later, thankyou!"
+    "contentNotAvailableText": "Please check back later, thankyou!",
+    "liveBadge": "LIVE",
+    "offAir": "Off air",
+    "evoProgram": "EVO\nProgram"
   },
   "evoBanner": {
     "readyToEvolve": "Ready to Evolve?",
@@ -70,16 +92,21 @@
     "line1": "News & Events",
     "line2": "Assets",
     "title": "Open News & Events Assets in Google Drive",
-    "ariaLabel": "News & Events Assets - open Google Drive folder"
+    "ariaLabel": "News & Events Assets - open Google Drive folder",
+    "subtitle": "Open the shared folder on Google Drive"
   },
   "activity": {
-    "waitingForResponse": "Waiting for Your Response ⏳",
+    "waitingForResponse": "Waiting for Your Response",
     "confirmationDeadline": "If we don’t receive your confirmation by D-2 (two days before the event), your spot will be automatically canceled and given to someone on the waiting list.",
     "allCaughtUp": "You’re all caught up! 🎉 No pending invitations at the moment. Stay tuned for upcoming events!",
-    "invitedToJoin": "Events You’re Invited To Join 👀",
+    "invitedToJoin": "Events You're Invited To Join",
     "noPendingEvent": "You’ve no pending event at the moment. Stay tuned for upcoming events!",
     "confirm": "Confirm",
-    "scan": "Scan"
+    "scan": "Scan",
+    "allCaughtUpTitle": "You are all caught up",
+    "allCaughtUpText": "No pending invitations at the moment. Stay tuned for upcoming events!",
+    "attended": "Attendance recorded",
+    "myEventsTitle": "My Events"
   },
   "event": {
     "upcomingEvents": "Upcoming Events",
@@ -155,9 +182,11 @@
     "categories": "Categories:",
     "allCategories": "All Category",
     "showLove": "Show your love if you liked this!",
-    "moreTags": "{{count}} more"
+    "moreTags": "{{count}} more",
+    "empty": "Check our news back soon!"
   },
   "social": {
+    "title": "Social Media",
     "ourLine1": "Our",
     "ourLine2": "Social Media",
     "ourLine3": "Presence",
@@ -213,7 +242,7 @@
     "back": "Back",
     "myRegistrations": "My registrations",
     "allTypes": "All",
-    "empty": "No wellness activities are open right now. Please check back later.",
+    "empty": "Check back our wellness activities later.",
     "moreSessions": "+{{count}} more session(s)",
     "availableSessions": "Available Sessions",
     "noSessions": "No upcoming sessions for this activity.",
@@ -276,7 +305,8 @@
       "checkingIn": "Checking you in...",
       "keepInFrame": "Make sure the QR code is fully inside the frame.",
       "failed": "We could not record your attendance."
-    }
+    },
+    "noSessionsOnDate": "No wellness sessions on this date. Pick another day."
   },
   "evo": {
     "title": "Employee Volunteer",
@@ -294,5 +324,17 @@
     "requiredIfSelected": "Required if you select \"{{value}}\"",
     "whatsappRequired": "Whatsapp number is required",
     "numberInvalid": "Number is invalid"
+  },
+  "myEvents": {
+    "searchPlaceholder": "Search event or place",
+    "filterAwaiting": "Awaiting",
+    "filterConfirmed": "Confirmed"
+  },
+  "filters": {
+    "byDate": "Filter by date",
+    "clearDate": "Clear date",
+    "reset": "Reset filters",
+    "noMatches": "Nothing matches",
+    "noMatchesText": "Try a different date or filter."
   }
 }

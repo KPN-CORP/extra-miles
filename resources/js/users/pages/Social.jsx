@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageToggle from "../components/Layout/LanguageToggle";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,9 +9,11 @@ import "swiper/css";
 import "swiper/css/bundle";
 import { FreeMode } from "swiper/modules";
 
-import { useApiUrl } from "../components/context/ApiContext";
+import AppShell from "../components/Layout/AppShell";
+import AppHeader from "../components/Layout/AppHeader";
+import { useApiUrl } from "../components/Context/ApiContext";
 import { showAlert } from "../components/Helper/alertHelper";
-import { useAuth } from "../components/context/AuthContext";
+import { useAuth } from "../components/Context/AuthContext";
 import { getImageUrl } from "../components/Helper/imagePath";
 
 import { motion } from "motion/react";
@@ -19,6 +21,7 @@ import SocialLoader from "../components/Loader/SocialLoader";
 import YouTubePlayer from "../components/Helper/youtubeHelper";
 import InstagramPlayer from "../components/Helper/instagramHelper";
 import TikTokPlayer from "../components/Helper/tiktokHelper";
+import { zoomFrom } from '../components/Helper/zoomTransition';
 
 const pageVariants = {
   initial: { opacity: 0, x: 0 },
@@ -27,11 +30,12 @@ const pageVariants = {
 };
 
 export default function Social() {
-  const navigate = useNavigate();
   const location = useLocation();
   const bounds = location.state?.bounds;
 
-  const [initialStyle, setInitialStyle] = useState(null);
+  // Diturunkan saat render, bukan state: tanpa bounds nilainya identitas,
+  // jadi halaman tetap tampil (hanya tanpa animasi zoom dari tile).
+  const initialStyle = zoomFrom(bounds);
   const apiUrl = useApiUrl();
   const { token } = useAuth();
   
@@ -87,26 +91,16 @@ export default function Social() {
   
     if (token) fetchContent();
 
-    if (bounds) {
-      const scaleX = bounds.width / window.innerWidth;
-      const scaleY = bounds.height / window.innerHeight;
-      const offsetX = bounds.left + bounds.width / 2 - window.innerWidth / 2;
-      const offsetY = bounds.top + bounds.height / 2 - window.innerHeight / 2;
-
-      setInitialStyle({
-        scaleX,
-        scaleY,
-        offsetX,
-        offsetY,
-        borderRadius: 16,
-      });
-    }
   }, [apiUrl, token, bounds]);
 
-  if (!initialStyle) return null; 
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto">
+    <AppShell nav surface="brand">
+    <AppHeader
+      title={t('social.title')}
+      variant="solid"
+      trailing={<LanguageToggle variant="onRed" />}
+    />
     <motion.div
       initial={{
           opacity: 0,
@@ -134,18 +128,9 @@ export default function Social() {
         }}
         transition={{ duration: 0.5, type: "tween", ease: "easeInOut" }}
       >
-      <div className="w-full h-screen relative bg-red-700 text-white overflow-auto min-h-screen p-5">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <button
-            onClick={() => navigate(`/`)}
-            className="text-xl font-bold flex items-center gap-1 pr-4"
-          >
-            <i className="ri-arrow-left-line" />
-          </button>
-          <LanguageToggle variant="onRed" />
-        </div>
-        <div className="fixed bottom-0 right-0 w-1/2 overflow-hidden z-0 pointer-events-none">
+      <div className="relative px-5 pt-4">
+        {/* Ornamen dinaikkan setinggi tab bar agar tidak tertutup olehnya. */}
+        <div className="fixed bottom-[calc(var(--app-nav-h)+var(--app-safe-bottom))] right-0 w-1/2 overflow-hidden z-0 pointer-events-none">
           <img
             className="w-full h-full object-cover"
             src={getImageUrl(apiUrl, 'assets/images/Element Extra Mile 2.png')}
@@ -252,6 +237,6 @@ export default function Social() {
         </motion.div>
       </div>
       </motion.div>
-    </div>
+    </AppShell>
   );
 }

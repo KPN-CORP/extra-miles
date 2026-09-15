@@ -101,5 +101,16 @@
     "Extra Miles is briefly offline while we ship an update. Please check back shortly.": "Extra Miles sedang tidak tersedia sementara karena pembaruan. Silakan kembali beberapa saat lagi.",
     "Back to Home": "Kembali ke Beranda",
     "Go Back": "Kembali",
-    "If the problem keeps happening, please contact your administrator.": "Jika masalah ini terus terjadi, silakan hubungi administrator Anda."
+    "If the problem keeps happening, please contact your administrator.": "Jika masalah ini terus terjadi, silakan hubungi administrator Anda.",
+    "development_mode_banner": ":flag aktif di :env, sehingga halaman login lokal ini menggantikan proses SSO Darwinbox. Hapus :code dari :env dan rute ini kembali 404.",
+    "Mobile Development Login": "Login Pengembangan Mobile",
+    "employee app": "aplikasi karyawan",
+    "dev_mobile_gate_banner": "Aplikasi karyawan hanya tampil pada perangkat sentuh dengan lebar di bawah 768px. Aktifkan emulasi perangkat (:shortcut) sebelum masuk, atau Anda akan melihat layar \u201cMobile Only\u201d dan token tidak akan tersimpan.",
+    "Employee ID / Email": "ID Karyawan / Email",
+    "The employee whose session you want to borrow.": "Karyawan yang sesinya ingin Anda gunakan.",
+    "Show the token instead of opening the app": "Tampilkan token tanpa membuka aplikasi",
+    "Open the employee app": "Buka aplikasi karyawan",
+    "Bearer token": "Token bearer",
+    "dev_mobile_token_hint": "Kirim sebagai header Authorization: Bearer, atau tempelkan ke SPA dengan :storage lalu muat ulang.",
+    "Go to the admin development login": "Buka login pengembangan admin"
 }

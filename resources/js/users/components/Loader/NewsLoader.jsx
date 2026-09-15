@@ -3,7 +3,7 @@ import ContentLoader from "react-content-loader";
 
 const NewsLoader = (props) => {
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-stone-50 to-orange-200 p-5">
+    <div className="flex flex-col app-surface app-bg p-5">
       <ContentLoader
         speed={1}
         width="100%"

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ApiProvider } from './components/context/ApiContext';
+import { ApiProvider } from './components/Context/ApiContext';
 import { AnimatePresence } from "motion/react";
 import { NavigationProvider } from './components/Context/NavigationProvider'; // sesuaikan path
 
@@ -15,7 +15,7 @@ import ConfirmLogin from './pages/ConfirmLogin';
 import Survey from './pages/Survey';
 import SurveyDetails from './pages/SurveyDetails';
 import VoteDetails from './pages/VoteDetails';
-import { AuthProvider } from './components/context/AuthContext';
+import { AuthProvider } from './components/Context/AuthContext';
 import News from './pages/News';
 import NewsDetails from './pages/NewsDetails';
 import Social from './pages/Social';
@@ -24,6 +24,7 @@ import EvoRegistration from './pages/EvoRegistration';
 import Wellness from './pages/Wellness';
 import WellnessDetails from './pages/WellnessDetails';
 import MyWellness from './pages/MyWellness';
+import MyEvents from './pages/MyEvents';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -35,6 +36,7 @@ const AnimatedRoutes = () => {
         <Route path="/login-failed" element={<LoginFailed />} />
         <Route path="/" element={<Home />} />
         <Route path="/event" element={<Event />} />
+        <Route path="/my-events" element={<MyEvents />} />
         <Route path="/event/:id" element={<EventDetails />} />
         <Route path="/event-registration/:id" element={<EventRegistration />} />
         <Route path="/survey" element={<Survey />} />

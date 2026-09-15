@@ -3,7 +3,7 @@ import ContentLoader from "react-content-loader";
 
 const SocialLoader = (props) => {
   return (
-    <div className="flex flex-col h-screen bg-red-700 p-5">
+    <div className="flex flex-col app-surface bg-brand-700 p-5">
       <ContentLoader
         speed={1}
         width="100%"

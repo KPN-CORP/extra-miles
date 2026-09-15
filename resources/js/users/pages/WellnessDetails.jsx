@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageToggle from '../components/Layout/LanguageToggle';
+import AppHeader from '../components/Layout/AppHeader';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import parse from 'html-react-parser';
@@ -163,13 +164,11 @@ export default function WellnessDetails() {
     };
 
     const header = (title) => (
-        <div className="flex items-center gap-2">
-            <button onClick={() => navigate('/wellness')} className="text-red-700 text-xl" aria-label={t('wellness.back')}>
-                <i className="ri-arrow-left-line"></i>
-            </button>
-            <div className="flex-1 text-center text-red-700 text-base font-semibold truncate">{title}</div>
-            <LanguageToggle />
-        </div>
+        <AppHeader
+            title={title}
+            backTo="/wellness"
+            trailing={<LanguageToggle />}
+        />
     );
 
     // Only the body waits -- the page chrome is real from the first frame. A
@@ -182,10 +181,10 @@ export default function WellnessDetails() {
                 animate="animate"
                 exit="exit"
                 transition={{ duration: 0.25 }}
-                className="w-full min-h-screen bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto"
+                className="w-full app-surface app-bg overflow-auto"
             >
-                <div className="px-5 pt-5 pb-24 flex flex-col gap-4">
-                    {header(t('wellness.title'))}
+                {header(t('wellness.title'))}
+                <div className="app-container px-5 pt-4 pb-10 flex flex-col gap-4">
                     <CardLoader />
                     <CardLoader />
                 </div>
@@ -202,11 +201,11 @@ export default function WellnessDetails() {
             animate="animate"
             exit="exit"
             transition={{ duration: 0.25 }}
-            className="w-full min-h-screen bg-gradient-to-br from-stone-50 to-orange-200 overflow-auto"
+            className="w-full app-surface app-bg overflow-auto"
         >
-            <div className="px-5 pt-5 pb-24 flex flex-col gap-4">
-                {header(activity.name)}
+            {header(activity.name)}
 
+            <div className="app-container px-5 pt-4 pb-10 flex flex-col gap-4">
                 {activity.image && (
                     <img
                         src={`${apiUrl}/images/${activity.image}`}

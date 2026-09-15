@@ -13,18 +13,27 @@ export default function LanguageToggle({ className = '', variant = 'light' }) {
     const { t, i18n } = useTranslation();
     const current = i18n.resolvedLanguage;
 
-    const activeClass =
-        variant === 'onRed'
-            ? 'bg-white text-red-700'
-            : 'bg-red-700 text-white';
-    const idleClass =
-        variant === 'onRed'
-            ? 'text-white/80'
-            : 'text-stone-500';
+    const onRed = variant === 'onRed';
+    const onBanner = variant === 'onBanner';
+
+    // Di atas latar merah, pil memakai kaca transparan; di atas banner memakai
+    // putih pekat supaya tetap terbaca di bagian artwork yang ramai; di latar
+    // terang memakai putih bersih. Semuanya ditentukan di sini supaya pemanggil
+    // tidak perlu menimpa kelas warna lewat className.
+    const wrapClass = onRed
+        ? 'bg-white/15 ring-white/40'
+        : onBanner
+          ? 'bg-white/85 ring-white/90 shadow-card backdrop-blur-[2px]'
+          : 'bg-white/70 ring-stone-300';
+    const activeClass = onRed ? 'bg-white text-brand-700' : 'bg-brand-700 text-white';
+    const idleClass = onRed ? 'text-white/80' : 'text-stone-500';
+    // Di atas banner pilnya sedikit lebih besar: ia berdiri sendiri di sana,
+    // tidak menempel pada blok teks seperti varian lain.
+    const sizeClass = onBanner ? 'px-2.5 py-1 text-[10.5px]' : 'px-2 py-0.5 text-[10px]';
 
     return (
         <div
-            className={`inline-flex items-center rounded-full p-0.5 bg-white/70 ring-1 ring-inset ring-stone-300 ${className}`}
+            className={`inline-flex items-center rounded-full p-0.5 ring-1 ring-inset ${wrapClass} ${className}`}
             role="group"
             aria-label={t('app.language')}
         >
@@ -35,7 +44,7 @@ export default function LanguageToggle({ className = '', variant = 'light' }) {
                     onClick={() => i18n.changeLanguage(code)}
                     aria-pressed={current === code}
                     title={label}
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold leading-none transition ${
+                    className={`${sizeClass} rounded-full font-bold leading-none transition ${
                         current === code ? activeClass : idleClass
                     }`}
                 >
