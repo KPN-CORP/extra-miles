@@ -1,45 +1,57 @@
----
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/hcispanel/extra-miles-stage
+    - |
+      set -e
+      REPO="$(basename "$(pwd)")"
+      case "$REPO" in
+        extra-miles)                        # PRODUCTION
+          DEPLOYPATH=/home/hcispanel/extra-miles
+          PUBHTML=/home/hcispanel/public_html/extramiles.hcis.live
+          ;;
+        extra-miles-stage)                  # STAGING
+          DEPLOYPATH=/home/hcispanel/extra-miles-stage
+          PUBHTML=/home/hcispanel/public_html/extramiles-stage.hcis.live
+          ;;
+        *)
+          echo "Unknown repo folder: $REPO — refusing to deploy"; exit 1
+          ;;
+      esac
+      echo "Deploying $REPO -> $DEPLOYPATH  (assets: $PUBHTML)"
 
-    # Copy essential Laravel application directories to deployment path
-    - /bin/cp -r app bootstrap config database routes resources $DEPLOYPATH
+      # Copy application code into the live app directory
+      cp -r app bootstrap config database routes resources "$DEPLOYPATH"/
+      cp -r public/build "$DEPLOYPATH"/public/
 
-    - /bin/cp -r public/build $DEPLOYPATH/public
+      # Copy public assets into the site document root.
+      # public/build WAJIB ikut ke sini — kalau tidak, semua asset Vite
+      # (/build/assets/*.js, /build/manifest.json) 404 dan SPA React blank.
+      cp -r public/css public/img public/images public/js public/scss "$PUBHTML"/
+      cp -r public/build "$PUBHTML"/
+      cp -r public/files "$PUBHTML"/
 
-    # Copy public assets to the public_html directory
-    - /bin/cp -r public/css public/img public/images public/js public/scss /home/hcispanel/public_html/extramiles.hcis.live
+      # Refresh Laravel caches in the live app.
+      # optimize:clear membuang cache lama, lalu optimize MEMBANGUN ULANG
+      # cache config/route/view/event. Tanpa 'optimize' setiap request harus
+      # mem-parse ulang ~30 file config + routes/web.php dan meng-compile
+      # blade — itu ratusan milidetik per request di shared hosting.
+      # Catatan: route:cache gagal kalau ada route pakai closure — pastikan
+      # semua route di routes/web.php & routes/api.php menunjuk ke controller.
+      cd "$DEPLOYPATH"
+      php artisan optimize:clear
+      php artisan optimize
 
-    # Change directory to the deployment path
-    - cd $DEPLOYPATH
-
-    # Install production dependencies using Composer
-    # - composer install --no-dev --optimize-autoloader
-
-    # Run database migrations (for first deployment)
-    # - php artisan migrate --force
-
-    # Rebuild Laravel's caches. optimize:clear first so nothing stale survives,
-    # then `optimize` re-caches config, events, routes and views. Without this
-    # every request re-parses .env, all of config/ and the whole route table,
-    # which is the single largest per-request cost on the cPanel host.
-    # Route caching requires that no route action be a closure -- keep new routes
-    # pointing at controllers or `optimize` will fail here and the deploy stops.
-    - php artisan optimize:clear
-    - php artisan optimize
-    
+# ---
 # deployment:
 #   tasks:
-#     - export DEPLOYPATH=/home/hcis8257/kpn-em
+#     - export DEPLOYPATH=/home/hcispanel/extra-miles-stage
 
 #     # Copy essential Laravel application directories to deployment path
 #     - /bin/cp -r app bootstrap config database routes resources $DEPLOYPATH
-    
+
 #     - /bin/cp -r public/build $DEPLOYPATH/public
 
 #     # Copy public assets to the public_html directory
-#     - /bin/cp -r public/css public/img public/images public/js public/scss /home/hcis8257/public_html/kpnem.hcis.dev
+#     - /bin/cp -r public/css public/img public/images public/js public/scss /home/hcispanel/public_html/extramiles.hcis.live
 
 #     # Change directory to the deployment path
 #     - cd $DEPLOYPATH
@@ -50,5 +62,35 @@ deployment:
 #     # Run database migrations (for first deployment)
 #     # - php artisan migrate --force
 
-#     # Clear Laravel application cache
+#     # Rebuild Laravel's caches. optimize:clear first so nothing stale survives,
+#     # then `optimize` re-caches config, events, routes and views. Without this
+#     # every request re-parses .env, all of config/ and the whole route table,
+#     # which is the single largest per-request cost on the cPanel host.
+#     # Route caching requires that no route action be a closure -- keep new routes
+#     # pointing at controllers or `optimize` will fail here and the deploy stops.
 #     - php artisan optimize:clear
+#     - php artisan optimize
+    
+# # deployment:
+# #   tasks:
+# #     - export DEPLOYPATH=/home/hcis8257/kpn-em
+
+# #     # Copy essential Laravel application directories to deployment path
+# #     - /bin/cp -r app bootstrap config database routes resources $DEPLOYPATH
+    
+# #     - /bin/cp -r public/build $DEPLOYPATH/public
+
+# #     # Copy public assets to the public_html directory
+# #     - /bin/cp -r public/css public/img public/images public/js public/scss /home/hcis8257/public_html/kpnem.hcis.dev
+
+# #     # Change directory to the deployment path
+# #     - cd $DEPLOYPATH
+
+# #     # Install production dependencies using Composer
+# #     # - composer install --no-dev --optimize-autoloader
+
+# #     # Run database migrations (for first deployment)
+# #     # - php artisan migrate --force
+
+# #     # Clear Laravel application cache
+# #     - php artisan optimize:clear
