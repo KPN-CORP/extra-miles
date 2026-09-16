@@ -2,22 +2,44 @@
 deployment:
   tasks:
     - |
-      set -e
-      REPO="$(basename "$(pwd)")"
+      set -euo pipefail
+      SRC="$(pwd)"
+      REPO="$(basename "$SRC")"
+      echo "=== cPanel deploy ==="
+      echo "cwd  : $SRC"
+      echo "repo : $REPO"
+
       case "$REPO" in
-        extra-miles)                        # PRODUCTION
+        extra-miles|extra-miles-prod)       # PRODUCTION
           DEPLOYPATH=/home/hcispanel/extra-miles
           PUBHTML=/home/hcispanel/public_html/extramiles.hcis.live
           ;;
-        extra-miles-stage)                  # STAGING
+        extra-miles-stage|extra-miles_stage)   # STAGING
           DEPLOYPATH=/home/hcispanel/extra-miles-stage
-          PUBHTML=/home/hcispanel/public_html/extra-miles-stage
+          PUBHTML=/home/hcispanel/public_html/extramiles-stage.hcis.live
           ;;
         *)
-          echo "Unknown repo folder: $REPO — refusing to deploy"; exit 1
+          echo "ERROR: unknown repo folder '$REPO'."
+          echo "Add it to the case block above. Sibling folders:"
+          ls -1 "$(dirname "$SRC")"
+          exit 1
           ;;
       esac
-      echo "Deploying $REPO -> $DEPLOYPATH  (assets: $PUBHTML)"
+      echo "app   -> $DEPLOYPATH"
+      echo "assets-> $PUBHTML"
+
+      # Guard: never let the repo clone copy onto itself.
+      if [ "$SRC" = "$DEPLOYPATH" ]; then
+        echo "ERROR: DEPLOYPATH is the repo clone itself. Point it at the live app dir."
+        exit 1
+      fi
+      for d in "$DEPLOYPATH" "$PUBHTML"; do
+        if [ ! -d "$d" ]; then
+          echo "ERROR: target does not exist: $d"
+          exit 1
+        fi
+      done
+      mkdir -p "$DEPLOYPATH/public"
 
       # Copy application code into the live app directory
       cp -r app bootstrap config database routes resources "$DEPLOYPATH"/
@@ -40,58 +62,4 @@ deployment:
       cd "$DEPLOYPATH"
       php artisan optimize:clear
       php artisan optimize
-
-# ---
-# deployment:
-#   tasks:
-#     - export DEPLOYPATH=/home/hcispanel/extra-miles-stage
-
-#     # Copy essential Laravel application directories to deployment path
-#     - /bin/cp -r app bootstrap config database routes resources $DEPLOYPATH
-
-#     - /bin/cp -r public/build $DEPLOYPATH/public
-
-#     # Copy public assets to the public_html directory
-#     - /bin/cp -r public/css public/img public/images public/js public/scss /home/hcispanel/public_html/extramiles.hcis.live
-
-#     # Change directory to the deployment path
-#     - cd $DEPLOYPATH
-
-#     # Install production dependencies using Composer
-#     # - composer install --no-dev --optimize-autoloader
-
-#     # Run database migrations (for first deployment)
-#     # - php artisan migrate --force
-
-#     # Rebuild Laravel's caches. optimize:clear first so nothing stale survives,
-#     # then `optimize` re-caches config, events, routes and views. Without this
-#     # every request re-parses .env, all of config/ and the whole route table,
-#     # which is the single largest per-request cost on the cPanel host.
-#     # Route caching requires that no route action be a closure -- keep new routes
-#     # pointing at controllers or `optimize` will fail here and the deploy stops.
-#     - php artisan optimize:clear
-#     - php artisan optimize
-    
-# # deployment:
-# #   tasks:
-# #     - export DEPLOYPATH=/home/hcis8257/kpn-em
-
-# #     # Copy essential Laravel application directories to deployment path
-# #     - /bin/cp -r app bootstrap config database routes resources $DEPLOYPATH
-    
-# #     - /bin/cp -r public/build $DEPLOYPATH/public
-
-# #     # Copy public assets to the public_html directory
-# #     - /bin/cp -r public/css public/img public/images public/js public/scss /home/hcis8257/public_html/kpnem.hcis.dev
-
-# #     # Change directory to the deployment path
-# #     - cd $DEPLOYPATH
-
-# #     # Install production dependencies using Composer
-# #     # - composer install --no-dev --optimize-autoloader
-
-# #     # Run database migrations (for first deployment)
-# #     # - php artisan migrate --force
-
-# #     # Clear Laravel application cache
-# #     - php artisan optimize:clear
+      echo "=== deploy finished OK ==="
