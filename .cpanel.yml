@@ -1,65 +1,23 @@
 ---
 deployment:
   tasks:
-    - |
-      set -euo pipefail
-      SRC="$(pwd)"
-      REPO="$(basename "$SRC")"
-      echo "=== cPanel deploy ==="
-      echo "cwd  : $SRC"
-      echo "repo : $REPO"
+    - export DEPLOYPATH=/home/hcispanel/extra-miles-stage
+    - export PUBHTML=/home/hcispanel/public_html/extramiles.hcis.live
 
-      case "$REPO" in
-        extra-miles|extra-miles-prod)       # PRODUCTION
-          DEPLOYPATH=/home/hcispanel/extra-miles
-          PUBHTML=/home/hcispanel/public_html/extramiles.hcis.live
-          ;;
-        extra-miles-stage|extra-miles_stage)   # STAGING
-          DEPLOYPATH=/home/hcispanel/extra-miles-stage
-          PUBHTML=/home/hcispanel/public_html/extramiles-stage.hcis.live
-          ;;
-        *)
-          echo "ERROR: unknown repo folder '$REPO'."
-          echo "Add it to the case block above. Sibling folders:"
-          ls -1 "$(dirname "$SRC")"
-          exit 1
-          ;;
-      esac
-      echo "app   -> $DEPLOYPATH"
-      echo "assets-> $PUBHTML"
+    # Application code -> live app directory
+    - /bin/cp -r app bootstrap config database routes resources $DEPLOYPATH
+    - /bin/cp -r public/build $DEPLOYPATH/public
 
-      # Guard: never let the repo clone copy onto itself.
-      if [ "$SRC" = "$DEPLOYPATH" ]; then
-        echo "ERROR: DEPLOYPATH is the repo clone itself. Point it at the live app dir."
-        exit 1
-      fi
-      for d in "$DEPLOYPATH" "$PUBHTML"; do
-        if [ ! -d "$d" ]; then
-          echo "ERROR: target does not exist: $d"
-          exit 1
-        fi
-      done
-      mkdir -p "$DEPLOYPATH/public"
+    # Public assets -> site document root.
+    # public/build WAJIB ikut ke sini, kalau tidak semua asset Vite
+    # (/build/assets/*.js, /build/manifest.json) 404 dan SPA React blank.
+    - /bin/cp -r public/css public/img public/images public/js public/scss $PUBHTML
+    - /bin/cp -r public/build $PUBHTML
+    - /bin/cp -r public/files $PUBHTML
 
-      # Copy application code into the live app directory
-      cp -r app bootstrap config database routes resources "$DEPLOYPATH"/
-      cp -r public/build "$DEPLOYPATH"/public/
-
-      # Copy public assets into the site document root.
-      # public/build WAJIB ikut ke sini — kalau tidak, semua asset Vite
-      # (/build/assets/*.js, /build/manifest.json) 404 dan SPA React blank.
-      cp -r public/css public/img public/images public/js public/scss "$PUBHTML"/
-      cp -r public/build "$PUBHTML"/
-      cp -r public/files "$PUBHTML"/
-
-      # Refresh Laravel caches in the live app.
-      # optimize:clear membuang cache lama, lalu optimize MEMBANGUN ULANG
-      # cache config/route/view/event. Tanpa 'optimize' setiap request harus
-      # mem-parse ulang ~30 file config + routes/web.php dan meng-compile
-      # blade — itu ratusan milidetik per request di shared hosting.
-      # Catatan: route:cache gagal kalau ada route pakai closure — pastikan
-      # semua route di routes/web.php & routes/api.php menunjuk ke controller.
-      cd "$DEPLOYPATH"
-      php artisan optimize:clear
-      php artisan optimize
-      echo "=== deploy finished OK ==="
+    # Rebuild Laravel caches. optimize:clear membuang cache lama, lalu
+    # optimize membangun ulang cache config/route/view/event.
+    # Catatan: route:cache gagal kalau ada route pakai closure.
+    - cd $DEPLOYPATH
+    - php artisan optimize:clear
+    - php artisan optimize
