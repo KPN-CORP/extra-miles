@@ -144,7 +144,7 @@
         
                                                 {{-- Close Registration --}}
                                                 @if($event->status === 'Ongoing' || $event->status == 'Open Registration')
-                                                    <form id="close-form-{{ $event->id }}" action="{{ route('events.close', $event->id) }}" method="POST" class="d-inline">
+                                                    <form id="close-form-{{ $event->id }}" action="{{ route('events.toggleStatus', $event->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         <button type="button" class="btn btn-outline-secondary btn-sm btn-close-reg"
                                                             data-id="{{ $event->id }}" data-action="close" title="Close Registration">
@@ -152,7 +152,7 @@
                                                         </button>
                                                     </form>
                                                 @elseif($event->status === 'Full Booked')
-                                                    <form id="close-form-{{ $event->id }}" action="{{ route('events.close', $event->id) }}" method="POST" class="d-inline">
+                                                    <form id="close-form-{{ $event->id }}" action="{{ route('events.toggleStatus', $event->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         <button type="button" class="btn btn-outline-success btn-sm btn-close-reg"
                                                             data-id="{{ $event->id }}" data-action="open" title="Open Registration">

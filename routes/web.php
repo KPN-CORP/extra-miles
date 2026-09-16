@@ -78,7 +78,7 @@ Route::prefix('admin')->group(function () {
             Route::delete('/events/{id}/archive', [EventController::class, 'softDelete'])->name('events.softDelete');
             Route::delete('/events/{id}/removeEvoParticipants', [EventController::class, 'removeEvoParticipants'])->name('events.removeEvoParticipants');
             Route::post('/events/{id}/close', [EventController::class, 'closeRegistration'])->name('events.close');
-            Route::post('/events/{id}/toggle-status', [EventController::class, 'toggleStatus'])->name('events.close');
+            Route::post('/events/{id}/toggle-status', [EventController::class, 'toggleStatus'])->name('events.toggleStatus');
             Route::get('/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
             Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
             Route::get('/events/{encryptedId}/participants', [EventParticipantController::class, 'listParticipants'])->name('events.participants');
