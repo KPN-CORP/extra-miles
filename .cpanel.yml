@@ -10,7 +10,7 @@ deployment:
           ;;
         extra-miles-stage)                  # STAGING
           DEPLOYPATH=/home/hcispanel/extra-miles-stage
-          PUBHTML=/home/hcispanel/public_html/extramiles-stage.hcis.live
+          PUBHTML=/home/hcispanel/public_html/extra-miles-stage
           ;;
         *)
           echo "Unknown repo folder: $REPO — refusing to deploy"; exit 1
