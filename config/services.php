@@ -14,6 +14,14 @@ return [
     |
     */
 
+    // Darwinbox -> auth-service handshake yang menerbitkan JWT untuk SPA mobile.
+    // Dibaca lewat config(), BUKAN env() langsung di controller: deploy menjalankan
+    // 'php artisan optimize' (config:cache), dan saat config ter-cache Laravel tidak
+    // memuat .env sama sekali -- env() akan mengembalikan null di runtime.
+    'auth_service' => [
+        'url' => env('AUTH_SERVICE_URL'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
