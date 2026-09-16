@@ -1,8 +1,18 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/hcispanel/extra-miles-stage
-    - export PUBHTML=/home/hcispanel/public_html/extramiles.hcis.live
+    # Satu repo, dua environment. Environment dipilih dari nama folder clone
+    # cPanel (Repository Path), jadi file ini identik di semua branch:
+    #   ~/repositories/extra-miles        -> ~/extra-miles        -> extramiles.hcis.live
+    #   ~/repositories/extra-miles-stage  -> ~/extra-miles-stage  -> extramiles-stage.hcis.live
+    - export REPO=$(basename $(pwd))
+    - export DEPLOYPATH=$HOME/$REPO
+    - export PUBHTML=$HOME/public_html/$(echo $REPO | sed 's/^extra-miles/extramiles/').hcis.live
+    - echo "Deploying $REPO -> $DEPLOYPATH (assets -> $PUBHTML)"
+
+    # Gagal cepat dengan pesan jelas kalau target belum dibuat
+    - test -d $DEPLOYPATH
+    - test -d $PUBHTML
 
     # Application code -> live app directory
     - /bin/cp -r app bootstrap config database routes resources $DEPLOYPATH
