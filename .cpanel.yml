@@ -1,48 +1,33 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/hcispanel/extra-miles-stage
+    # Satu repo, dua environment. Environment dipilih dari nama folder clone
+    # cPanel (Repository Path), jadi file ini identik di semua branch:
+    #   ~/repositories/extra-miles        -> ~/extra-miles        -> extramiles.hcis.live
+    #   ~/repositories/extra-miles-stage  -> ~/extra-miles-stage  -> extramiles-stage.hcis.live
+    - export REPO=$(basename $(pwd))
+    - export DEPLOYPATH=$HOME/$REPO
+    - export PUBHTML=$HOME/public_html/$(echo $REPO | sed 's/^extra-miles/extramiles/').hcis.live
+    - echo "Deploying $REPO -> $DEPLOYPATH (assets -> $PUBHTML)"
 
-    # Copy essential Laravel application directories to deployment path
+    # Gagal cepat dengan pesan jelas kalau target belum dibuat
+    - test -d $DEPLOYPATH
+    - test -d $PUBHTML
+
+    # Application code -> live app directory
     - /bin/cp -r app bootstrap config database routes resources $DEPLOYPATH
-
     - /bin/cp -r public/build $DEPLOYPATH/public
 
-    # Copy public assets to the public_html directory
-    - /bin/cp -r public/css public/img public/images public/js public/scss /home/hcispanel/public_html/extramiles.hcis.live
+    # Public assets -> site document root.
+    # public/build WAJIB ikut ke sini, kalau tidak semua asset Vite
+    # (/build/assets/*.js, /build/manifest.json) 404 dan SPA React blank.
+    - /bin/cp -r public/css public/img public/images public/js public/scss $PUBHTML
+    - /bin/cp -r public/build $PUBHTML
+    - /bin/cp -r public/files $PUBHTML
 
-    # Change directory to the deployment path
+    # Rebuild Laravel caches. optimize:clear membuang cache lama, lalu
+    # optimize membangun ulang cache config/route/view/event.
+    # Catatan: route:cache gagal kalau ada route pakai closure.
     - cd $DEPLOYPATH
-
-    # Install production dependencies using Composer
-    # - composer install --no-dev --optimize-autoloader
-
-    # Run database migrations (for first deployment)
-    # - php artisan migrate --force
-
-    # Clear Laravel application cache
     - php artisan optimize:clear
-    
-# deployment:
-#   tasks:
-#     - export DEPLOYPATH=/home/hcis8257/kpn-em
-
-#     # Copy essential Laravel application directories to deployment path
-#     - /bin/cp -r app bootstrap config database routes resources $DEPLOYPATH
-    
-#     - /bin/cp -r public/build $DEPLOYPATH/public
-
-#     # Copy public assets to the public_html directory
-#     - /bin/cp -r public/css public/img public/images public/js public/scss /home/hcis8257/public_html/kpnem.hcis.dev
-
-#     # Change directory to the deployment path
-#     - cd $DEPLOYPATH
-
-#     # Install production dependencies using Composer
-#     # - composer install --no-dev --optimize-autoloader
-
-#     # Run database migrations (for first deployment)
-#     # - php artisan migrate --force
-
-#     # Clear Laravel application cache
-#     - php artisan optimize:clear
+    - php artisan optimize
