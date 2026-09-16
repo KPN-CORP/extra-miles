@@ -22,21 +22,12 @@ deployment:
     # public/build WAJIB ikut ke sini, kalau tidak semua asset Vite
     # (/build/assets/*.js, /build/manifest.json) 404 dan SPA React blank.
     - /bin/cp -r public/css public/img public/images public/js public/scss $PUBHTML
-    # Wajib rm dulu. $PUBHTML/build pernah berupa symlink (ke environment
-    # lain), dan cp -r menolak menimpa non-directory. Tanpa slash di akhir,
-    # supaya yang terhapus symlink-nya saja, bukan isi direktori tujuan.
-    # Bonus: asset Vite pakai content hash, rm dulu membuang file lama.
-    - rm -rf $PUBHTML/build
     - /bin/cp -r public/build $PUBHTML
     - /bin/cp -r public/files $PUBHTML
 
     # Rebuild Laravel caches. optimize:clear membuang cache lama, lalu
-    # cache config/view/event dibangun ulang.
-    # route:cache SENGAJA tidak dipakai: ada route pakai closure, dan
-    # artisan optimize (Laravel 11) ikut menjalankan route:cache -> gagal
-    # dengan LogicException. Jadi cache-nya dibangun satu per satu.
+    # optimize membangun ulang cache config/route/view/event.
+    # Catatan: route:cache gagal kalau ada route pakai closure.
     - cd $DEPLOYPATH
     - php artisan optimize:clear
-    - php artisan config:cache
-    - php artisan view:cache
-    - php artisan event:cache
+    - php artisan optimize
