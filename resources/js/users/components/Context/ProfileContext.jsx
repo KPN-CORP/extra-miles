@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useAuth } from './AuthContext';
+import { resolveApiUrl } from './ApiContext';
 import { SSO_URL } from '../Helper/ssoRedirect';
 
 const ProfileContext = createContext();
@@ -15,7 +16,7 @@ export const ProfileProvider = ({ children }) => {
   const fetchProfile = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/profiles`,
+        `${resolveApiUrl()}/api/profiles`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
