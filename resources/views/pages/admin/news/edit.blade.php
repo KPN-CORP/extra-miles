@@ -115,7 +115,7 @@
                                                 <div class="col">
                                                     <img 
                                                         id="image-preview"
-                                                        src="{{ asset('storage/' . $news->image) }}" 
+                                                        src="{{ route('images.show', ['path' => $news->image]) }}" 
                                                         alt="{{ __('Preview') }}" 
                                                         class="img-fluid rounded"
                                                         style="max-height: 200px; object-fit: contain;"

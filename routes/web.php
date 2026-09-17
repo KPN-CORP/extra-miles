@@ -54,7 +54,12 @@ Route::middleware('dev.mode')->group(function () {
 // mencocokkan garis miring, jadi ketika route ini ditaruh sesudahnya setiap
 // /images/... ditelan SpaController dan tag <img> menerima HTML shell -- yang
 // tampil sebagai gambar rusak. Itu sebabnya banner aktivitas wellness kosong.
-Route::get('/images/{filename}', ImageController::class);
+//
+// Parameter-nya ikut mencocokkan garis miring supaya path bersarang hasil
+// simpanan lama ("assets/images/news/news_4.jpg") juga terlayani.
+Route::get('/images/{path}', ImageController::class)
+    ->where('path', '.*')
+    ->name('images.show');
 
 Route::get('/{any?}', SpaController::class)->where('any', '^(?!admin).*$');
 

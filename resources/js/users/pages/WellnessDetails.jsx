@@ -12,6 +12,7 @@ import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
 import { formatSession, seatLabel, statusStyle } from '../components/Helper/wellnessHelper';
+import { getImageUrl } from '../components/Helper/imagePath';
 import {
     ACTIVITIES_KEY,
     activityKey,
@@ -208,7 +209,7 @@ export default function WellnessDetails() {
             <div className="app-container px-5 pt-4 pb-10 flex flex-col gap-4">
                 {activity.image && (
                     <img
-                        src={`${apiUrl}/images/${activity.image}`}
+                        src={getImageUrl(apiUrl, activity.image)}
                         alt={activity.name}
                         className="w-full h-40 object-cover rounded-xl shadow-sm"
                     />

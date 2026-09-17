@@ -72,7 +72,7 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                                     </div>
                                     <div class="modal-body text-center">
-                                        <img src="{{ asset('storage/' . $survey->banner) }}" alt="{{ __('Full Banner') }}" class="img-fluid">
+                                        <img src="{{ route('images.show', ['path' => $survey->banner]) }}" alt="{{ __('Full Banner') }}" class="img-fluid">
                                     </div>
                                 </div>
                             </div>
