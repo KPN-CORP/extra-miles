@@ -14,6 +14,7 @@ import { getImageUrl } from '../components/Helper/imagePath';
 import { motion } from "motion/react";
 import parse from "html-react-parser";
 import { zoomFrom } from '../components/Helper/zoomTransition';
+import BottomNav from '../components/Layout/BottomNav';
 
 const pageVariants = {
   initial: { opacity: 0, y: "50%" },     // Masuk dari kanan
@@ -198,7 +199,7 @@ export default function EventDetails() {
   <div className="w-full relative app-surface app-bg overflow-auto">
     <AppHeader title={t('event.upcomingEvents')} backTo="/event" />
     <motion.div
-      className="app-container px-5 pt-4 pb-10"
+      className="app-container px-5 pt-4 pb-nav"
       variants={pageVariants}
       animate="animate"
       exit="exit"
@@ -313,6 +314,7 @@ export default function EventDetails() {
                   )}
               </div>
         </motion.div>
+  <BottomNav />
   </div>
   );
 }

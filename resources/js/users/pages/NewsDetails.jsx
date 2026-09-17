@@ -12,6 +12,7 @@ import parse from "html-react-parser";
 import NewsInteraction from '../components/Helper/NewsInteraction';
 import YouTubePlayer from '../components/Helper/youtubeHelper';
 import { useNavigationDirection } from "../components/Context/NavigationProvider";
+import BottomNav from '../components/Layout/BottomNav';
 
 export default function NewsDetails({ onLike }) {
   const { id } = useParams();
@@ -129,7 +130,7 @@ export default function NewsDetails({ onLike }) {
     <div className="w-full relative app-surface app-bg overflow-auto">
     <AppHeader title={t('news.title')} backTo="/news" />
     <motion.div
-        className="app-container px-5 pt-4 pb-10"
+        className="app-container px-5 pt-4 pb-nav"
         variants={pageVariants2}
         initial="initial"
         animate="animate"
@@ -166,7 +167,7 @@ export default function NewsDetails({ onLike }) {
         </div>
     </div>
     <div className="w-full inline-flex flex-col justify-center items-center gap-3 mb-2">
-        <div className="justify-start text-red-700 text-sm font-bold font-['Montserrat'] leading-none">
+        <div className="justify-start text-red-700 text-sm font-bold leading-none">
           <p>{t('news.showLove')}</p>
         </div>
         <NewsInteraction
@@ -178,6 +179,7 @@ export default function NewsDetails({ onLike }) {
         />
     </div>
     </motion.div>
+    <BottomNav />
     </div>
   );
 }

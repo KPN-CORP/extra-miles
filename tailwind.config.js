@@ -77,7 +77,10 @@ export default {
                 },
             },
             fontFamily: {
-                sans: ['Montserrat', 'sans-serif'], // Add Montserrat
+                // Albert Sans. Nama family-nya harus tepat "Albert Sans" --
+                // "Albert" saja tidak ada di Google Fonts dan akan jatuh
+                // diam-diam ke sans-serif generik.
+                sans: ['Albert Sans', 'sans-serif'],
                 inter: ['Inter', 'sans-serif'], // Add Inter // Add Montserrat
             },
             screens: {

@@ -85,7 +85,7 @@ export default () => {
       ) : (
         // Baris geser dengan snap: kartu berikutnya sedikit terlihat sebagai
         // petunjuk bahwa daftar masih bisa digeser.
-        <div className="snap-row no-scrollbar -mx-5 px-5 pb-1">
+        <div className="snap-row no-scrollbar -mx-5 -my-1 px-5 py-1">
           {latestNews.map((item) => {
             const newsDate = new Date(item.publish_date);
             const day = newsDate.toLocaleDateString(i18n.resolvedLanguage === "id" ? "id-ID" : "en-US", {

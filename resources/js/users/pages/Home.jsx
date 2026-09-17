@@ -51,7 +51,9 @@ const Home = () => {
                 justru terbaca seperti salah render. */}
             <HomeHero />
 
-            <div className="px-5 pt-2.5 flex flex-col gap-6">
+            {/* pt-6 = gap-6: jarak di atas seksi pertama sama dengan jarak
+                antar-seksi, jadi ritmenya satu ukuran dari atas ke bawah. */}
+            <div className="px-5 pt-6 flex flex-col gap-6">
                 {/* Berita paling depan: isinya yang paling sering berubah.
                     Quick Access sudah dihafal karyawan, jadi boleh di bawahnya. */}
                 <NewsSection />

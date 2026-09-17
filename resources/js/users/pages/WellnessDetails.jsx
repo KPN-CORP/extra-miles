@@ -13,6 +13,7 @@ import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
 import { formatSession, seatLabel, statusStyle } from '../components/Helper/wellnessHelper';
 import { getImageUrl } from '../components/Helper/imagePath';
+import BottomNav from '../components/Layout/BottomNav';
 import {
     ACTIVITIES_KEY,
     activityKey,
@@ -185,7 +186,7 @@ export default function WellnessDetails() {
                 className="w-full app-surface app-bg overflow-auto"
             >
                 {header(t('wellness.title'))}
-                <div className="app-container px-5 pt-4 pb-10 flex flex-col gap-4">
+                <div className="app-container px-5 pt-4 pb-nav flex flex-col gap-4">
                     <CardLoader />
                     <CardLoader />
                 </div>
@@ -206,7 +207,7 @@ export default function WellnessDetails() {
         >
             {header(activity.name)}
 
-            <div className="app-container px-5 pt-4 pb-10 flex flex-col gap-4">
+            <div className="app-container px-5 pt-4 pb-nav flex flex-col gap-4">
                 {activity.image && (
                     <img
                         src={getImageUrl(apiUrl, activity.image)}
@@ -296,6 +297,7 @@ export default function WellnessDetails() {
                     })
                 )}
             </div>
+            <BottomNav />
         </motion.div>
     );
 }
