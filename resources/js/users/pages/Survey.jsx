@@ -236,7 +236,7 @@ export default function Survey() {
             transition={{ duration: 0.6, ease: "easeInOut" }}
             className={`flex-1 w-full bg-red-700 rounded-t-3xl p-5 overflow-auto ${loading ? 'hidden' : ''}`}
             >
-                <div className="flex flex-col justify-start items-start gap-3 w-full">
+                <div className="grid gap-3 w-full rail:grid-cols-2">
                     {mergedData && mergedData.length > 0 ? (
                         mergedData.map((data, index) => {                                
                             const { daysUntil, daysUntilLabel } = dateTimeHelper(data);

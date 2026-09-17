@@ -184,7 +184,7 @@ export default function Event() {
           className="px-5 pt-4"
         >
         {/* Main Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 rail:grid-cols-[320px_minmax(0,1fr)] rail:items-start">
             {/* Left Column: Calendar */}
             <div className="calendar-container">
                 <div {...swipeHandlers}>
@@ -224,6 +224,7 @@ export default function Event() {
             </div>
 
             {/* Right Column: Filters and Event Cards */}
+            <div className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-2">
             {categories.map((item) => (
                 <button
@@ -256,7 +257,7 @@ export default function Event() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     layout
-                    className="space-y-3"
+                    className="grid gap-3"
                     >
                     {filteredEvents.map((event) => {
                         const registeredStatus = event.event_participant?.[0]?.status || null;
@@ -352,6 +353,7 @@ export default function Event() {
                     </motion.div>
                 )}
             </AnimatePresence>
+            </div>
         </div>
         </motion.div>
         </AppShell>

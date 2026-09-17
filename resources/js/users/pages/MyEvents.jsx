@@ -194,7 +194,7 @@ export default function MyEvents() {
                             </div>
                         )}
 
-                        <div className="flex flex-col gap-2">
+                        <div className="grid gap-2 rail:grid-cols-2">
                             {visible.map((event) => (
                                 <MyEventCard
                                     key={event.encrypted_id}

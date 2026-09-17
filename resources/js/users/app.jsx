@@ -53,14 +53,38 @@ const AnimatedRoutes = () => {
     </AnimatePresence>
   );
 };
-const checkIsMobile = () => {
-  const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
-  const isTouchDevice =
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0 ||
-    navigator.msMaxTouchPoints > 0;
+// Daftar media query yang menentukan kelayakan perangkat. Sengaja TIDAK
+// memakai lebar layar: lebar berubah saat ponsel diputar (iPhone 15 Pro jadi
+// 852px di landscape), dan dulu itu membuat aplikasi tiba-tiba menampilkan
+// layar "Mobile Only" hanya karena perangkat dimiringkan.
+const MOBILE_QUERIES = ["(pointer: coarse)", "(hover: none)"];
 
-  return isMobileScreen && isTouchDevice;
+// Probe dukungan fitur. Bila browser mengenal pointer/hover, salah satu nilai
+// pasti cocok; bila tidak ada yang cocok, fiturnya memang tidak dipahami.
+// Cara ini dipakai alih-alih memeriksa `media === "not all"` karena Chrome
+// mengembalikan query yang tidak dikenal apa adanya, bukan "not all".
+const MOBILE_SUPPORT_PROBE =
+  "(pointer: coarse), (pointer: fine), (pointer: none), (hover: hover), (hover: none)";
+
+// Fallback browser lama yang tidak mendukung pointer/hover sama sekali.
+const hasTouchPoints = () =>
+  "ontouchstart" in window ||
+  navigator.maxTouchPoints > 0 ||
+  navigator.msMaxTouchPoints > 0;
+
+const checkIsMobile = () => {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return hasTouchPoints();
+  }
+
+  if (!window.matchMedia(MOBILE_SUPPORT_PROBE).matches) {
+    return hasTouchPoints();
+  }
+
+  // OR, bukan AND. Sebagian Android lama salah melaporkan salah satu fitur;
+  // memblokir ponsel karyawan jauh lebih merugikan daripada meloloskan laptop
+  // layar sentuh, jadi satu sinyal positif sudah cukup.
+  return MOBILE_QUERIES.some((query) => window.matchMedia(query).matches);
 };
 
 const AppContent = () => {
@@ -68,7 +92,9 @@ const AppContent = () => {
   const [isMobile, setIsMobile] = useState(checkIsMobile);
 
   useEffect(() => {
-    const media = window.matchMedia("(max-width: 768px)");
+    if (typeof window.matchMedia !== "function") {
+      return undefined;
+    }
 
     const handleChange = () => {
       setIsMobile(checkIsMobile());
@@ -76,22 +102,26 @@ const AppContent = () => {
 
     handleChange();
 
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-    } else {
-      media.addListener(handleChange); // fallback browser lama
-    }
+    // Jenis pointer bisa berubah di tengah sesi, misalnya saat mouse atau
+    // keyboard dilepas dari tablet, jadi kedua query tetap didengarkan.
+    const watchers = MOBILE_QUERIES.map((query) => window.matchMedia(query));
 
-    window.addEventListener("resize", handleChange);
+    watchers.forEach((media) => {
+      if (media.addEventListener) {
+        media.addEventListener("change", handleChange);
+      } else {
+        media.addListener(handleChange); // fallback browser lama
+      }
+    });
 
     return () => {
-      if (media.removeEventListener) {
-        media.removeEventListener("change", handleChange);
-      } else {
-        media.removeListener(handleChange);
-      }
-
-      window.removeEventListener("resize", handleChange);
+      watchers.forEach((media) => {
+        if (media.removeEventListener) {
+          media.removeEventListener("change", handleChange);
+        } else {
+          media.removeListener(handleChange);
+        }
+      });
     };
   }, []);
 
@@ -115,8 +145,8 @@ const AppContent = () => {
 
   if (!isMobile) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center">
-        <i className="ri-smartphone-line text-6xl text-red-500 mb-4"></i>
+      <div className="app-bg flex flex-col items-center justify-center min-h-screen px-8 text-center">
+        <i className="ri-smartphone-line text-6xl text-brand-700 mb-4"></i>
         <h1 className="text-2xl font-bold text-gray-800">{t('app.mobileOnly')}</h1>
         <p className="text-gray-600 mt-2">
           {t('app.mobileOnlyText')}

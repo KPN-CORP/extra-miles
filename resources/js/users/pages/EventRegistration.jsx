@@ -8,6 +8,7 @@ import EventForm from '../components/Forms/EventForm';
 import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import AppHeader from '../components/Layout/AppHeader';
+import AppShell from '../components/Layout/AppShell';
 import { getImageUrl } from '../components/Helper/imagePath';
 import EventLoader from '../components/Loader/EventLoader';
 
@@ -97,14 +98,15 @@ export default function EventDetails() {
   const endTime = event.time_end ? event.time_end.replace(/:/g, ':').slice(0, 5) : 'end';
 
   return (
-    <div className="w-full relative app-surface app-bg overflow-auto">
+    <AppShell>
       <AppHeader title={t('event.registrationForm')} backTo="/event" />
-      <div className="app-container px-5 pt-4 pb-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="px-5 pt-4">
+        <div className="grid grid-cols-1 gap-5 rail:grid-cols-[320px_minmax(0,1fr)] rail:items-start">
             {event.image && <img className="w-full object-cover rounded-lg" src={getImageUrl(apiUrl, event.image)} />}
 
             {/* <img className="w-full object-cover rounded-lg" src={getImageUrl(apiUrl, event.image)} /> */}
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
+            <div className="flex flex-col gap-5">
+            <div className='flex flex-col gap-2'>
                 <div className="self-stretch justify-start text-red-700 text-lg font-semibold">{event.title}</div>
                 <div className="flex gap-2">
                 {(Array.isArray(event.businessUnit) ? event.businessUnit : [t('event.allBu')]).map((index, i) => (
@@ -159,8 +161,9 @@ export default function EventDetails() {
               {/* Form */}
               <EventForm />
             </div>
+            </div>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

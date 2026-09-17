@@ -130,7 +130,7 @@ export default function Social() {
       >
       <div className="relative px-5 pt-4">
         {/* Ornamen dinaikkan setinggi tab bar agar tidak tertutup olehnya. */}
-        <div className="fixed bottom-[calc(var(--app-nav-h)+var(--app-safe-bottom))] right-0 w-1/2 overflow-hidden z-0 pointer-events-none">
+        <div className="app-anchor-right fixed bottom-[calc(var(--app-nav-h)+var(--app-safe-bottom))] right-0 w-1/2 overflow-hidden z-0 pointer-events-none">
           <img
             className="w-full h-full object-cover"
             src={getImageUrl(apiUrl, 'assets/images/Element Extra Mile 2.png')}

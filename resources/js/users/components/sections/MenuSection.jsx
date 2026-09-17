@@ -114,7 +114,7 @@ return (
     <section className="flex flex-col gap-3">
         <SectionHeader title={t('home.quickAccess')} />
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 md:grid-cols-4 rail:grid-cols-6">
           {tiles.map((tile) => {
             return (
               <button

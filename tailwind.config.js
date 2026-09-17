@@ -90,6 +90,22 @@ export default {
                 lg: "1024px", // Default lg breakpoint
                 xl: "1280px", // Default xl breakpoint
                 "2xl": "1536px", // Default 2xl breakpoint
+
+                // Tata letak aplikasi karyawan ditentukan dua pertanyaan saja:
+                // layarnya lebar, dan layarnya pendek.
+                //
+                //   short -> ponsel dimiringkan; tinggi yang jadi barang langka.
+                //   wide  -> tablet landscape; ruang mendatar berlimpah.
+                //   rail  -> salah satu dari keduanya: tab bar bawah diganti
+                //            rail kiri, karena di kedua keadaan itu bar bawah
+                //            memakan tinggi yang justru paling dibutuhkan.
+                //
+                // Tablet portrait sengaja TIDAK masuk `rail`: layarnya tinggi
+                // dan dipegang dua tangan, jadi tab bar bawah tetap yang paling
+                // mudah dijangkau, sama seperti di ponsel.
+                short: { raw: "(max-height: 500px)" },
+                wide: { raw: "(min-width: 1024px)" },
+                rail: { raw: "(min-width: 1024px), (max-height: 500px)" },
             },
         },
     },

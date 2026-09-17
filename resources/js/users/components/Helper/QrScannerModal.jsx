@@ -87,9 +87,9 @@ export default function QRScannerModal({ isOpen, onClose, event, onScanSuccess }
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-black bg-opacity-70 transition-opacity duration-200">
+    <div className="fixed inset-0 z-50 flex items-end md:items-center bg-black bg-opacity-70 transition-opacity duration-200">
       <div
-        className={`bg-white w-full h-[85vh] rounded-t-2xl p-4 relative shadow-lg transform transition-all duration-200 ${
+        className={`bg-white w-full h-[85vh] rounded-t-2xl p-4 relative shadow-lg transform transition-all duration-200 md:max-w-[480px] md:mx-auto md:h-[70vh] md:rounded-2xl short:h-[92vh] ${
           isVisible ? 'animate-slideUp' : 'animate-slideDown'
         }`}
       >

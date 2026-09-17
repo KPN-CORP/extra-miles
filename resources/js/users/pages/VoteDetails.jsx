@@ -2,6 +2,7 @@ import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 import LanguageToggle from "../components/Layout/LanguageToggle";
 import AppHeader from "../components/Layout/AppHeader";
+import AppShell from "../components/Layout/AppShell";
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -94,7 +95,7 @@ export default function VoteList() {
   
     return (
         
-        <div className="w-full relative app-surface bg-brand-700 overflow-auto">
+        <AppShell surface="brand">
             <AppHeader
                 title={t('vote.letsVote')}
                 variant="solid"
@@ -102,16 +103,16 @@ export default function VoteList() {
                 trailing={<LanguageToggle variant="onRed" />}
             />
             <motion.div
-                className="app-container px-5 pt-4 pb-10"
+                className="px-5 pt-4"
                 variants={pageVariants}
                 initial="initial"
                 animate="animate"
                 exit="exit"
                 transition={{ duration: 0.3, ease: "easeInOut" }}
             >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 rail:grid-cols-[320px_minmax(0,1fr)] rail:items-start">
                     {data.banner && (
-                        <>
+                        <div className="w-full">
                             {loadingBanner && <BannerLoader className='w-full object-fill rounded-3xl' />}
                             <img
                             src={getImageUrl(apiUrl, data.banner)}
@@ -122,8 +123,10 @@ export default function VoteList() {
                                 loadingBanner ? 'opacity-0' : 'opacity-100'
                             }`}
                             />
-                        </>
+                        </div>
                     )}
+
+                    <div className="flex flex-col gap-6">
                     <div className="flex-col flex w-full text-center justify-center text-white text-2xl font-bold gap-1">
                         <span className="text-white text-base font-medium">{t('vote.endsIn')}</span>
                         <CountdownTimer
@@ -188,8 +191,9 @@ export default function VoteList() {
                         )
                         }
                     </div>
+                    </div>
                 </div>
             </motion.div>
-        </div>
+        </AppShell>
     );
 }

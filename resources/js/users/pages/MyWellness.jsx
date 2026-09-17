@@ -192,7 +192,8 @@ export default function MyWellness() {
                         </button>
                     </div>
                 ) : (
-                    registrations.map((registration) => {
+                    <div className="grid gap-4 rail:grid-cols-2">
+                    {registrations.map((registration) => {
                         const when = formatSession(registration.schedule);
                         const busy = busyId === registration.id;
 
@@ -286,7 +287,8 @@ export default function MyWellness() {
                                 )}
                             </div>
                         );
-                    })
+                    })}
+                    </div>
                 )}
             </div>
 

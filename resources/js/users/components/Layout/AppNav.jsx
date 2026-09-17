@@ -7,7 +7,16 @@ import { useApiUrl } from '../Context/ApiContext';
 import { useAuth } from '../Context/AuthContext';
 
 /**
- * Tab bar utama aplikasi.
+ * Navigasi utama aplikasi -- satu komponen, dua bentuk.
+ *
+ * Di ponsel tegak dan tablet tegak ia berupa tab bar di bawah layar. Pada
+ * breakpoint `rail` (layar lebar ATAU layar pendek) ia berdiri sebagai rail di
+ * tepi kiri: di ponsel landscape tinggi layar tinggal ~390px, dan bar bawah
+ * setinggi 62px memakan ruang yang justru paling langka; di tablet landscape
+ * ruang mendatar justru berlimpah.
+ *
+ * Bentuknya ditentukan CSS, bukan JavaScript, supaya perubahannya terjadi tepat
+ * saat perangkat diputar tanpa menunggu React me-render ulang.
  *
  * Tab Event dan Wellness menuju daftar milik karyawan sendiri (/my-events dan
  * /wellness/my-registrations), bukan halaman jelajah. Halaman jelajahnya tetap
@@ -49,7 +58,7 @@ const matches = (pathname, prefix) =>
 // Tab menyala untuk seluruh daftar `match`-nya, bukan cuma tujuannya.
 const isActive = (pathname, tab) => (tab.match ?? [tab.path]).some((p) => matches(pathname, p));
 
-export default function BottomNav() {
+export default function AppNav() {
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const { t } = useTranslation();
@@ -69,20 +78,20 @@ export default function BottomNav() {
 
     return (
         <nav
-            className="fixed inset-x-0 bottom-0 z-40 pb-safe app-blur bg-white/85 border-t border-stone-200/80 shadow-nav"
+            className="fixed z-40 app-blur bg-white/85 border-stone-200/80 inset-x-0 bottom-0 pb-safe border-t shadow-nav rail:inset-x-auto rail:inset-y-0 rail:left-0 rail:w-[length:var(--app-rail-w)] rail:pb-0 rail:pl-safe rail:border-t-0 rail:border-r rail:shadow-none"
             aria-label={t('nav.primary')}
         >
-            <ul className="app-container flex items-stretch h-[var(--app-nav-h)] px-1">
+            <ul className="app-container flex items-stretch h-[var(--app-nav-h)] px-1 rail:h-full rail:max-w-none rail:flex-col rail:items-center rail:justify-center rail:gap-2 rail:px-1">
                 {TABS.map((tab) => {
                     const active = isActive(pathname, tab);
 
                     return (
-                        <li key={tab.path} className="flex-1">
+                        <li key={tab.path} className="flex-1 rail:flex-none rail:w-full">
                             <button
                                 type="button"
                                 onClick={() => go(tab)}
                                 aria-current={active ? 'page' : undefined}
-                                className="tap w-full h-full flex flex-col items-center justify-center gap-1"
+                                className="tap w-full h-full flex flex-col items-center justify-center gap-1 rail:h-12"
                             >
                                 {/* Pil di belakang ikon menandai tab aktif; lebih
                                     menyatu dengan bar daripada garis di tepi atas. */}
@@ -98,7 +107,7 @@ export default function BottomNav() {
                                     />
                                 </span>
                                 <span
-                                    className={`text-[10px] leading-none ${
+                                    className={`text-[10px] leading-none short:hidden ${
                                         active ? 'text-brand-700 font-bold' : 'text-stone-500 font-medium'
                                     }`}
                                 >

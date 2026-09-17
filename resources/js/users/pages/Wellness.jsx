@@ -197,7 +197,8 @@ export default function Wellness() {
                         description={filtersActive ? t('wellness.noSessionsOnDate') : t('wellness.empty')}
                     />
                 ) : (
-                    visible.map(({ activity, session, others }) => {
+                    <div className="grid gap-4 rail:grid-cols-2">
+                    {visible.map(({ activity, session, others }) => {
                         const when = formatSession(session);
 
                         return (
@@ -250,7 +251,8 @@ export default function Wellness() {
                                 <i className="ri-arrow-right-s-line text-stone-300 text-lg shrink-0" aria-hidden="true" />
                             </button>
                         );
-                    })
+                    })}
+                    </div>
                 )}
 
                 {filtersActive && (

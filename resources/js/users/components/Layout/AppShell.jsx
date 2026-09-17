@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 
-import BottomNav from './BottomNav';
+import AppNav from './AppNav';
 import BrandWatermark from './BrandWatermark';
 
 // Transisi halus antar halaman -- AnimatePresence di app.jsx berjalan dengan
@@ -15,9 +15,13 @@ const pageVariants = {
 /**
  * Pembungkus standar setiap halaman aplikasi karyawan.
  *
- * Menyatukan latar, lebar kolom, jarak aman notch, ruang untuk bottom
- * navigation, dan animasi transisi supaya tiap halaman tidak menulis ulang
- * kombinasi kelas yang sama.
+ * Menyatukan latar, lebar kolom, jarak aman notch, ruang untuk navigasi, dan
+ * animasi transisi supaya tiap halaman tidak menulis ulang kombinasi kelas yang
+ * sama.
+ *
+ * Lebar kolom dan bentuk navigasi ikut keadaan layar (lihat --app-column dan
+ * --app-rail-w di global.css); halaman tidak perlu tahu sedang di ponsel,
+ * ponsel landscape, atau tablet.
  */
 export default function AppShell({
     children,
@@ -37,7 +41,7 @@ export default function AppShell({
             animate="animate"
             exit="exit"
             transition={{ duration: 0.22, ease: 'easeOut' }}
-            className={`app-surface ${surfaceClass} relative w-full ${className}`}
+            className={`app-surface ${nav ? 'app-has-nav' : ''} ${surfaceClass} relative w-full ${className}`}
         >
             {/* Cap air digambar lebih dulu dan diberi z-0; konten di bawahnya
                 memakai z-10. Keduanya harus punya z-index eksplisit: elemen
@@ -50,7 +54,7 @@ export default function AppShell({
                 {children}
             </div>
 
-            {nav && <BottomNav />}
+            {nav && <AppNav />}
         </motion.div>
     );
 }

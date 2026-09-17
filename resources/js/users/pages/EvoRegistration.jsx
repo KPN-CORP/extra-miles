@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageToggle from '../components/Layout/LanguageToggle';
 import AppHeader from '../components/Layout/AppHeader';
+import AppShell from '../components/Layout/AppShell';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -83,16 +84,22 @@ export default function EvoRegistration() {
   const year = date.getFullYear();  
 
   return (
-    <div className="w-full relative app-surface app-bg overflow-auto">
+    <AppShell>
       <AppHeader
         title={t('evo.title')}
         trailing={<LanguageToggle />}
       />
-      <div className="app-container px-5 pt-4 pb-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {event.image && <img className="w-full object-cover rounded-lg" src={getImageUrl(apiUrl, event.image)} />}
+      <div className="px-5 pt-4">
+        <div className="grid grid-cols-1 gap-5 rail:grid-cols-[320px_minmax(0,1fr)] rail:items-start">
+            {event.image && (
+              <img
+                className="w-full object-cover rounded-lg rail:sticky rail:top-[calc(var(--app-header-h)+16px)]"
+                src={getImageUrl(apiUrl, event.image)}
+              />
+            )}
 
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-2 text-sm'>
+            <div className="flex flex-col gap-5">
+            <div className='flex flex-col gap-2 text-sm'>
                 <div className="self-stretch justify-start text-red-700 text-lg font-semibold">{event.title}</div>
                 <div className="prose prose-sm leading-relaxed text-stone-800 max-w-none [&>p mb-0]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1">
                   {parse(event.description)}
@@ -117,8 +124,9 @@ export default function EvoRegistration() {
               {/* Form */}
               <EvoForm encryptedID={event.encrypted_id} registered={hasRegistered} />
             </div>
+            </div>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

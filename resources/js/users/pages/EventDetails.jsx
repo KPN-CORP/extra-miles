@@ -14,7 +14,7 @@ import { getImageUrl } from '../components/Helper/imagePath';
 import { motion } from "motion/react";
 import parse from "html-react-parser";
 import { zoomFrom } from '../components/Helper/zoomTransition';
-import BottomNav from '../components/Layout/BottomNav';
+import AppShell from '../components/Layout/AppShell';
 
 const pageVariants = {
   initial: { opacity: 0, y: "50%" },     // Masuk dari kanan
@@ -141,7 +141,7 @@ export default function EventDetails() {
 
 
   if (loading) return (
-  <div className="w-full relative app-surface app-bg overflow-auto">
+  <AppShell nav>
     <motion.div
       variants={pageVariants}
       initial="initial"
@@ -151,7 +151,7 @@ export default function EventDetails() {
     >
       <EventLoader />
     </motion.div>
-  </div>
+  </AppShell>
   ) 
 
   if (!event) {
@@ -196,22 +196,23 @@ export default function EventDetails() {
   const statusColor = getStatusColor();
   
   return (
-  <div className="w-full relative app-surface app-bg overflow-auto">
+  <AppShell nav>
     <AppHeader title={t('event.upcomingEvents')} backTo="/event" />
     <motion.div
-      className="app-container px-5 pt-4 pb-nav"
+      className="px-5 pt-4"
       variants={pageVariants}
       animate="animate"
       exit="exit"
       transition={{ duration: 0.3, type: "tween", ease: "easeOut" }}
     >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6 rail:grid-cols-[320px_minmax(0,1fr)] rail:items-start">
                   <img
                       src={getImageUrl(apiUrl, event.image)}
                       alt={event.title}
                       className="w-full object-fill rounded-lg"
                   />
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
+                  <div className="flex flex-col gap-6">
+                  <div className='flex flex-col gap-2'>
                       <div className="self-stretch inline-flex justify-start items-center gap-4">
                         <div data-color="primary" data-size="H6" data-type="normal" className="bg-white/0 inline-flex flex-col justify-center items-center">
                           <div className={`px-2 py-1 ${statusColor.bg} rounded inline-flex justify-center items-center overflow-hidden`}>
@@ -313,8 +314,8 @@ export default function EventDetails() {
                     </>
                   )}
               </div>
+              </div>
         </motion.div>
-  <BottomNav />
-  </div>
+  </AppShell>
   );
 }

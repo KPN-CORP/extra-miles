@@ -12,7 +12,7 @@ import parse from "html-react-parser";
 import NewsInteraction from '../components/Helper/NewsInteraction';
 import YouTubePlayer from '../components/Helper/youtubeHelper';
 import { useNavigationDirection } from "../components/Context/NavigationProvider";
-import BottomNav from '../components/Layout/BottomNav';
+import AppShell from '../components/Layout/AppShell';
 
 export default function NewsDetails({ onLike }) {
   const { id } = useParams();
@@ -71,7 +71,7 @@ export default function NewsDetails({ onLike }) {
 
   
   if (loading) return (
-    <div className="w-full relative app-surface app-bg overflow-auto">
+    <AppShell nav>
       <motion.div
         variants={pageVariants}
         initial="initial"
@@ -81,7 +81,7 @@ export default function NewsDetails({ onLike }) {
       >
         <NewsLoader />
       </motion.div>
-    </div>
+    </AppShell>
   ) 
 
   if (!news) {
@@ -127,10 +127,10 @@ export default function NewsDetails({ onLike }) {
 
 
   return (
-    <div className="w-full relative app-surface app-bg overflow-auto">
+    <AppShell nav>
     <AppHeader title={t('news.title')} backTo="/news" />
     <motion.div
-        className="app-container px-5 pt-4 pb-nav"
+        className="px-5 pt-4"
         variants={pageVariants2}
         initial="initial"
         animate="animate"
@@ -153,17 +153,19 @@ export default function NewsDetails({ onLike }) {
             ))}
         </div>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-3">
+    <div className="grid grid-cols-1 gap-6 mb-3 rail:grid-cols-[320px_minmax(0,1fr)] rail:items-start">
         <img
             src={getImageUrl(apiUrl, news.image)}
             alt={news.title}
             className="w-full aspect-[16/9] object-fill rounded"
         />
+        <div className="flex flex-col gap-6">
         {news.link && (
           <YouTubePlayer videoId={news.link} />
         )}
         <div onClick={handleDoubleTap} onTouchStart={handleDoubleTap} className="prose prose-sm leading-relaxed text-stone-800 max-w-none [&>p]:mb-4 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4 [&>h4]:mb-4 [&>h1]:font-semibold [&>h2]:font-semibold [&>h3]:font-semibold [&>h4]:font-semibold [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>li]:mb-1 pl-2 pr-1">
           {parse(news.content)}
+        </div>
         </div>
     </div>
     <div className="w-full inline-flex flex-col justify-center items-center gap-3 mb-2">
@@ -179,7 +181,6 @@ export default function NewsDetails({ onLike }) {
         />
     </div>
     </motion.div>
-    <BottomNav />
-    </div>
+    </AppShell>
   );
 }

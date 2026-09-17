@@ -5,7 +5,6 @@ import AppHeader from '../components/Layout/AppHeader';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import parse from 'html-react-parser';
-import { motion } from 'motion/react';
 
 import { useApiUrl } from '../components/Context/ApiContext';
 import { useAuth } from '../components/Context/AuthContext';
@@ -13,7 +12,7 @@ import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
 import { formatSession, seatLabel, statusStyle } from '../components/Helper/wellnessHelper';
 import { getImageUrl } from '../components/Helper/imagePath';
-import BottomNav from '../components/Layout/BottomNav';
+import AppShell from '../components/Layout/AppShell';
 import {
     ACTIVITIES_KEY,
     activityKey,
@@ -22,12 +21,6 @@ import {
     loadWellness,
     MY_REGISTRATIONS_KEY,
 } from '../components/Helper/wellnessCache';
-
-const pageVariants = {
-    initial: { opacity: 0, x: 0 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 0 },
-};
 
 export default function WellnessDetails() {
     const { id } = useParams();
@@ -177,37 +170,23 @@ export default function WellnessDetails() {
     // full-screen splash here read as if the app were relaunching.
     if (loading) {
         return (
-            <motion.div
-                variants={pageVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={{ duration: 0.25 }}
-                className="w-full app-surface app-bg overflow-auto"
-            >
+            <AppShell nav>
                 {header(t('wellness.title'))}
-                <div className="app-container px-5 pt-4 pb-nav flex flex-col gap-4">
+                <div className="px-5 pt-4 flex flex-col gap-4">
                     <CardLoader />
                     <CardLoader />
                 </div>
-            </motion.div>
+            </AppShell>
         );
     }
 
     if (!activity) return null;
 
     return (
-        <motion.div
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.25 }}
-            className="w-full app-surface app-bg overflow-auto"
-        >
+        <AppShell nav>
             {header(activity.name)}
 
-            <div className="app-container px-5 pt-4 pb-nav flex flex-col gap-4">
+            <div className="px-5 pt-4 flex flex-col gap-4">
                 {activity.image && (
                     <img
                         src={getImageUrl(apiUrl, activity.image)}
@@ -297,7 +276,6 @@ export default function WellnessDetails() {
                     })
                 )}
             </div>
-            <BottomNav />
-        </motion.div>
+        </AppShell>
     );
 }

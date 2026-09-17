@@ -182,6 +182,8 @@ export default function News() {
                 exit={skipExit ? {opacity: 0, x: 0} : "exit"}
                 transition={{ duration: 0.3, type: "tween", ease: "easeInOut" }}
             >
+            <div className="grid gap-4 rail:grid-cols-[320px_minmax(0,1fr)] rail:items-start">
+            <div className="min-w-0">
             {/* Search + Filter button */}
             <div className="w-full p-2 bg-white rounded-lg inline-flex items-center gap-2 overflow-hidden mb-4">
               <div className="text-gray-400 text-lg">
@@ -208,11 +210,13 @@ export default function News() {
             <div className="flex items-center justify-between mb-1">
               <div className="text-red-700 text-xs font-bold">{t('news.latest')}</div>
             </div>
-            <div className="overflow-x-scroll whitespace-nowrap mb-4">
+            <div className="mb-4">
               <Swiper
                 modules={[FreeMode]}
                 spaceBetween={15}
                 slidesPerView={2}
+                breakpointsBase="container"
+                breakpoints={{ 480: { slidesPerView: 3 }, 700: { slidesPerView: 4 } }}
                 followFinger={true}
                 speed={600}
               >
@@ -229,7 +233,7 @@ export default function News() {
                         <div onClick={() => {
                           setSkipExit(true);
                           navigate(`/news/${item.encrypted_id}`)
-                        }} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 aspect-[4/3] relative rounded-lg overflow-hidden">
+                        }} className="w-full aspect-[4/3] short:aspect-[16/9] relative rounded-lg overflow-hidden">
                         {/* Image + loader */}
                         <div className="absolute inset-0 flex items-center justify-center">
                             <img
@@ -265,6 +269,9 @@ export default function News() {
               </Swiper>
             </div>
 
+            </div>
+
+            <div className="min-w-0">
             {/* Filter Buttons */}
             <div className="flex gap-2 mb-4 py-2 px-1 overflow-x-auto whitespace-nowrap no-scrollbar">
               {[
@@ -290,8 +297,8 @@ export default function News() {
             </div>
 
             {/* News List */}
-            <div className="max-h-screen overflow-y-auto pr-1">
-              <div className="space-y-3">
+            <div className="min-w-0">
+              <div className="grid gap-3">
                   {filteredNews.map((news) => {
                       const newsDate = new Date(news.publish_date);
                       const day = newsDate.toLocaleDateString(dateLocale, {
@@ -336,6 +343,8 @@ export default function News() {
                       );
                   })}
               </div>
+          </div>
+          </div>
           </div>
         </motion.div>
           </AppShell>
