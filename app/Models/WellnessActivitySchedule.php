@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\WellnessRecurrenceFrequency;
 use App\Enums\WellnessRegistrationStatus;
 use App\Enums\WellnessScheduleStatus;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Str;
 
 class WellnessActivitySchedule extends Model
 {
@@ -28,7 +28,9 @@ class WellnessActivitySchedule extends Model
         'registration_start_at',
         'registration_end_at',
         'status',
-        'qr_token',
+        'recurrence_group_id',
+        'recurrence_frequency',
+        'recurrence_until',
         'created_by',
         'updated_by',
     ];
@@ -40,14 +42,9 @@ class WellnessActivitySchedule extends Model
         'registration_end_at' => 'datetime',
         'quota' => 'integer',
         'status' => WellnessScheduleStatus::class,
+        'recurrence_frequency' => WellnessRecurrenceFrequency::class,
+        'recurrence_until' => 'date',
     ];
-
-    protected static function booted(): void
-    {
-        static::creating(function (self $schedule) {
-            $schedule->qr_token ??= (string) Str::uuid();
-        });
-    }
 
     public function getEncryptedIdAttribute(): string
     {
@@ -148,16 +145,30 @@ class WellnessActivitySchedule extends Model
         return $at->lte($this->end_at);
     }
 
+    /**
+     * The attendance QR belongs to the activity type, and so does the window it
+     * will accept a scan in. A session with no type reachable falls back to the
+     * config default rather than refusing every scan.
+     */
+    public function activityType(): ?WellnessActivityType
+    {
+        return $this->activity?->type;
+    }
+
     public function checkInOpensAt(): Carbon
     {
-        return $this->start_at->copy()
-            ->subMinutes(config('wellness.check_in.opens_minutes_before'));
+        $minutes = $this->activityType()?->checkInOpensMinutesBefore()
+            ?? (int) config('wellness.check_in.opens_minutes_before');
+
+        return $this->start_at->copy()->subMinutes($minutes);
     }
 
     public function checkInClosesAt(): Carbon
     {
-        return $this->end_at->copy()
-            ->addMinutes(config('wellness.check_in.closes_minutes_after'));
+        $minutes = $this->activityType()?->checkInClosesMinutesAfter()
+            ?? (int) config('wellness.check_in.closes_minutes_after');
+
+        return $this->end_at->copy()->addMinutes($minutes);
     }
 
     public function isCheckInOpen(?Carbon $at = null): bool
@@ -166,6 +177,43 @@ class WellnessActivitySchedule extends Model
 
         return $this->status->allowsCheckIn()
             && $at->between($this->checkInOpensAt(), $this->checkInClosesAt());
+    }
+
+    /**
+     * Whether this schedule was created as one occurrence of a repeating
+     * series. Standalone schedules have no group, and are always edited alone.
+     */
+    public function isRecurring(): bool
+    {
+        return $this->recurrence_group_id !== null;
+    }
+
+    /**
+     * The occurrences of the same series that come after this one. Ordered the
+     * same way the list is, with the id breaking a tie between two sessions
+     * that start at the same minute.
+     */
+    public function followingInSeries(): Builder
+    {
+        $query = static::query()
+            ->where('recurrence_group_id', $this->recurrence_group_id)
+            ->whereKeyNot($this->getKey());
+
+        if (! $this->isRecurring()) {
+            // No group means no siblings -- return a query that can never match
+            // rather than one that would sweep up every standalone schedule.
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query
+            ->where(function (Builder $q) {
+                $q->where('start_at', '>', $this->start_at)
+                    ->orWhere(fn (Builder $tie) => $tie
+                        ->where('start_at', $this->start_at)
+                        ->where('id', '>', $this->id));
+            })
+            ->orderBy('start_at')
+            ->orderBy('id');
     }
 
     public function scopeUpcoming($query)

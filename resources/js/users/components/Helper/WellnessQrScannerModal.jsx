@@ -6,12 +6,22 @@ import { Scanner } from '@yudiel/react-qr-scanner';
 import { useApiUrl } from '../Context/ApiContext';
 import { useAuth } from '../Context/AuthContext';
 
+/** "08:00 - 10:00" dari payload sesi yang dikembalikan backend. */
+function sessionRange(session) {
+    const clock = (value) => (value || '').slice(11, 16);
+
+    return `${clock(session.start_at)} - ${clock(session.end_at)}`;
+}
+
 /**
  * Wellness attendance check-in.
  *
- * The QR encodes the session's qr_token; the backend decides whether this
- * employee may check in (approved registration, inside the check-in window),
- * so the scanner only forwards what it read.
+ * The QR encodes the *activity type's* qr_token -- one code posted at the door
+ * covers every session of that type. Which session the scan means is entirely
+ * the backend's call: it picks the earliest session this employee is approved
+ * for whose window contains the moment of the scan and that they have not
+ * already been marked present for. The scanner only forwards what it read, and
+ * shows back the session that took it.
  */
 export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess }) {
     const apiUrl = useApiUrl();
@@ -136,6 +146,14 @@ export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess 
                     <div className="text-center px-4">
                         <p className="text-gray-600 text-base">{t('wellness.qr.attending')}</p>
                         <p className="text-red-700 text-base font-bold">{result.activity}</p>
+                        {/* Satu QR mencakup banyak sesi, jadi sebutkan sesi mana
+                            yang tercatat -- peserta bisa punya dua sesi hari itu. */}
+                        {result.session && (
+                            <p className="text-gray-500 text-xs mt-1">
+                                {t('wellness.qr.sessionAt', { time: sessionRange(result.session) })}
+                                {result.session.location ? ` · ${result.session.location}` : ''}
+                            </p>
+                        )}
                         <p className="text-gray-400 text-xs mt-1">{result.attended_at}</p>
                     </div>
                 ) : error ? (

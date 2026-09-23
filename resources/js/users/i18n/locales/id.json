@@ -300,11 +300,12 @@
     },
     "qr": {
       "checkedIn": "Check-in berhasil",
-      "pointCamera": "Arahkan kamera Anda ke kode QR sesi untuk mengonfirmasi kehadiran.",
+      "pointCamera": "Arahkan kamera ke kode QR kehadiran untuk mengonfirmasi kehadiran Anda.",
       "attending": "Anda hadir 🎉",
       "checkingIn": "Sedang memproses check-in...",
       "keepInFrame": "Pastikan kode QR sepenuhnya berada di dalam bingkai.",
-      "failed": "Kami tidak dapat mencatat kehadiran Anda."
+      "failed": "Kami tidak dapat mencatat kehadiran Anda.",
+      "sessionAt": "Sesi pukul {{time}}"
     },
     "noSessionsOnDate": "Tidak ada sesi wellness pada tanggal ini. Pilih hari lain."
   },

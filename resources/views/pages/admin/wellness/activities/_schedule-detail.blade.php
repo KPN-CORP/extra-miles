@@ -39,7 +39,7 @@
                 @foreach ($activity->schedules as $schedule)
                     <tr>
                         <td>
-                            <div class="fw-semibold small">{{ $schedule->start_at->format('d M Y') }}</div>
+                            <div class="fw-semibold small">{{ $schedule->start_at->translatedFormat('D, d M Y') }}</div>
                             <small class="text-muted">
                                 {{ $schedule->start_at->format('H:i') }} &ndash; {{ $schedule->end_at->format('H:i') }}
                             </small>
@@ -47,9 +47,10 @@
                         <td class="small">{{ $schedule->location ?: '-' }}</td>
                         <td class="small">
                             @if ($schedule->registration_start_at || $schedule->registration_end_at)
-                                {{ $schedule->registration_start_at?->format('d M H:i') ?? __('anytime') }}
-                                &rarr;
-                                {{ $schedule->registration_end_at?->format('d M H:i') ?? __('session end') }}
+                                <div>{{ $schedule->registration_start_at?->translatedFormat('D, d M H:i') ?? __('anytime') }}</div>
+                                <div class="text-muted">
+                                    &rarr; {{ $schedule->registration_end_at?->translatedFormat('D, d M H:i') ?? __('session end') }}
+                                </div>
                             @else
                                 <span class="text-muted">{{ __('Always open') }}</span>
                             @endif
@@ -72,10 +73,6 @@
                             <a href="{{ route('admin.wellness.registrations.index', $schedule->encrypted_id) }}"
                                 class="btn btn-sm btn-outline-primary" title="{{ __('Participants') }}">
                                 <i class="ri-group-line"></i>
-                            </a>
-                            <a href="{{ route('wellness.schedules.qr', $schedule->encrypted_id) }}"
-                                class="btn btn-sm btn-outline-secondary" title="{{ __('Attendance QR') }}" target="_blank">
-                                <i class="ri-qr-code-line"></i>
                             </a>
                         </td>
                     </tr>

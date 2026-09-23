@@ -300,11 +300,12 @@
     },
     "qr": {
       "checkedIn": "Checked in",
-      "pointCamera": "Point your camera at the session QR code to confirm your attendance.",
+      "pointCamera": "Point your camera at the attendance QR code to confirm your attendance.",
       "attending": "You're attending 🎉",
       "checkingIn": "Checking you in...",
       "keepInFrame": "Make sure the QR code is fully inside the frame.",
-      "failed": "We could not record your attendance."
+      "failed": "We could not record your attendance.",
+      "sessionAt": "Session at {{time}}"
     },
     "noSessionsOnDate": "No wellness sessions on this date. Pick another day."
   },

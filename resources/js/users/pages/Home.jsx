@@ -10,6 +10,7 @@ import QuoteSection from '../components/sections/QuoteSection';
 import AssetSection from '../components/sections/AssetSection';
 import { showAlert } from '../components/Helper/alertHelper';
 import { useAuth } from '../components/Context/AuthContext';
+import { MyEventsProvider } from '../components/Context/MyEventsContext';
 import PageLoader from '../components/Loader/PageLoader';
 import { SSO_URL } from '../components/Helper/ssoRedirect';
 
@@ -53,15 +54,25 @@ const Home = () => {
 
             {/* pt-6 = gap-6: jarak di atas seksi pertama sama dengan jarak
                 antar-seksi, jadi ritmenya satu ukuran dari atas ke bawah. */}
-            <div className="px-5 pt-6 flex flex-col gap-6">
-                {/* Berita paling depan: isinya yang paling sering berubah.
-                    Quick Access sudah dihafal karyawan, jadi boleh di bawahnya. */}
-                <NewsSection />
-                <MenuSection />
-                <ActivitySection limit={2} />
-                <QuoteSection />
-                <AssetSection />
-            </div>
+            <MyEventsProvider>
+                <div className="px-5 pt-6 flex flex-col gap-6">
+                    {/* Undangan yang belum dijawab naik ke paling atas: itu
+                        satu-satunya seksi beranda yang menunggu tindakan
+                        karyawan, dan tenggatnya lewat kalau tidak terlihat.
+                        Kalau kosong seksinya hilang sama sekali (hideWhenEmpty)
+                        sehingga berita kembali jadi yang pertama. */}
+                    <ActivitySection limit={2} only="pending" hideWhenEmpty />
+
+                    {/* Berita di depan sisanya: isinya yang paling sering
+                        berubah. Quick Access sudah dihafal karyawan, jadi boleh
+                        di bawahnya. */}
+                    <NewsSection />
+                    <MenuSection />
+                    <ActivitySection limit={2} only="registered" />
+                    <QuoteSection />
+                    <AssetSection />
+                </div>
+            </MyEventsProvider>
         </AppShell>
     );
 };

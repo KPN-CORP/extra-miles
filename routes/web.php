@@ -170,6 +170,11 @@ Route::prefix('admin')->group(function () {
                 Route::put('/wellness/types/{encryptedId}', [WellnessActivityTypeController::class, 'update'])->name('wellness.types.update');
                 Route::delete('/wellness/types/{encryptedId}/archive', [WellnessActivityTypeController::class, 'archive'])->name('wellness.types.archive');
                 Route::post('/wellness/types/{encryptedId}/restore', [WellnessActivityTypeController::class, 'restore'])->name('wellness.types.restore');
+
+                // Attendance QR lives on the type: one printed code covers every
+                // session of every activity of that type.
+                Route::get('/wellness/types/{encryptedId}/qr', [WellnessActivityTypeController::class, 'qr'])->name('wellness.types.qr');
+                Route::post('/wellness/types/{encryptedId}/rotate-qr', [WellnessActivityTypeController::class, 'rotateQr'])->name('wellness.types.rotateQr');
             });
 
             // Wellness -- activities
@@ -186,8 +191,6 @@ Route::prefix('admin')->group(function () {
             Route::post('/wellness/activities/{encryptedId}/schedules', [WellnessActivityScheduleController::class, 'store'])->name('wellness.schedules.store');
             Route::put('/wellness/schedules/{encryptedId}', [WellnessActivityScheduleController::class, 'update'])->name('wellness.schedules.update');
             Route::delete('/wellness/schedules/{encryptedId}/archive', [WellnessActivityScheduleController::class, 'archive'])->name('wellness.schedules.archive');
-            Route::get('/wellness/schedules/{encryptedId}/qr', [WellnessActivityScheduleController::class, 'qr'])->name('wellness.schedules.qr');
-            Route::post('/wellness/schedules/{encryptedId}/rotate-qr', [WellnessActivityScheduleController::class, 'rotateQr'])->name('wellness.schedules.rotateQr');
 
             // Wellness -- participants of one schedule
             Route::get('/wellness/schedules/{encryptedId}/participants', [WellnessRegistrationController::class, 'index'])->name('admin.wellness.registrations.index');

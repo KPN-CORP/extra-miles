@@ -29,6 +29,22 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Repeating Schedules
+    |--------------------------------------------------------------------------
+    |
+    | A repeating schedule is written out as one row per occurrence. This caps
+    | how many rows a single "repeat until" can produce, so a mistyped year
+    | cannot fill the table -- 260 covers five years of weekly sessions or
+    | roughly nine months of daily ones.
+    |
+    */
+
+    'recurrence' => [
+        'max_occurrences' => (int) env('WELLNESS_RECURRENCE_MAX', 260),
+    ],
+
     'waitlist' => [
         'auto_promote' => (bool) env('WELLNESS_WAITLIST_AUTO_PROMOTE', true),
     ],

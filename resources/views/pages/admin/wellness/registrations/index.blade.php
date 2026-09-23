@@ -23,9 +23,14 @@
             </small>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('wellness.schedules.qr', $schedule->encrypted_id) }}" target="_blank" class="btn btn-outline-dark">
-                <i class="ri-qr-code-line me-1"></i> {{ __('QR') }}
-            </a>
+            {{-- The attendance QR belongs to the activity type, so one code covers
+                 every session of it; this is a shortcut to that code, not a
+                 per-session one. --}}
+            @if ($schedule->activity->type)
+                <a href="{{ route('wellness.types.qr', $schedule->activity->type->encrypted_id) }}" target="_blank" class="btn btn-outline-dark">
+                    <i class="ri-qr-code-line me-1"></i> {{ __('QR') }}
+                </a>
+            @endif
             {{-- data-no-loader: this serves a file, the page never navigates, so the
                  preloader would have nothing to clear it. --}}
             <a href="{{ route('wellness.registrations.export', $schedule->encrypted_id) }}" class="btn btn-outline-success" data-no-loader>
