@@ -72,6 +72,22 @@ class WellnessActivityRegistration extends Model
             && ($at ?? now())->gt($this->confirm_due_at);
     }
 
+    /**
+     * The status to show the employee. Blacklisting is an admin matter: from
+     * where the employee stands they are waiting, which is exactly true -- the
+     * registration holds no seat and is not being promoted. Everything else is
+     * shown as it is.
+     */
+    public function employeeFacingStatus(): WellnessRegistrationStatus
+    {
+        if ($this->status !== WellnessRegistrationStatus::Blacklisted) {
+            return $this->status;
+        }
+
+        return $this->schedule?->activity?->registration_method?->queueStatus()
+            ?? WellnessRegistrationStatus::Registered;
+    }
+
     public function schedule()
     {
         return $this->belongsTo(WellnessActivitySchedule::class, 'wellness_activity_schedule_id');

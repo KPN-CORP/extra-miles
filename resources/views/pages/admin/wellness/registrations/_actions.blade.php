@@ -55,17 +55,24 @@
         </button>
     @endif
 
-    @if ($holdsSeat)
+    {{-- Rejecting is the admin's way out for anyone still in play, seated or
+         queued: the seat moves down the queue and the employee cannot come
+         back. Only offered while the session is still ahead. --}}
+    @if ($status->holdsTheEmployee() && $schedule->start_at->isFuture())
         <button type="button" class="btn btn-outline-danger js-action"
-            data-url="{{ route('wellness.registrations.revoke', $registration->encrypted_id) }}"
-            data-title="{{ __('Revoke seat') }}"
-            data-body="{{ __("Take back :name's seat? It is offered to the next person in the queue straight away.", ['name' => $name]) }}"
-            data-confirm="{{ __('Revoke seat') }}"
+            data-url="{{ route('wellness.registrations.reject', $registration->encrypted_id) }}"
+            data-title="{{ __('Reject participant') }}"
+            data-body="{{ $holdsSeat
+                ? __("Reject :name? Their seat is offered to the next person in the queue, and they cannot register for this session again.", ['name' => $name])
+                : __('Reject :name? They cannot register for this session again.', ['name' => $name]) }}"
+            data-confirm="{{ __('Reject') }}"
             data-variant="btn-danger"
-            data-bs-toggle="modal" data-bs-target="#actionModal" title="{{ __('Revoke seat') }}">
+            data-bs-toggle="modal" data-bs-target="#actionModal" title="{{ __('Reject') }}">
             <i class="ri-user-unfollow-line"></i>
         </button>
-    @elseif ($status->canTransitionTo(WellnessRegistrationStatus::Cancelled))
+    @endif
+
+    @if (! $holdsSeat && $status->canTransitionTo(WellnessRegistrationStatus::Cancelled))
         <button type="button" class="btn btn-outline-secondary js-action"
             data-url="{{ route('wellness.registrations.cancel', $registration->encrypted_id) }}"
             data-title="{{ __('Cancel registration') }}"

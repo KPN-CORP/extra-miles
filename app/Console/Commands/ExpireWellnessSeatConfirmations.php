@@ -17,19 +17,30 @@ class ExpireWellnessSeatConfirmations extends Command
 {
     protected $signature = 'wellness:expire-confirmations';
 
-    protected $description = 'Revoke wellness seats not confirmed before their deadline and promote the queue';
+    protected $description = 'Revoke wellness seats not confirmed in time, release lapsed blacklists, and promote the queue';
 
     public function handle(WellnessRegistrationService $service): int
     {
-        ['revoked' => $revoked, 'promoted' => $promoted] = $service->expireUnconfirmed();
+        // Blacklists first: a registration released back into the queue this
+        // minute should be eligible for any seat the expiry sweep then frees.
+        ['restored' => $restored, 'promoted' => $afterRestore] = $service->restoreExpiredBlacklists();
+        ['revoked' => $revoked, 'promoted' => $afterExpiry] = $service->expireUnconfirmed();
 
-        if ($revoked === 0) {
-            $this->info('No expired seat confirmations.');
+        if ($restored === 0 && $revoked === 0) {
+            $this->info('Nothing to expire or restore.');
 
             return self::SUCCESS;
         }
 
-        $this->info("Revoked {$revoked} unconfirmed seat(s); offered {$promoted} to the queue.");
+        if ($restored > 0) {
+            $this->info("Returned {$restored} registration(s) to the queue after their blacklist ended.");
+        }
+
+        if ($revoked > 0) {
+            $this->info("Revoked {$revoked} unconfirmed seat(s).");
+        }
+
+        $this->info('Offered '.($afterRestore + $afterExpiry).' seat(s) to the queue.');
 
         return self::SUCCESS;
     }

@@ -66,6 +66,7 @@ enum WellnessRegistrationMethod: string
             WellnessRegistrationStatus::AwaitingConfirmation,
             $this->queueStatus(),
             WellnessRegistrationStatus::Blacklisted,
+            WellnessRegistrationStatus::Rejected,
             WellnessRegistrationStatus::Cancelled,
         ];
     }

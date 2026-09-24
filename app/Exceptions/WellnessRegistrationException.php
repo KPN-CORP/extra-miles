@@ -62,6 +62,38 @@ class WellnessRegistrationException extends RuntimeException
         return self::make('not_confirmed', __('Only a registration holding a seat can be checked in.'));
     }
 
+    public static function alreadyBookedThatDay(): self
+    {
+        return self::make(
+            'already_booked_that_day',
+            __('You are already registered for this activity on that day.')
+        );
+    }
+
+    public static function clashesWithAnotherSession(string $activity): self
+    {
+        return self::make(
+            'session_clash',
+            __('This overlaps a session you are already registered for (:activity).', ['activity' => $activity])
+        );
+    }
+
+    public static function registrationRejected(): self
+    {
+        return self::make(
+            'registration_rejected',
+            __('Your registration for this session was not accepted, so it cannot be repeated.')
+        );
+    }
+
+    public static function sessionAlreadyStarted(): self
+    {
+        return self::make(
+            'session_started',
+            __('This session has already started, so its seats can no longer be changed.')
+        );
+    }
+
     public static function nothingToConfirm(): self
     {
         return self::make('nothing_to_confirm', __('This registration is not waiting for your confirmation.'));

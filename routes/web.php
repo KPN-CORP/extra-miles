@@ -197,7 +197,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/wellness/schedules/{encryptedId}/participants', [WellnessRegistrationController::class, 'store'])->name('wellness.registrations.store');
             Route::get('/wellness/schedules/{encryptedId}/export', [WellnessRegistrationController::class, 'export'])->name('wellness.registrations.export');
             Route::post('/wellness/registrations/{encryptedId}/confirm', [WellnessRegistrationController::class, 'confirm'])->name('wellness.registrations.confirm');
-            Route::post('/wellness/registrations/{encryptedId}/revoke', [WellnessRegistrationController::class, 'revoke'])->name('wellness.registrations.revoke');
+            Route::post('/wellness/registrations/{encryptedId}/reject', [WellnessRegistrationController::class, 'reject'])->name('wellness.registrations.reject');
             Route::post('/wellness/registrations/{encryptedId}/requeue', [WellnessRegistrationController::class, 'requeue'])->name('wellness.registrations.requeue');
             Route::post('/wellness/registrations/{encryptedId}/blacklist', [WellnessRegistrationController::class, 'blacklist'])->name('wellness.registrations.blacklist');
             Route::post('/wellness/registrations/{encryptedId}/cancel', [WellnessRegistrationController::class, 'cancel'])->name('wellness.registrations.cancel');

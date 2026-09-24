@@ -117,11 +117,15 @@ class WellnessController extends Controller
 
         $registrations = WellnessActivityRegistration::with(['schedule.activity.type', 'feedback'])
             ->forEmployee($employeeId)
+            // Blacklisted belongs here: it is a live registration of theirs, shown
+            // as the ordinary queue status below. Rejected and Cancelled do not --
+            // that session is finished as far as the employee is concerned.
             ->whereIn('status', [
                 WellnessRegistrationStatus::Confirmed->value,
                 WellnessRegistrationStatus::AwaitingConfirmation->value,
                 WellnessRegistrationStatus::Registered->value,
                 WellnessRegistrationStatus::WaitingList->value,
+                WellnessRegistrationStatus::Blacklisted->value,
             ])
             ->get()
             ->sortByDesc(fn ($registration) => $registration->schedule?->start_at)
@@ -130,8 +134,10 @@ class WellnessController extends Controller
         return response()->json(
             $registrations->map(fn (WellnessActivityRegistration $registration) => [
                 'id' => $registration->encrypted_id,
-                'status' => $registration->status->value,
-                'status_label' => $registration->status->label(),
+                // Never $registration->status directly: blacklisting is an admin
+                // matter and must not surface here.
+                'status' => $registration->employeeFacingStatus()->value,
+                'status_label' => $registration->employeeFacingStatus()->label(),
                 'attended_at' => $registration->attended_at?->toDateTimeString(),
                 'registered_at' => $registration->registered_at?->toDateTimeString(),
                 'can_cancel' => $registration->status->canTransitionTo(WellnessRegistrationStatus::Cancelled),
@@ -205,14 +211,19 @@ class WellnessController extends Controller
             return response()->json(['error' => $e->getMessage(), 'reason' => $e->reason], 422);
         }
 
+        // Masked, same as myRegistrations: someone registering while blacklisted
+        // is told they are queued, which is what has actually happened to them.
+        $shown = $registration->employeeFacingStatus();
+
         return response()->json([
             'message' => match (true) {
-                $registration->status === WellnessRegistrationStatus::Confirmed => 'Your seat is confirmed. See you there!',
-                $registration->status === WellnessRegistrationStatus::Registered => 'This session is full, so you are in the queue. We will confirm you automatically if a seat frees up.',
+                $shown === WellnessRegistrationStatus::Confirmed => 'Your seat is confirmed. See you there!',
+                $shown === WellnessRegistrationStatus::AwaitingConfirmation => 'You have a seat. Confirm it before the deadline to keep it.',
+                $shown === WellnessRegistrationStatus::Registered => 'This session is full, so you are in the queue. We will offer you a seat automatically if one frees up.',
                 default => 'You are on the waiting list. An admin will confirm the participants.',
             },
-            'status' => $registration->status->value,
-            'status_label' => $registration->status->label(),
+            'status' => $shown->value,
+            'status_label' => $shown->label(),
             'id' => $registration->encrypted_id,
         ]);
     }

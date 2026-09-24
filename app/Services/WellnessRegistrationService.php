@@ -84,6 +84,21 @@ class WellnessRegistrationService
                 throw WellnessRegistrationException::alreadyRegistered($registration->status);
             }
 
+            // Turned away by an admin. An admin can still put them back by hand;
+            // the employee cannot let themselves back in.
+            if ($registration
+                && $registration->status === WellnessRegistrationStatus::Rejected
+                && $source === WellnessRegistrationSource::SelfService) {
+                throw WellnessRegistrationException::registrationRejected();
+            }
+
+            // One session per activity per day, and nothing that overlaps a
+            // session they already hold. Admins may override -- they override
+            // the quota and the registration window too.
+            if ($source === WellnessRegistrationSource::SelfService) {
+                $this->assertNoClash($schedule, $employee['employee_id']);
+            }
+
             $isFull = $schedule->isFull();
             $isBlacklisted = WellnessBlacklist::coversEmployee($employee['employee_id']);
 
@@ -101,14 +116,16 @@ class WellnessRegistrationService
                 if ($isBlacklisted) {
                     $remark = trim(($remark ? $remark.' ' : '').'(Employee is on the wellness blacklist.)');
                 }
+            } elseif ($isBlacklisted) {
+                // The registration is accepted but parked: it holds no seat and
+                // is never promoted. The sweep returns it to the queue once the
+                // blacklist lapses. The employee is never shown this status.
+                $target = WellnessRegistrationStatus::Blacklisted;
+                $remark = $remark ?: 'On the wellness blacklist when registering.';
             } else {
-                $target = $method->autoConfirms() && ! $isFull && ! $isBlacklisted
+                $target = $method->autoConfirms() && ! $isFull
                     ? $this->seatStatusFor($schedule)
                     : $method->queueStatus();
-
-                if ($isBlacklisted && $method->autoConfirms()) {
-                    $remark = $remark ?: 'On the wellness blacklist, so not confirmed automatically.';
-                }
             }
 
             $attributes = [
@@ -243,6 +260,29 @@ class WellnessRegistrationService
     public function cancel(WellnessActivityRegistration $registration, ?string $remark = null, ?int $actorId = null): WellnessActivityRegistration
     {
         return $this->transitionTo($registration, WellnessRegistrationStatus::Cancelled, $remark, $actorId);
+    }
+
+    /**
+     * An admin turns someone away. The seat they held is offered to the next
+     * person in the queue straight away, and the session disappears from their
+     * own list -- they cannot register for it again, though an admin still can
+     * put them back.
+     *
+     * Refused once the session has started: seats stop moving at that point,
+     * and attendance is already being taken against them.
+     */
+    public function reject(WellnessActivityRegistration $registration, ?string $remark = null, ?int $actorId = null): WellnessActivityRegistration
+    {
+        if ($registration->schedule && ! $registration->schedule->start_at->isFuture()) {
+            throw WellnessRegistrationException::sessionAlreadyStarted();
+        }
+
+        return $this->transitionTo(
+            $registration,
+            WellnessRegistrationStatus::Rejected,
+            $remark ?: 'Rejected by an administrator.',
+            $actorId,
+        );
     }
 
     /**
@@ -420,6 +460,72 @@ class WellnessRegistrationService
     }
 
     /**
+     * Return registrations parked on `blacklisted` to the ordinary queue once
+     * the blacklist that put them there has lapsed, then backfill seats.
+     *
+     * Registering while blacklisted is allowed -- it just never seats anyone
+     * automatically. This is what "back to normal when the blacklist ends"
+     * means in practice, and it has to happen on its own or an expired
+     * blacklist would keep someone out of every session until noticed.
+     *
+     * @return array{restored: int, promoted: int}
+     */
+    public function restoreExpiredBlacklists(?int $actorId = null): array
+    {
+        $parked = WellnessActivityRegistration::query()
+            ->where('status', WellnessRegistrationStatus::Blacklisted->value)
+            // Still covered by a live blacklist? Then leave it where it is.
+            ->whereNotExists($this->activeBlacklistFor('wellness_activity_registrations.employee_id'))
+            ->with('schedule.activity')
+            ->get()
+            // A session that has already finished has nothing to restore into.
+            ->filter(fn (WellnessActivityRegistration $r) => $r->schedule?->end_at?->isFuture())
+            ->groupBy('wellness_activity_schedule_id');
+
+        $restored = 0;
+        $promoted = 0;
+
+        foreach ($parked as $scheduleId => $registrations) {
+            $schedule = WellnessActivitySchedule::find($scheduleId);
+
+            if (! $schedule) {
+                continue;
+            }
+
+            [$count, $seated] = DB::transaction(function () use ($schedule, $registrations, $actorId) {
+                $locked = $this->lockSchedule($schedule);
+                $queue = $this->methodFor($locked)->queueStatus();
+                $moved = 0;
+
+                foreach ($registrations as $registration) {
+                    $registration->refresh();
+
+                    if ($registration->status !== WellnessRegistrationStatus::Blacklisted) {
+                        continue;
+                    }
+
+                    $this->recordTransition(
+                        $registration,
+                        $registration->status,
+                        $queue,
+                        'Blacklist ended; returned to the queue.',
+                        $actorId,
+                    );
+
+                    $moved++;
+                }
+
+                return [$moved, $moved > 0 ? $this->promoteQueue($locked, $actorId) : 0];
+            });
+
+            $restored += $count;
+            $promoted += $seated;
+        }
+
+        return ['restored' => $restored, 'promoted' => $promoted];
+    }
+
+    /**
      * Attendance check-in from a scanned activity-type QR.
      *
      * The code covers every session of the type, so the scan is matched to the
@@ -515,6 +621,50 @@ class WellnessRegistrationService
                         ->orWhereDate('wellness_blacklists.end_date', '>=', now()->toDateString());
                 });
         };
+    }
+
+    /**
+     * Refuses a registration that would double-book the employee.
+     *
+     * Two separate rules, both counted against registrations the employee still
+     * has a stake in (see WellnessRegistrationStatus::holdsTheEmployee):
+     *
+     *  1. one session per activity per calendar day, whatever the times;
+     *  2. nothing whose time overlaps a session they already hold, even under a
+     *     different activity. Sessions that merely sit on the same day are fine.
+     *
+     * Overlap is half-open -- a session ending at 10:00 does not clash with one
+     * starting at 10:00, so back-to-back bookings work.
+     */
+    protected function assertNoClash(WellnessActivitySchedule $schedule, string $employeeId): void
+    {
+        $held = WellnessActivityRegistration::query()
+            ->where('employee_id', $employeeId)
+            ->whereIn('status', WellnessRegistrationStatus::holdingValues())
+            ->where('wellness_activity_schedule_id', '!=', $schedule->id)
+            ->with('schedule.activity')
+            ->get()
+            ->filter(fn (WellnessActivityRegistration $r) => $r->schedule !== null);
+
+        $sameDayThisActivity = $held->first(
+            fn (WellnessActivityRegistration $r) => $r->wellness_activity_id === $schedule->wellness_activity_id
+                && $r->schedule->start_at->isSameDay($schedule->start_at)
+        );
+
+        if ($sameDayThisActivity) {
+            throw WellnessRegistrationException::alreadyBookedThatDay();
+        }
+
+        $overlapping = $held->first(
+            fn (WellnessActivityRegistration $r) => $r->schedule->start_at->lt($schedule->end_at)
+                && $r->schedule->end_at->gt($schedule->start_at)
+        );
+
+        if ($overlapping) {
+            throw WellnessRegistrationException::clashesWithAnotherSession(
+                $overlapping->schedule->activity?->name ?? __('another activity')
+            );
+        }
     }
 
     /**

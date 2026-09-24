@@ -33,6 +33,13 @@ enum WellnessRegistrationStatus: string
     case Cancelled = 'cancelled';
 
     /**
+     * Turned away by an admin. Terminal from the employee's side: the session
+     * disappears from their list and they cannot register for it again. An
+     * admin can still put them back, so a misclick is not permanent.
+     */
+    case Rejected = 'rejected';
+
+    /**
      * A seat that is spoken for, whether or not the employee has accepted it.
      * An unconfirmed seat still holds quota -- releasing it early would let the
      * session be oversubscribed while its holder is still entitled to confirm.
@@ -75,6 +82,38 @@ enum WellnessRegistrationStatus: string
     }
 
     /**
+     * Whether this registration should stop the same employee taking another
+     * session at a clashing time. Blacklisted counts -- they are still waiting
+     * on this session, just not eligible to be seated automatically. Rejected
+     * and Cancelled do not: that session is over for them.
+     */
+    public function holdsTheEmployee(): bool
+    {
+        return $this->isActive() || $this === self::Blacklisted;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function holdingValues(): array
+    {
+        return array_map(
+            fn (self $case) => $case->value,
+            array_values(array_filter(self::cases(), fn (self $case) => $case->holdsTheEmployee()))
+        );
+    }
+
+    /**
+     * Statuses the employee is never shown. Blacklisting is an admin matter --
+     * see WellnessActivityRegistration::employeeFacingStatus(), which shows the
+     * ordinary queue status instead. Rejected registrations are hidden outright.
+     */
+    public function hiddenFromEmployee(): bool
+    {
+        return in_array($this, [self::Blacklisted, self::Rejected], true);
+    }
+
+    /**
      * A registration waiting for a seat, under either method.
      */
     public function isQueued(): bool
@@ -98,17 +137,26 @@ enum WellnessRegistrationStatus: string
         return match ($this) {
             self::Registered, self::WaitingList => [
                 self::Confirmed, self::AwaitingConfirmation, self::Blacklisted, self::Cancelled,
+                self::Rejected,
             ],
             self::AwaitingConfirmation => [
                 self::Confirmed, self::Blacklisted, self::Cancelled, self::Registered, self::WaitingList,
+                self::Rejected,
             ],
             self::Confirmed => [
                 self::AwaitingConfirmation, self::Blacklisted, self::Cancelled, self::Registered, self::WaitingList,
+                self::Rejected,
             ],
             self::Blacklisted => [
                 self::Confirmed, self::AwaitingConfirmation, self::Registered, self::WaitingList, self::Cancelled,
+                self::Rejected,
             ],
             self::Cancelled => [
+                self::Confirmed, self::AwaitingConfirmation, self::Registered, self::WaitingList,
+            ],
+            // Not a dead end for an admin -- only for the employee, who is
+            // refused at register() rather than here.
+            self::Rejected => [
                 self::Confirmed, self::AwaitingConfirmation, self::Registered, self::WaitingList,
             ],
         };
@@ -128,6 +176,7 @@ enum WellnessRegistrationStatus: string
             self::WaitingList => __('Waiting List'),
             self::Blacklisted => __('Blacklisted'),
             self::Cancelled => __('Cancelled'),
+            self::Rejected => __('Rejected'),
         };
     }
 
@@ -143,6 +192,7 @@ enum WellnessRegistrationStatus: string
             self::WaitingList => 'bg-warning-subtle text-warning',
             self::Blacklisted => 'bg-dark-subtle text-dark',
             self::Cancelled => 'bg-secondary-subtle text-secondary',
+            self::Rejected => 'bg-danger-subtle text-danger',
         };
     }
 

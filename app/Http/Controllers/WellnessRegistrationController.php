@@ -151,10 +151,12 @@ class WellnessRegistrationController extends Controller
     }
 
     /**
-     * Take a seat back. The freed seat is offered to the next person in the
-     * FIFO queue automatically; under Selection it returns to the admin.
+     * Turn a participant away. Any seat they held is offered to the next person
+     * in the FIFO queue straight away; under Selection it returns to the admin
+     * to reassign. The session then disappears from the employee's own list and
+     * they cannot register for it again.
      */
-    public function revoke(Request $request, string $encryptedId)
+    public function reject(Request $request, string $encryptedId)
     {
         $registration = WellnessActivityRegistration::with('schedule.activity')
             ->findOrFail($this->decryptId($encryptedId));
@@ -162,18 +164,13 @@ class WellnessRegistrationController extends Controller
         $validated = $request->validate(['remark' => ['nullable', 'string', 'max:500']]);
 
         try {
-            $this->service->transitionTo(
-                $registration,
-                WellnessRegistrationStatus::Cancelled,
-                $validated['remark'] ?? 'Seat revoked by an administrator.',
-                Auth::id(),
-            );
+            $this->service->reject($registration, $validated['remark'] ?? null, Auth::id());
         } catch (WellnessRegistrationException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
 
         return redirect()->back()->with('success', __(
-            'The seat held by :name has been revoked.',
+            ':name has been rejected for this session.',
             ['name' => $this->nameFor($registration)]
         ));
     }
