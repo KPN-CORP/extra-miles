@@ -46,7 +46,7 @@ const CountdownTimer = ({ endDateTime, onEnd }) => {
         <span>{t('event.hasEnded')}</span>
       ) : (
         <span>
-          {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+          {t('countdown.format', timeLeft)}
         </span>
       )}
     </div>

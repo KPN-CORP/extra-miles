@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
+import { localeTag } from '../Helper/localeHelper';
+
 /**
  * Filter tanggal yang bisa dilipat, dipakai halaman /my-events dan /wellness.
  *
@@ -37,13 +39,14 @@ export default function DateFilter({ value, onChange, markedDates = null, classN
             <summary className="tap h-11 px-4 flex items-center gap-2 cursor-pointer text-[13px] font-bold text-stone-800 list-none">
                 <i className="ri-calendar-2-line text-brand-700 text-base" aria-hidden="true" />
                 {value
-                    ? value.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })
+                    ? value.toLocaleDateString(localeTag(), { day: '2-digit', month: 'short', year: 'numeric' })
                     : t('filters.byDate')}
                 <i className="ri-arrow-down-s-line ms-auto text-stone-400 text-base" aria-hidden="true" />
             </summary>
 
             <div className="px-3 pb-3 flex flex-col gap-2">
                 <Calendar
+                    locale={localeTag()}
                     onChange={onChange}
                     value={value}
                     className="w-full border-0"

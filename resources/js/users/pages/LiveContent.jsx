@@ -1,8 +1,10 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import YouTubePlayer from '../components/Helper/youtubeHelper';
 
 export default function LiveContent({ isOpen, onClose, id }) {
+    const { t } = useTranslation();
     return (
       <AnimatePresence>
         {isOpen && (
@@ -24,6 +26,7 @@ export default function LiveContent({ isOpen, onClose, id }) {
                 className="absolute top-2 right-2 p-2 px-3 text-white font-semibold"
                 style={{ zIndex: 9999 }}
                 onClick={onClose}
+                aria-label={t('common.close')}
               >
                 ✕
               </button>

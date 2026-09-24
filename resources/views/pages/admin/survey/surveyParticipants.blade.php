@@ -62,7 +62,7 @@
                     </span>
                 </div>
                 @if ($participant->form_data && $participant->created_at)
-                    <small class="text-muted">{{ \Carbon\Carbon::parse($participant->created_at)->format('d M Y h:i A') }}</small><br>
+                    <small class="text-muted">{{ \Carbon\Carbon::parse($participant->created_at)->translatedFormat('d M Y h:i A') }}</small><br>
                 @endif
                 <small class="text-muted">{{ $participant->business_unit }} | {{ $participant->location }}</small>
             </button>

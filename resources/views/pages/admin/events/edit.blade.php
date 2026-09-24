@@ -15,9 +15,9 @@
                     <label for="category" class="form-label">{{ __('Category') }}</label>
                     <select class="form-select" id="category" name="category" required>
                         <option selected disabled>{{ __('Please select') }}</option>
-                        <option value="Event" {{ $event->category == 'Event' ? 'selected' : '' }}>Event</option>
-                        <option value="Sport" {{ $event->category == 'Sport' ? 'selected' : '' }}>Sport</option>
-                        <option value="Training" {{ $event->category == 'Training' ? 'selected' : '' }}>Training</option>
+                        <option value="Event" {{ $event->category == 'Event' ? 'selected' : '' }}>{{ __('Event') }}</option>
+                        <option value="Sport" {{ $event->category == 'Sport' ? 'selected' : '' }}>{{ __('Sport') }}</option>
+                        <option value="Training" {{ $event->category == 'Training' ? 'selected' : '' }}>{{ __('Training') }}</option>
                         {{-- Populate options --}}
                     </select>
                 </div>
@@ -178,7 +178,7 @@
                             <option value="{{ $form->id }}"
                                     data-url="{{ route('formbuilder.edit', $form->id) }}"
                                     {{ $form->id == $event->form_id ? 'selected' : '' }}>
-                                {{ $form->title." (".$form->created_at->format('d M Y').")" }}
+                                {{ $form->title." (".$form->created_at->translatedFormat('d M Y').")" }}
                             </option>
                             @endforeach
                         </select>

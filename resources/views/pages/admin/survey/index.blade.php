@@ -10,7 +10,7 @@
         <div>
             <h4 class="page-title mb-1">{{ __('Survey') }}</h4>
             <div class="text-muted small">
-                <span class="me-3"><i class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}</span>
+                <span class="me-3"><i class="ri-calendar-line me-1"></i>{{ now()->translatedFormat('l, d F Y') }}</span>
                 <span><i class="ri-time-line me-1"></i><span id="currentTime"></span> {{ __('WIB') }}</span>
             </div>
         </div>

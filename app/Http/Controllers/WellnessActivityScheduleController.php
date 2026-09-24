@@ -65,8 +65,8 @@ class WellnessActivityScheduleController extends Controller
         );
 
         return redirect()->back()->with('success', $created->count() > 1
-            ? $created->count().' schedules added.'
-            : 'Schedule added.');
+            ? __(':count schedules added.', ['count' => $created->count()])
+            : __('Schedule added.'));
     }
 
     public function update(WellnessActivityScheduleRequest $request, string $encryptedId)
@@ -80,7 +80,7 @@ class WellnessActivityScheduleController extends Controller
         // Shrinking the quota below the seats already held would silently put the
         // schedule over capacity; make the admin free those seats first.
         if ($quota !== null && $quota < $schedule->taken_seats) {
-            return redirect()->back()->with('error', 'Quota cannot be lower than the '.$schedule->taken_seats.' seat(s) already held.');
+            return redirect()->back()->with('error', __('Quota cannot be lower than the :count seat(s) already held.', ['count' => $schedule->taken_seats]));
         }
 
         $applyToFollowing = $request->updateScope()->includesFollowing() && $schedule->isRecurring();
@@ -94,8 +94,11 @@ class WellnessActivityScheduleController extends Controller
                 ->first(fn (WellnessActivitySchedule $sibling) => $sibling->taken_seats > $quota);
 
             if ($overfilled) {
-                return redirect()->back()->with('error', 'The session on '.$overfilled->start_at->translatedFormat('D, d M Y H:i')
-                    .' already holds '.$overfilled->taken_seats.' seat(s), so the quota cannot be lowered to '.$quota.' across the series.');
+                return redirect()->back()->with('error', __('The session on :date already holds :count seat(s), so the quota cannot be lowered to :quota across the series.', [
+                    'date' => $overfilled->start_at->translatedFormat('D, d M Y H:i'),
+                    'count' => $overfilled->taken_seats,
+                    'quota' => $quota,
+                ]));
             }
         }
 
@@ -107,14 +110,14 @@ class WellnessActivityScheduleController extends Controller
         $schedule->update($attributes + ['updated_by' => Auth::id()]);
 
         if (! $applyToFollowing) {
-            return redirect()->back()->with('success', 'Schedule updated.');
+            return redirect()->back()->with('success', __('Schedule updated.'));
         }
 
         $updated = $this->recurrence->applyToFollowing($schedule, $original, Auth::id());
 
         return redirect()->back()->with('success', $updated > 0
-            ? 'Schedule updated, along with '.$updated.' following occurrence(s).'
-            : 'Schedule updated.');
+            ? __('Schedule updated, along with :count following occurrence(s).', ['count' => $updated])
+            : __('Schedule updated.'));
     }
 
     public function archive(string $encryptedId)
@@ -123,11 +126,11 @@ class WellnessActivityScheduleController extends Controller
             ->findOrFail($this->decryptId($encryptedId));
 
         if ($schedule->taken_seats > 0) {
-            return redirect()->back()->with('error', 'This schedule still has '.$schedule->taken_seats.' active registration(s). Cancel them first.');
+            return redirect()->back()->with('error', __('This schedule still has :count active registration(s). Cancel them first.', ['count' => $schedule->taken_seats]));
         }
 
         $schedule->delete();
 
-        return redirect()->back()->with('success', 'Schedule archived.');
+        return redirect()->back()->with('success', __('Schedule archived.'));
     }
 }

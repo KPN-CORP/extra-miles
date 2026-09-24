@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import YouTube from 'react-youtube';
+import { useTranslation } from 'react-i18next';
 
 const YouTubePlayer = ({ videoId }) => {
+  const { t } = useTranslation();
   const [error, setError] = useState(false);
 
   const opts = {
@@ -24,7 +26,7 @@ const YouTubePlayer = ({ videoId }) => {
         <div className="w-full h-full relative">
             <img
             src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
-            alt="Video thumbnail"
+            alt={t('media.videoThumbnail')}
             className="w-full h-full object-cover"
             onError={(e) => {
               e.target.onerror = null; // prevent infinite loop
@@ -33,7 +35,7 @@ const YouTubePlayer = ({ videoId }) => {
             />
             <button onClick={() => window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank')} className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-40 w-full h-full">
                 <div className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition flex items-center gap-2">
-                    <span>Open In YouTube</span>
+                    <span>{t('media.openInYoutube')}</span>
                     <i className="ri-youtube-fill text-2xl"></i>
                 </div>
             </button>

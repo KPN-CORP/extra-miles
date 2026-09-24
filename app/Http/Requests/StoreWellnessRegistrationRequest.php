@@ -39,7 +39,7 @@ class StoreWellnessRegistrationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'employee_id.exists' => 'That employee ID was not found in the HR database.',
+            'employee_id.exists' => __('That employee ID was not found in the HR database.'),
         ];
     }
 }

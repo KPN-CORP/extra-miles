@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { useAuth } from './AuthContext';
 import { resolveApiUrl } from './ApiContext';
 import { SSO_URL } from '../Helper/ssoRedirect';
+import { translate } from '../Helper/localeHelper';
 
 const ProfileContext = createContext();
 
@@ -27,8 +28,8 @@ export const ProfileProvider = ({ children }) => {
     } catch (err) {
       Swal.fire({
         icon: 'warning',
-        title: 'Connection Ended',
-        text: 'Unable to connect to the server. Please try again later.',
+        title: translate('alerts.connectionEnded'),
+        text: translate('alerts.connectionEndedText'),
         timer: 2500,
         showConfirmButton: false,
       }).then(() => {

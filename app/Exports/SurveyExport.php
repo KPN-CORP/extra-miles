@@ -5,13 +5,14 @@ namespace App\Exports;
 use App\Models\Survey;
 use App\Models\SurveyParticipant;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class SurveyExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles
+class SurveyExport implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles
 {
     protected $survey_id;
 
@@ -23,7 +24,7 @@ class SurveyExport implements FromCollection, WithHeadings, ShouldAutoSize, With
     public function collection()
     {
         $survey = Survey::where('id', $this->survey_id)->select(['form_schema'])->first();
-        
+
         $fieldMap = []; // key => label
         if ($survey && $survey->form_schema) {
             $schema = json_decode($survey->form_schema, true);
@@ -37,16 +38,16 @@ class SurveyExport implements FromCollection, WithHeadings, ShouldAutoSize, With
         }
 
         $participants = SurveyParticipant::where('survey_id', $this->survey_id)
-        ->select([
-            'employee_id',
-            'fullname',
-            'business_unit',
-            'job_level',
-            'location',
-            'unit',
-            'form_data'
-        ])
-        ->get();
+            ->select([
+                'employee_id',
+                'fullname',
+                'business_unit',
+                'job_level',
+                'location',
+                'unit',
+                'form_data',
+            ])
+            ->get();
 
         return $participants->map(function ($item, $index) use ($fieldMap) {
             $base = [
@@ -79,19 +80,19 @@ class SurveyExport implements FromCollection, WithHeadings, ShouldAutoSize, With
             $schema = json_decode($survey->form_schema, true);
             if (isset($schema['fields']) && is_array($schema['fields'])) {
                 foreach ($schema['fields'] as $field) {
-                    $formLabels[] = $field['label'] ?? 'Unnamed Field';
+                    $formLabels[] = $field['label'] ?? __('Unnamed Field');
                 }
             }
         }
 
         return array_merge([
             'No',
-            'Employee ID',
-            'Full Name',
-            'Business Unit',
-            'Job Level',
-            'Location',
-            'Unit',
+            __('Employee ID'),
+            __('Full Name'),
+            __('Business Unit'),
+            __('Job Level'),
+            __('Location'),
+            __('Unit'),
         ], $formLabels);
     }
 
@@ -100,10 +101,10 @@ class SurveyExport implements FromCollection, WithHeadings, ShouldAutoSize, With
         // Set heading row (baris ke-1)
         return [
             1 => [
-                'font' => ['bold' => true,'color' => ['rgb' => 'FFFFFF'],],
-                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'fillType' => Fill::FILL_SOLID,
                     'startColor' => ['rgb' => 'ab2f2b'], // warna merah muda
                 ],
             ],

@@ -98,7 +98,7 @@
                                             </div>
                                             <input type="text" name="customsearch" id="customsearch"
                                                 class="form-control border-dark-subtle border-start-0"
-                                                placeholder="{{ __('Search..') }}" aria-label="search" aria-describedby="search">
+                                                placeholder="{{ __('Search..') }}" aria-label="{{ __('Search') }}" aria-describedby="search">
                                         </div>
                                     </div>
                                 </div>
@@ -192,7 +192,7 @@
                                         </div>
                                         <input type="text" name="customsearch2" id="customsearch2"
                                             class="form-control w-border-dark-subtle border-left-0" placeholder="{{ __('Search..') }}"
-                                            aria-label="search" aria-describedby="search">
+                                            aria-label="{{ __('Search') }}" aria-describedby="search">
                                     </div>
                                     </div>
                                 </div>
@@ -275,7 +275,7 @@
                                                         <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="cancelModalLabel{{ $p->id }}">{{ __('Cancel Reason') }}</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                                                         </div>
                                                         <div class="modal-body">
                                                             <div class="mb-3">
@@ -310,7 +310,7 @@
                                             </div>
                                             <input type="text" name="customsearch1" id="customsearch1"
                                                 class="form-control w-border-dark-subtle border-left-0" placeholder="{{ __('Search..') }}"
-                                                aria-label="search" aria-describedby="search">
+                                                aria-label="{{ __('Search') }}" aria-describedby="search">
                                         </div>
                                     </div>
                                 </div>
@@ -358,7 +358,7 @@
                 @csrf
                 <div class="modal-header">
                 <h5 class="modal-title" id="addParticipantModalLabel">{{ __('Add Participant') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
                 
                 <div class="modal-body">
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     employeeList.style.display = 'block';
                 } else {
-                    employeeList.innerHTML = '<div class="list-group-item">{{ __('No results found') }}</div>';
+                    employeeList.innerHTML = '<div class="list-group-item">' + @json(__('No results found')) + '</div>';
                     employeeList.style.display = 'block';
                 }
             });

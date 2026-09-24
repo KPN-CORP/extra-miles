@@ -20,8 +20,8 @@ enum WellnessScheduleUpdateScope: string
     public function label(): string
     {
         return match ($this) {
-            self::This => 'This schedule only',
-            self::Following => 'This and the following schedules',
+            self::This => __('This schedule only'),
+            self::Following => __('This and the following schedules'),
         };
     }
 }

@@ -176,7 +176,7 @@
                             <option value="{{ $form->id }}"
                                     data-url="{{ route('formbuilder.edit', $form->id) }}"
                                     {{ $form->id == $event->form_id ? 'selected' : '' }}>
-                                {{ $form->title." (".$form->created_at->format('d M Y').")" }}
+                                {{ $form->title." (".$form->created_at->translatedFormat('d M Y').")" }}
                             </option>
                             @endforeach
                         </select>

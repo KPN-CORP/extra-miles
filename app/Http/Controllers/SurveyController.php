@@ -3,19 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Exports\SurveyExport;
-use Illuminate\Http\Request;
-use App\Models\MasterBisnisunit;
-use App\Models\Location;
-use App\Models\Department;
 use App\Models\Employee;
-use App\Models\Grade;
 use App\Models\Event;
 use App\Models\FormTemplate;
+use App\Models\Grade;
+use App\Models\Location;
+use App\Models\MasterBisnisunit;
+use App\Models\ModelHasRole;
 use App\Models\survey;
 use App\Models\SurveyParticipant;
-use App\Models\ModelHasRole;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -30,14 +29,14 @@ class SurveyController extends Controller
         $userRoleIds = $user->roles->pluck('id');
 
         $modelIds = ModelHasRole::whereIn('role_id', $userRoleIds)
-        ->pluck('model_id');
+            ->pluck('model_id');
 
         $surveyToUpdate = survey::whereIn('status', ['Ongoing'])->whereNull('deleted_at')->get();
         $now = Carbon::now();
 
         foreach ($surveyToUpdate as $survey) {
-            $start = Carbon::parse($survey->start_date . ' ' . $survey->time_start);
-            $end = Carbon::parse($survey->end_date . ' ' . $survey->time_end);
+            $start = Carbon::parse($survey->start_date.' '.$survey->time_start);
+            $end = Carbon::parse($survey->end_date.' '.$survey->time_end);
 
             if ($now->greaterThan($end)) {
                 $survey->status = 'Closed';
@@ -46,22 +45,22 @@ class SurveyController extends Controller
         }
 
         $surveyList = survey::withCount('surveyParticipant')
-        ->whereIn('status', ['Ongoing', 'Draft'])
-        ->whereIn('created_by', $modelIds)
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->whereIn('status', ['Ongoing', 'Draft'])
+            ->whereIn('created_by', $modelIds)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $surveyClosed = survey::withCount('surveyParticipant')
-        ->whereIn('status', ['Closed'])
-        ->whereIn('created_by', $modelIds)
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->whereIn('status', ['Closed'])
+            ->whereIn('created_by', $modelIds)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $surveyArchive = survey::onlyTrashed()
-        ->withCount('surveyParticipant')
-        ->whereIn('created_by', $modelIds)
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->withCount('surveyParticipant')
+            ->whereIn('created_by', $modelIds)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('pages.admin.survey.index', [
             'link' => $link,
@@ -82,7 +81,7 @@ class SurveyController extends Controller
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
             ->pluck('nama_bisnis');
-        
+
         $locations = Employee::select('group_company', 'office_area')
             ->whereNull('deleted_at')
             ->groupBy('group_company', 'office_area')
@@ -94,7 +93,7 @@ class SurveyController extends Controller
             ->orderBy('group_company')
             ->orderBy('unit')
             ->get();
-        
+
         $grades = Grade::select('group_name')
             ->distinct()
             ->orderBy('group_name')
@@ -103,9 +102,9 @@ class SurveyController extends Controller
         $events = Event::whereNotIn('status', ['Draft'])
             ->whereNull('deleted_at')
             ->get();
-        
-        $formTemplates = FormTemplate::select('id','title','form_schema','created_at')
-            ->where('category','!=','event')
+
+        $formTemplates = FormTemplate::select('id', 'title', 'form_schema', 'created_at')
+            ->where('category', '!=', 'event')
             ->orderBy('title')
             ->get();
 
@@ -155,30 +154,30 @@ class SurveyController extends Controller
         }
 
         survey::create([
-            'category'         => $request->survey_type,
-            'title'            => $request->title,
-            'start_date'       => $startDate,
-            'time_start'       => $timeStart,
-            'end_date'         => $endDate,
-            'time_end'         => $timeEnd,
-            'event_id'         => $request->related,
-            'form_id'          => $request->form_id,
-            'form_schema'      => $formSchema,
-            'description'      => $request->description,
-            'banner'           => $imagePath,
-            'icon'             => $request->survey_type === 'vote' ? 'assets/images/surveys/vote/vote-icon.png' : 'assets/images/surveys/survey/survey-icon.png',
-            'status'           => $request->action === 'draft' ? 'Draft' : 'Ongoing',
-            'quota'            => $request->participants,
-            'businessUnit'     => $request->business_unit ? json_encode($request->business_unit) : null,
-            'unit'             => $request->unit ? json_encode($request->unit) : null,
-            'jobLevel'         => $request->job_level ? json_encode($request->job_level) : null,
-            'location'         => $request->location ? json_encode($request->location) : null,
-            'created_by'       => Auth::id(),
-            'content_link'     => $request->content_link,
-            'other_link'     => $request->other_link,
+            'category' => $request->survey_type,
+            'title' => $request->title,
+            'start_date' => $startDate,
+            'time_start' => $timeStart,
+            'end_date' => $endDate,
+            'time_end' => $timeEnd,
+            'event_id' => $request->related,
+            'form_id' => $request->form_id,
+            'form_schema' => $formSchema,
+            'description' => $request->description,
+            'banner' => $imagePath,
+            'icon' => $request->survey_type === 'vote' ? 'assets/images/surveys/vote/vote-icon.png' : 'assets/images/surveys/survey/survey-icon.png',
+            'status' => $request->action === 'draft' ? 'Draft' : 'Ongoing',
+            'quota' => $request->participants,
+            'businessUnit' => $request->business_unit ? json_encode($request->business_unit) : null,
+            'unit' => $request->unit ? json_encode($request->unit) : null,
+            'jobLevel' => $request->job_level ? json_encode($request->job_level) : null,
+            'location' => $request->location ? json_encode($request->location) : null,
+            'created_by' => Auth::id(),
+            'content_link' => $request->content_link,
+            'other_link' => $request->other_link,
         ]);
 
-        return redirect()->route('admin.survey.index')->with('success', 'Survey has been created successfully.');
+        return redirect()->route('admin.survey.index')->with('success', __('Survey has been created successfully.'));
     }
 
     public function edit($id)
@@ -196,7 +195,7 @@ class SurveyController extends Controller
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
             ->pluck('nama_bisnis');
-        
+
         $locations = Employee::select('group_company', 'office_area')
             ->whereNull('deleted_at')
             ->groupBy('group_company', 'office_area')
@@ -208,7 +207,7 @@ class SurveyController extends Controller
             ->orderBy('group_company')
             ->orderBy('unit')
             ->get();
-        
+
         $grades = Grade::select('group_name')
             ->distinct()
             ->orderBy('group_name')
@@ -217,9 +216,9 @@ class SurveyController extends Controller
         $events = Event::whereNotIn('status', ['Draft'])
             ->whereNull('deleted_at')
             ->get();
-        
-        $formTemplates = FormTemplate::select('id','title','form_schema','created_at')
-            ->where('category','!=','event')
+
+        $formTemplates = FormTemplate::select('id', 'title', 'form_schema', 'created_at')
+            ->where('category', '!=', 'event')
             ->orderBy('title')
             ->get();
 
@@ -242,7 +241,7 @@ class SurveyController extends Controller
         $survey = survey::findOrFail($id);
 
         $request->validate([
-            'title' => 'required|unique:surveys,title,' . $survey->id,
+            'title' => 'required|unique:surveys,title,'.$survey->id,
             'end_date' => 'required|date',
             'banner' => 'nullable|image|max:2048',
             'participants' => 'nullable|integer',
@@ -263,23 +262,23 @@ class SurveyController extends Controller
         }
 
         $imagePath = null;
-        $survey->start_date       = $startDate;
-        $survey->time_start       = $timeStart;
-        $survey->end_date         = $endDate;
-        $survey->time_end         = $timeEnd;
-        $survey->event_id         = $request->related;
-        $survey->title            = $request->title;
-        $survey->description      = $request->description;
-        $survey->quota            = $request->participants;
-        $survey->form_id          = $request->form_id;
-        $survey->form_schema      = $formSchema;
+        $survey->start_date = $startDate;
+        $survey->time_start = $timeStart;
+        $survey->end_date = $endDate;
+        $survey->time_end = $timeEnd;
+        $survey->event_id = $request->related;
+        $survey->title = $request->title;
+        $survey->description = $request->description;
+        $survey->quota = $request->participants;
+        $survey->form_id = $request->form_id;
+        $survey->form_schema = $formSchema;
         // JSON encode untuk multiple select fields
-        $survey->businessUnit     = $request->business_unit ? json_encode($request->business_unit) : null;
-        $survey->unit             = $request->unit ? json_encode($request->unit) : null;
-        $survey->jobLevel         = $request->job_level ? json_encode($request->job_level) : null;
-        $survey->location         = $request->location ? json_encode($request->location) : null;
-        $survey->content_link     = $request->content_link;
-        $survey->other_link       = $request->other_link;
+        $survey->businessUnit = $request->business_unit ? json_encode($request->business_unit) : null;
+        $survey->unit = $request->unit ? json_encode($request->unit) : null;
+        $survey->jobLevel = $request->job_level ? json_encode($request->job_level) : null;
+        $survey->location = $request->location ? json_encode($request->location) : null;
+        $survey->content_link = $request->content_link;
+        $survey->other_link = $request->other_link;
 
         // Upload banner jika ada
         if ($request->hasFile('banner')) {
@@ -287,33 +286,33 @@ class SurveyController extends Controller
             $imagePath = $request->file('banner')->store($folder, 'public');
             $survey->banner = $imagePath;
         }
-        
+
         // Simpan status draft jika ada
         if ($request->action == 'draft') {
             $survey->status = 'Draft';
-        }else if ($request->action == 'update') {
+        } elseif ($request->action == 'update') {
             $survey->status = 'Ongoing';
         }
 
         $survey->save();
 
-        return redirect()->route('admin.survey.index')->with('success', 'Survey updated successfully.');
+        return redirect()->route('admin.survey.index')->with('success', __('Survey updated successfully.'));
     }
 
     public function archive($id)
     {
-        $survey = Survey::findOrFail($id);
+        $survey = survey::findOrFail($id);
         $survey->delete(); // Soft delete (mengisi deleted_at)
-        
-        return redirect()->back()->with('success', 'Survey berhasil diarsipkan.');
+
+        return redirect()->back()->with('success', __('Survey archived successfully.'));
     }
 
     public function listParticipants($encryptedId)
     {
         $id = Crypt::decryptString($encryptedId);
-        $survey = Survey::withCount('surveyParticipant')->findOrFail($id);
+        $survey = survey::withCount('surveyParticipant')->findOrFail($id);
         $listSurveyParticipants = SurveyParticipant::with('formTemplate')->where('survey_id', $id)->get();
-        
+
         $survey->businessUnit = json_decode($survey->businessUnit, true);
         $survey->unit = json_decode($survey->unit, true);
         $survey->jobLevel = json_decode($survey->jobLevel, true);
@@ -326,7 +325,7 @@ class SurveyController extends Controller
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
             ->pluck('nama_bisnis');
-        
+
         $locations = Location::select('company_name', 'area', 'work_area')
             ->orderBy('area')
             ->get();
@@ -336,7 +335,7 @@ class SurveyController extends Controller
             ->orderBy('group_company')
             ->orderBy('unit')
             ->get();
-        
+
         $grades = Grade::select('group_name')
             ->distinct()
             ->orderBy('group_name')
@@ -359,12 +358,13 @@ class SurveyController extends Controller
             'listParticipants' => $listSurveyParticipants,
         ]);
     }
+
     public function listVoteParticipants($encryptedId)
     {
         $id = Crypt::decryptString($encryptedId);
-        $survey = Survey::withCount('surveyParticipant')->findOrFail($id);
+        $survey = survey::withCount('surveyParticipant')->findOrFail($id);
         $listSurveyParticipants = SurveyParticipant::with('formTemplate')->where('survey_id', $id)->get();
-        
+
         $survey->businessUnit = json_decode($survey->businessUnit, true);
         $survey->unit = json_decode($survey->unit, true);
         $survey->jobLevel = json_decode($survey->jobLevel, true);
@@ -377,7 +377,7 @@ class SurveyController extends Controller
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
             ->pluck('nama_bisnis');
-        
+
         $locations = Location::select('company_name', 'area', 'work_area')
             ->orderBy('area')
             ->get();
@@ -387,7 +387,7 @@ class SurveyController extends Controller
             ->orderBy('group_company')
             ->orderBy('unit')
             ->get();
-        
+
         $grades = Grade::select('group_name')
             ->distinct()
             ->orderBy('group_name')

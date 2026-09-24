@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form } from 'formik';
 import { PulseLoader } from 'react-spinners';
-import { useApiUrl } from '../context/ApiContext';
+import { useApiUrl } from '../Context/ApiContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { showAlert } from '../Helper/alertHelper';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../Context/AuthContext';
 import { generateValidationSchema } from '../Helper/generateValidationSchema';
-import { log } from 'handlebars';
 
 function parsePhoneNumber(fullNumber) {
     const knownCountryCodes = ['+62', '+60', '+65', '+63', '+66', '+84', '+91', '+966', '+81', '+1'];
@@ -140,13 +139,23 @@ export default function EvoForm({ encryptedID, registered }) {
             showAlert({
                 icon: isOK ? 'success' : 'error',
                 title: isOK ? t('event.registrationSuccessful') : t('event.registrationFailed'),
-                text: response.data.message,
+                text: isOK
+                    ? (registered ? t('evo.updatedText') : t('evo.registeredText'))
+                    : t('event.registrationFailedText'),
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => navigate(`/`, { replace: true }));
         } catch (error) {
             console.error("Error submitting form:", error);
-            alert(t('alerts.submitFormError'));
+            if (error.response?.status === 409) {
+                showAlert({
+                    icon: 'warning',
+                    title: t('event.alreadyRegistered'),
+                    text: t('evo.alreadyRegisteredText'),
+                });
+            } else {
+                alert(t('alerts.submitFormError'));
+            }
         } finally {
             setSubmitting(false);
             setIsSubmitting(false);

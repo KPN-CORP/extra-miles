@@ -3,24 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Exports\EvoParticipantsExport;
-use Illuminate\Http\Request;
-use App\Models\MasterBisnisunit;
-use App\Models\Location;
-use App\Models\Department;
 use App\Models\Employee;
-use App\Models\Grade;
 use App\Models\Event;
-use App\Models\FormTemplate;
 use App\Models\EventParticipant;
+use App\Models\FormTemplate;
+use App\Models\Grade;
+use App\Models\MasterBisnisunit;
 use App\Models\ModelHasRole;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EventController extends Controller
 {
@@ -28,19 +24,19 @@ class EventController extends Controller
     {
         $parentLink = 'Event Management';
         $link = 'Events';
-        
+
         $user = Auth::user();
         $userRoleIds = $user->roles->pluck('id');
 
         $modelIds = ModelHasRole::whereIn('role_id', $userRoleIds)
-        ->pluck('model_id');
+            ->pluck('model_id');
 
         $eventsToUpdate = Event::whereIn('status', ['Open Registration', 'Full Booked'])->whereNull('deleted_at')->get();
         $now = Carbon::now();
 
         foreach ($eventsToUpdate as $event) {
-            $start = Carbon::parse($event->start_date . ' ' . $event->time_start);
-            $end = Carbon::parse($event->end_date . ' ' . $event->time_end);
+            $start = Carbon::parse($event->start_date.' '.$event->time_start);
+            $end = Carbon::parse($event->end_date.' '.$event->time_end);
 
             if ($now->greaterThanOrEqualTo($start) && $now->lessThan($end)) {
                 $event->status = 'Ongoing';
@@ -52,25 +48,25 @@ class EventController extends Controller
         }
 
         $events = Event::withCount('participants')
-        ->whereIn('status', ['Open Registration', 'Full Booked', 'Draft', 'Ongoing'])
-        ->whereIn('created_by', $modelIds)
-        ->orderBy('created_at', 'desc')
-        ->where('category', '!=', 'EVO')
-        ->get();
+            ->whereIn('status', ['Open Registration', 'Full Booked', 'Draft', 'Ongoing'])
+            ->whereIn('created_by', $modelIds)
+            ->orderBy('created_at', 'desc')
+            ->where('category', '!=', 'EVO')
+            ->get();
 
         $eventClosed = Event::withCount('participants')
-        ->whereIn('status', ['Closed'])
-        ->whereIn('created_by', $modelIds)
-        ->orderBy('created_at', 'desc')
-        ->where('category', '!=', 'EVO')
-        ->get();
+            ->whereIn('status', ['Closed'])
+            ->whereIn('created_by', $modelIds)
+            ->orderBy('created_at', 'desc')
+            ->where('category', '!=', 'EVO')
+            ->get();
 
         $eventArchive = Event::onlyTrashed()
-        ->withCount('participants')
-        ->whereIn('created_by', $modelIds)
-        ->orderBy('created_at', 'desc')
-        ->where('category', '!=', 'EVO')
-        ->get();
+            ->withCount('participants')
+            ->whereIn('created_by', $modelIds)
+            ->orderBy('created_at', 'desc')
+            ->where('category', '!=', 'EVO')
+            ->get();
 
         return view('pages.admin.events.index', [
             'link' => $link,
@@ -89,9 +85,9 @@ class EventController extends Controller
             // $url = url($encryptedId);
             $url = $encryptedId;
 
-            return view('pages.admin.events.qr_png', compact('url','event'));
+            return view('pages.admin.events.qr_png', compact('url', 'event'));
         } catch (\Exception $e) {
-            abort(403, 'Invalid QR request');
+            abort(403, __('Invalid QR request'));
         }
     }
 
@@ -104,7 +100,7 @@ class EventController extends Controller
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
             ->pluck('nama_bisnis');
-        
+
         $locations = Employee::select('group_company', 'office_area')
             ->whereNull('deleted_at')
             ->groupBy('group_company', 'office_area')
@@ -116,14 +112,14 @@ class EventController extends Controller
             ->orderBy('group_company')
             ->orderBy('unit')
             ->get();
-        
+
         $grades = Grade::select('group_name')
             ->distinct()
             ->orderBy('group_name')
             ->get();
 
-        $formTemplates = FormTemplate::select('id','title','form_schema','created_at')
-            ->where('category','event')
+        $formTemplates = FormTemplate::select('id', 'title', 'form_schema', 'created_at')
+            ->where('category', 'event')
             ->orderBy('title')
             ->get();
 
@@ -179,31 +175,31 @@ class EventController extends Controller
         }
 
         Event::create([
-            'category'         => $request->category,
-            'start_date'       => $startDate,
-            'time_start'       => $timeStart,
-            'end_date'         => $endDate,
-            'time_end'         => $timeEnd,
-            'title'            => $request->event_name, 
-            'event_location'   => $request->event_location,
-            'description'      => $request->description,
-            'image'            => $imagePath,
-            'status'           => $request->action === 'draft' ? 'Draft' : 'Open Registration',
-            'status_survey'    => $request->has('need_survey') ? 'T' : 'F',
-            'status_voting'    => $request->has('need_voting') ? 'T' : 'F',
-            'quota'            => $request->participants,
-            'regist_deadline'  => $request->registration_deadline,
-            'businessUnit'     => $request->business_unit ? json_encode($request->business_unit) : null,
-            'unit'             => $request->unit ? json_encode($request->unit) : null,
-            'jobLevel'         => $request->job_level ? json_encode($request->job_level) : null,
-            'location'         => $request->location ? json_encode($request->location) : null,
-            'form_id'          => $request->form_id,
-            'form_schema'      => $formSchema,
-            'barcode_token'    => Str::uuid(),
-            'created_by'       => Auth::id(),
+            'category' => $request->category,
+            'start_date' => $startDate,
+            'time_start' => $timeStart,
+            'end_date' => $endDate,
+            'time_end' => $timeEnd,
+            'title' => $request->event_name,
+            'event_location' => $request->event_location,
+            'description' => $request->description,
+            'image' => $imagePath,
+            'status' => $request->action === 'draft' ? 'Draft' : 'Open Registration',
+            'status_survey' => $request->has('need_survey') ? 'T' : 'F',
+            'status_voting' => $request->has('need_voting') ? 'T' : 'F',
+            'quota' => $request->participants,
+            'regist_deadline' => $request->registration_deadline,
+            'businessUnit' => $request->business_unit ? json_encode($request->business_unit) : null,
+            'unit' => $request->unit ? json_encode($request->unit) : null,
+            'jobLevel' => $request->job_level ? json_encode($request->job_level) : null,
+            'location' => $request->location ? json_encode($request->location) : null,
+            'form_id' => $request->form_id,
+            'form_schema' => $formSchema,
+            'barcode_token' => Str::uuid(),
+            'created_by' => Auth::id(),
         ]);
 
-        return redirect()->route('admin.events.index')->with('success', 'Event has been created successfully.');
+        return redirect()->route('admin.events.index')->with('success', __('Event has been created successfully.'));
     }
 
     public function edit($id)
@@ -213,7 +209,7 @@ class EventController extends Controller
         $event->unit = json_decode($event->unit, true);
         $event->jobLevel = json_decode($event->jobLevel, true);
         $event->location = json_decode($event->location, true);
-        
+
         $parentLink = 'Event Management';
         $link = 'Edit Event';
         $back = 'admin.events.index';
@@ -221,7 +217,7 @@ class EventController extends Controller
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
             ->pluck('nama_bisnis');
-        
+
         $locations = Employee::select('group_company', 'office_area')
             ->whereNull('deleted_at')
             ->groupBy('group_company', 'office_area')
@@ -233,18 +229,18 @@ class EventController extends Controller
             ->orderBy('group_company')
             ->orderBy('unit')
             ->get();
-        
+
         $grades = Grade::select('group_name')
             ->distinct()
             ->orderBy('group_name')
             ->get();
-        
-        $formTemplates = FormTemplate::select('id','title','form_schema','created_at')
-            ->where('category','event')
+
+        $formTemplates = FormTemplate::select('id', 'title', 'form_schema', 'created_at')
+            ->where('category', 'event')
             ->orderBy('title')
             ->get();
 
-        return view('pages.admin.events.edit', compact('back','link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations', 'formTemplates'));
+        return view('pages.admin.events.edit', compact('back', 'link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations', 'formTemplates'));
     }
 
     public function update(Request $request, $id)
@@ -278,25 +274,25 @@ class EventController extends Controller
         }
 
         // Update data
-        $event->category         = $request->category;
-        $event->start_date       = $startDate;
-        $event->time_start       = $timeStart;
-        $event->end_date         = $endDate;
-        $event->time_end         = $timeEnd;
-        $event->title            = $request->event_name;
-        $event->description      = $request->description;
-        $event->status_survey    = $request->has('need_survey') ? 'T' : 'F';
-        $event->status_voting    = $request->has('need_voting') ? 'T' : 'F';
-        $event->quota            = $request->participants;
-        $event->regist_deadline  = $request->registration_deadline;
+        $event->category = $request->category;
+        $event->start_date = $startDate;
+        $event->time_start = $timeStart;
+        $event->end_date = $endDate;
+        $event->time_end = $timeEnd;
+        $event->title = $request->event_name;
+        $event->description = $request->description;
+        $event->status_survey = $request->has('need_survey') ? 'T' : 'F';
+        $event->status_voting = $request->has('need_voting') ? 'T' : 'F';
+        $event->quota = $request->participants;
+        $event->regist_deadline = $request->registration_deadline;
 
         // JSON encode untuk multiple select fields
-        $event->businessUnit     = $request->business_unit ? json_encode($request->business_unit) : null;
-        $event->unit             = $request->unit ? json_encode($request->unit) : null;
-        $event->jobLevel         = $request->job_level ? json_encode($request->job_level) : null;
-        $event->location         = $request->location ? json_encode($request->location) : null;
-        $event->form_id          = $request->form_id;
-        $event->form_schema      = $formSchema;
+        $event->businessUnit = $request->business_unit ? json_encode($request->business_unit) : null;
+        $event->unit = $request->unit ? json_encode($request->unit) : null;
+        $event->jobLevel = $request->job_level ? json_encode($request->job_level) : null;
+        $event->location = $request->location ? json_encode($request->location) : null;
+        $event->form_id = $request->form_id;
+        $event->form_schema = $formSchema;
         // Upload banner jika ada
         if ($request->hasFile('banner')) {
             $path = $request->file('banner')->store('assets/images/events', 'public');
@@ -306,13 +302,13 @@ class EventController extends Controller
         // Simpan status draft jika ada
         if ($request->action == 'draft') {
             $event->status = 'Draft';
-        }else if($request->action == 'update'){
+        } elseif ($request->action == 'update') {
             $event->status = 'Open Registration';
         }
 
         $event->save();
 
-        return redirect()->route('admin.events.index')->with('success', 'Event updated successfully.');
+        return redirect()->route('admin.events.index')->with('success', __('Event updated successfully.'));
     }
 
     public function softDelete($id)
@@ -320,7 +316,7 @@ class EventController extends Controller
         $event = Event::findOrFail($id);
         $event->delete();
 
-        return redirect()->back()->with('success', 'Event berhasil diarsipkan.');
+        return redirect()->back()->with('success', __('Event archived successfully.'));
     }
 
     public function removeEvoParticipants($id)
@@ -328,7 +324,7 @@ class EventController extends Controller
         $event = EventParticipant::findOrFail($id);
         $event->delete();
 
-        return redirect()->back()->with('success', 'Participant removed successfully!');
+        return redirect()->back()->with('success', __('Participant removed successfully!'));
     }
 
     public function closeRegistration($id)
@@ -337,7 +333,7 @@ class EventController extends Controller
         $event->status = 'Full Booked';
         $event->save();
 
-        return redirect()->back()->with('success', 'Event registration has been closed.');
+        return redirect()->back()->with('success', __('Event registration has been closed.'));
     }
 
     public function toggleStatus($id)
@@ -352,13 +348,13 @@ class EventController extends Controller
 
         $event->save();
 
-        return redirect()->back()->with('success', 'Event status updated successfully.');
+        return redirect()->back()->with('success', __('Event status updated successfully.'));
     }
 
     public function evoIndex()
     {
         $parentLink = 'Event Management';
-        $link = 'EVO';     
+        $link = 'EVO';
         $username = Auth::user()->name;
 
         $data = Event::withCount('participants')
@@ -368,14 +364,14 @@ class EventController extends Controller
             ->first();
 
         // Kalau belum ada event EVO
-        if (!$data) {
+        if (! $data) {
             return view('pages.admin.events.evoindex', [
-                'link'        => $link,
-                'parentLink'  => $parentLink,
-                'data'        => null,
-                'options'     => [],
-                'programs'    => [],
-                'username'    => $username,
+                'link' => $link,
+                'parentLink' => $parentLink,
+                'data' => null,
+                'options' => [],
+                'programs' => [],
+                'username' => $username,
             ]);
         }
 
@@ -399,12 +395,12 @@ class EventController extends Controller
             ->toArray();
 
         return view('pages.admin.events.evoindex', [
-            'link'        => $link,
-            'parentLink'  => $parentLink,
-            'data'        => $data,
-            'options'     => $options,   // untuk TAB
-            'programs'    => $programs,  // untuk filter di modal export
-            'username'    => $username,
+            'link' => $link,
+            'parentLink' => $parentLink,
+            'data' => $data,
+            'options' => $options,   // untuk TAB
+            'programs' => $programs,  // untuk filter di modal export
+            'username' => $username,
         ]);
     }
 
@@ -415,7 +411,7 @@ class EventController extends Controller
         $event->unit = json_decode($event->unit, true);
         $event->jobLevel = json_decode($event->jobLevel, true);
         $event->location = json_decode($event->location, true);
-        
+
         $parentLink = 'EVO';
         $link = 'Manage Event';
         $back = 'admin.evo.index';
@@ -423,7 +419,7 @@ class EventController extends Controller
         $bisnisunits = MasterBisnisunit::whereNotIn('nama_bisnis', ['KPN Plantations', 'Others', 'Katingan'])
             ->orderBy('nama_bisnis')
             ->pluck('nama_bisnis');
-        
+
         $locations = Employee::select('group_company', 'office_area')
             ->whereNull('deleted_at')
             ->groupBy('group_company', 'office_area')
@@ -435,18 +431,18 @@ class EventController extends Controller
             ->orderBy('group_company')
             ->orderBy('unit')
             ->get();
-        
+
         $grades = Grade::select('group_name')
             ->distinct()
             ->orderBy('group_name')
             ->get();
-        
-        $formTemplates = FormTemplate::select('id','title','form_schema','created_at')
-            ->where('category','event')
+
+        $formTemplates = FormTemplate::select('id', 'title', 'form_schema', 'created_at')
+            ->where('category', 'event')
             ->orderBy('title')
             ->get();
 
-        return view('pages.admin.events.evomanage', compact('back','link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations', 'formTemplates'));
+        return view('pages.admin.events.evomanage', compact('back', 'link', 'parentLink', 'event', 'bisnisunits', 'departments', 'grades', 'locations', 'formTemplates'));
     }
 
     public function evoUpdate(Request $request, $id)
@@ -480,25 +476,25 @@ class EventController extends Controller
         }
 
         // Update data
-        $event->category         = $request->category;
-        $event->start_date       = $startDate;
-        $event->time_start       = $timeStart;
-        $event->end_date         = $endDate;
-        $event->time_end         = $timeEnd;
-        $event->title            = $request->event_name;
-        $event->description      = $request->description;
-        $event->status_survey    = $request->has('need_survey') ? 'T' : 'F';
-        $event->status_voting    = $request->has('need_voting') ? 'T' : 'F';
-        $event->quota            = $request->participants;
-        $event->regist_deadline  = $request->registration_deadline;
+        $event->category = $request->category;
+        $event->start_date = $startDate;
+        $event->time_start = $timeStart;
+        $event->end_date = $endDate;
+        $event->time_end = $timeEnd;
+        $event->title = $request->event_name;
+        $event->description = $request->description;
+        $event->status_survey = $request->has('need_survey') ? 'T' : 'F';
+        $event->status_voting = $request->has('need_voting') ? 'T' : 'F';
+        $event->quota = $request->participants;
+        $event->regist_deadline = $request->registration_deadline;
 
         // JSON encode untuk multiple select fields
-        $event->businessUnit     = $request->business_unit ? json_encode($request->business_unit) : null;
-        $event->unit             = $request->unit ? json_encode($request->unit) : null;
-        $event->jobLevel         = $request->job_level ? json_encode($request->job_level) : null;
-        $event->location         = $request->location ? json_encode($request->location) : null;
-        $event->form_id          = $request->form_id;
-        $event->form_schema      = $formSchema;
+        $event->businessUnit = $request->business_unit ? json_encode($request->business_unit) : null;
+        $event->unit = $request->unit ? json_encode($request->unit) : null;
+        $event->jobLevel = $request->job_level ? json_encode($request->job_level) : null;
+        $event->location = $request->location ? json_encode($request->location) : null;
+        $event->form_id = $request->form_id;
+        $event->form_schema = $formSchema;
         // Upload banner jika ada
         if ($request->hasFile('banner')) {
             $path = $request->file('banner')->store('assets/images/events', 'public');
@@ -512,7 +508,7 @@ class EventController extends Controller
 
         $event->save();
 
-        return redirect()->route('admin.evo.index')->with('success', 'EVO updated successfully.');
+        return redirect()->route('admin.evo.index')->with('success', __('EVO updated successfully.'));
     }
 
     public function exportEvoParticipants(Request $request)
@@ -520,7 +516,7 @@ class EventController extends Controller
         $username = Auth::user()->name;
 
         // Ambil value option dari request
-        $option = $request->get('option', 'all'); 
+        $option = $request->get('option', 'all');
         $option = urldecode($option);
 
         $event = Event::with('participants')
@@ -528,9 +524,8 @@ class EventController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
-        $fileName = 'participants_' . Str::slug($option) . '.xlsx';
+        $fileName = 'participants_'.Str::slug($option).'.xlsx';
 
         return Excel::download(new EvoParticipantsExport($event, $option, $username), $fileName);
     }
-
 }

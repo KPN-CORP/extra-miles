@@ -10,7 +10,7 @@
         <div>
             <h4 class="page-title mb-1">{{ __('Events') }}</h4>
             <div class="text-muted small">
-                <span class="me-3"><i class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}</span>
+                <span class="me-3"><i class="ri-calendar-line me-1"></i>{{ now()->translatedFormat('l, d F Y') }}</span>
                 <span><i class="ri-time-line me-1"></i><span id="currentTime"></span> {{ __('WIB') }}</span>
             </div>
         </div>
@@ -54,7 +54,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $event->category }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($event->start_date)->translatedFormat('d M Y') }}</td>
                                             <td>{{ $event->title }}</td>
                                             <td style="text-align: center;">
                                                 <span style="color: {{ $event->participants_count >= $event->quota ? 'green' : 'red' }};">
@@ -157,7 +157,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $event->category }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($event->start_date)->translatedFormat('d M Y') }}</td>
                                             <td>{{ $event->title }}</td>
                                             <td style="text-align: center;">
                                                 <span style="color: {{ $event->participants_count >= $event->quota ? 'green' : 'red' }};">
@@ -217,7 +217,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $event->category }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($event->start_date)->translatedFormat('d M Y') }}</td>
                                             <td>{{ $event->title }}</td>
                                             <td style="text-align: center;">
                                                 <span style="color: {{ $event->participants_count >= $event->quota ? 'green' : 'red' }};">

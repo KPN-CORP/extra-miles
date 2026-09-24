@@ -4,20 +4,20 @@
     <!-- Brand Logo Light -->
     <a href="#" class="logo logo-light">
         <span class="logo-lg">
-            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="logo">
+            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="{{ __('Logo') }}">
         </span>
         <span class="logo-sm">
-            <img src="{{ asset('storage/img/logo-sm_ori.png') }}" alt="small logo">
+            <img src="{{ asset('storage/img/logo-sm_ori.png') }}" alt="{{ __('Small logo') }}">
         </span>
     </a>
 
     <!-- Brand Logo Dark -->
     <a href="#" class="logo logo-dark">
         <span class="logo-lg">
-            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="logo">
+            <img src="{{ asset('storage/img/extra_mile.png') }}" alt="{{ __('Logo') }}">
         </span>
         <span class="logo-sm">
-            <img src="{{ asset('storage/img/logo-sm_ori.png') }}" alt="small logo">
+            <img src="{{ asset('storage/img/logo-sm_ori.png') }}" alt="{{ __('Small logo') }}">
         </span>
     </a>
     

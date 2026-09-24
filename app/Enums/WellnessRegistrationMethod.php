@@ -13,24 +13,24 @@ enum WellnessRegistrationMethod: string
     public function label(): string
     {
         return match ($this) {
-            self::Fifo => 'FIFO (First Come, First Served)',
-            self::SelectionByAdmin => 'Selection by Admin',
+            self::Fifo => __('FIFO (First Come, First Served)'),
+            self::SelectionByAdmin => __('Selection by Admin'),
         };
     }
 
     public function shortLabel(): string
     {
         return match ($this) {
-            self::Fifo => 'FIFO',
-            self::SelectionByAdmin => 'Selection',
+            self::Fifo => __('FIFO'),
+            self::SelectionByAdmin => __('Selection'),
         };
     }
 
     public function description(): string
     {
         return match ($this) {
-            self::Fifo => 'Employees are confirmed automatically in registration order until the quota is full. The rest queue as Registered.',
-            self::SelectionByAdmin => 'Every employee joins the Waiting List. An admin confirms who gets a seat.',
+            self::Fifo => __('Employees are confirmed automatically in registration order until the quota is full. The rest queue as Registered.'),
+            self::SelectionByAdmin => __('Every employee joins the Waiting List. An admin confirms who gets a seat.'),
         };
     }
 
@@ -63,6 +63,7 @@ enum WellnessRegistrationMethod: string
     {
         return [
             WellnessRegistrationStatus::Confirmed,
+            WellnessRegistrationStatus::AwaitingConfirmation,
             $this->queueStatus(),
             WellnessRegistrationStatus::Blacklisted,
             WellnessRegistrationStatus::Cancelled,

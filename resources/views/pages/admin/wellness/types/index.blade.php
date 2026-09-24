@@ -132,7 +132,7 @@
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $type->name }}</td>
                                                 <td>{{ \Illuminate\Support\Str::limit($type->description, 80) ?: '-' }}</td>
-                                                <td>{{ $type->deleted_at?->format('d M Y H:i') }}</td>
+                                                <td>{{ $type->deleted_at?->translatedFormat('d M Y H:i') }}</td>
                                                 <td>
                                                     <form action="{{ route('wellness.types.restore', $type->encrypted_id) }}" method="POST">
                                                         @csrf

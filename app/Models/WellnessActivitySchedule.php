@@ -27,6 +27,7 @@ class WellnessActivitySchedule extends Model
         'quota',
         'registration_start_at',
         'registration_end_at',
+        'confirmation_deadline',
         'status',
         'recurrence_group_id',
         'recurrence_frequency',
@@ -40,6 +41,7 @@ class WellnessActivitySchedule extends Model
         'end_at' => 'datetime',
         'registration_start_at' => 'datetime',
         'registration_end_at' => 'datetime',
+        'confirmation_deadline' => 'datetime',
         'quota' => 'integer',
         'status' => WellnessScheduleStatus::class,
         'recurrence_frequency' => WellnessRecurrenceFrequency::class,
@@ -143,6 +145,38 @@ class WellnessActivitySchedule extends Model
 
         // Never accept a registration for a session that has already ended.
         return $at->lte($this->end_at);
+    }
+
+    /**
+     * Whether a seat on this session has to be accepted by the employee before
+     * it is theirs. No deadline set means no extra step -- the session behaves
+     * exactly as it did before confirmation deadlines existed.
+     */
+    public function requiresConfirmation(): bool
+    {
+        return $this->confirmation_deadline !== null;
+    }
+
+    /**
+     * When an employee seated at $seatedAt has to confirm by.
+     *
+     * Someone seated while the deadline is still ahead gets that deadline.
+     * Someone promoted off the queue after it has passed -- which only happens
+     * because an earlier holder let their own window lapse -- gets their own,
+     * running to the moment the session starts. Without this, a seat freed at
+     * the deadline could never be taken by anyone.
+     */
+    public function confirmDueFor(?Carbon $seatedAt = null): ?Carbon
+    {
+        if (! $this->requiresConfirmation()) {
+            return null;
+        }
+
+        $seatedAt ??= now();
+
+        return $seatedAt->lte($this->confirmation_deadline)
+            ? $this->confirmation_deadline->copy()
+            : $this->start_at->copy();
     }
 
     /**

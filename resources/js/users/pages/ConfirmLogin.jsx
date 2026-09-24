@@ -38,12 +38,12 @@ function ConfirmLogin() {
           return;
         }
 
-        const errorData = await response
-          .json()
-          .catch(() => ({ message: `Server error: ${response.status}` }));
+        const errorData = await response.json().catch(() => null);
 
+        // Pesan backend (mis. "Unauthenticated.") selalu berbahasa Inggris,
+        // jadi hanya dicatat di console; pengguna melihat teks terjemahan.
         console.error('Token verification failed:', response.status, errorData);
-        fail(errorData.message || t('login.verificationFailed'));
+        fail(t('login.verificationFailed'));
       } catch (err) {
         console.error('Network or unexpected error:', err);
         fail(t('login.networkIssue'));

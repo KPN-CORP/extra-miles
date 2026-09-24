@@ -4,17 +4,18 @@ namespace App\Exports;
 
 use App\Models\Event;
 use App\Models\EventParticipant;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles
+class ParticipantsExport implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles
 {
     protected $eventId;
 
@@ -54,19 +55,19 @@ class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize
                 'messages',
                 'attending_status',
                 'attending_at',
-                'form_data'
+                'form_data',
             ])
             ->get();
 
         return $participants->map(function ($item, $index) use ($fieldMap) {
 
-        $formData = json_decode($item->form_data, true);
+            $formData = json_decode($item->form_data, true);
 
-        $phone = $formData['whatsapp_number'] ?? '';
-        $code  = $formData['countryCode'] ?? '';
-        $phone = ltrim($phone, '0');
+            $phone = $formData['whatsapp_number'] ?? '';
+            $code = $formData['countryCode'] ?? '';
+            $phone = ltrim($phone, '0');
 
-        $whatsapp = "'" . $code . $phone; // tambah kutip di depan
+            $whatsapp = "'".$code.$phone; // tambah kutip di depan
 
             $base = [
                 'No' => $index + 1,
@@ -88,7 +89,7 @@ class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize
             foreach ($fieldMap as $key => $label) {
                 $base[$label] = $formData[$key] ?? null;
             }
-            
+
             return $base;
         });
     }
@@ -103,24 +104,24 @@ class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize
             $schema = json_decode($event->form_schema, true);
             if (isset($schema['fields']) && is_array($schema['fields'])) {
                 foreach ($schema['fields'] as $field) {
-                    $formLabels[] = $field['label'] ?? 'Unnamed Field';
+                    $formLabels[] = $field['label'] ?? __('Unnamed Field');
                 }
             }
         }
 
         return array_merge([
             'No',
-            'Employee ID',
-            'Full Name',
-            'Phone Number',
-            'Business Unit',
-            'Job Level',
-            'Location',
-            'Unit',
-            'Status',
-            'Messages',
-            'Attending Status',
-            'Attending At',
+            __('Employee ID'),
+            __('Full Name'),
+            __('Phone Number'),
+            __('Business Unit'),
+            __('Job Level'),
+            __('Location'),
+            __('Unit'),
+            __('Status'),
+            __('Messages'),
+            __('Attending Status'),
+            __('Attending At'),
         ], $formLabels);
     }
 
@@ -129,28 +130,28 @@ class ParticipantsExport implements FromCollection, WithHeadings, ShouldAutoSize
         // Set heading row (baris ke-1)
         return [
             1 => [
-                'font' => ['bold' => true,'color' => ['rgb' => 'FFFFFF'],],
-                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'fillType' => Fill::FILL_SOLID,
                     'startColor' => ['rgb' => 'ab2f2b'], // warna merah muda
                 ],
             ],
         ];
     }
-    
+
     public function columnFormats(): array
     {
         $headings = $this->headings();
-    
-        $index = array_search('Phone Number', $headings);
-    
+
+        $index = array_search(__('Phone Number'), $headings);
+
         if ($index === false) {
             return [];
         }
-    
+
         $columnLetter = Coordinate::stringFromColumnIndex($index + 1);
-    
+
         return [
             $columnLetter => NumberFormat::FORMAT_TEXT,
         ];

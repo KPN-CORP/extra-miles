@@ -95,7 +95,7 @@ export default function EventDetails() {
   const year = date.getFullYear();
   const formattedDate = `${day} ${month} ${year}`;  
   const startTime = event.time_start.replace(/:/g, ':').slice(0, 5);
-  const endTime = event.time_end ? event.time_end.replace(/:/g, ':').slice(0, 5) : 'end';
+  const endTime = event.time_end ? event.time_end.replace(/:/g, ':').slice(0, 5) : t('date.end');
 
   return (
     <AppShell>

@@ -176,7 +176,7 @@
                             <option disabled {{ !$survey->form_id ? 'selected' : '' }}>{{ __('Please select') }}</option>
                             @foreach($formTemplates as $form)
                                 <option value="{{ $form->id }}" {{ $form->id == $survey->form_id ? 'selected' : '' }}>
-                                    {{ $form->title." (".$form->created_at->format('d M Y').")" }}
+                                    {{ $form->title." (".$form->created_at->translatedFormat('d M Y').")" }}
                                 </option>
                             @endforeach
                         </select>

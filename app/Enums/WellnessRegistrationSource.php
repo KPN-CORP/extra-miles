@@ -13,8 +13,8 @@ enum WellnessRegistrationSource: string
     public function label(): string
     {
         return match ($this) {
-            self::SelfService => 'Self Registration',
-            self::Admin => 'Registered by Admin',
+            self::SelfService => __('Self Registration'),
+            self::Admin => __('Registered by Admin'),
         };
     }
 }

@@ -119,6 +119,7 @@ class WellnessController extends Controller
             ->forEmployee($employeeId)
             ->whereIn('status', [
                 WellnessRegistrationStatus::Confirmed->value,
+                WellnessRegistrationStatus::AwaitingConfirmation->value,
                 WellnessRegistrationStatus::Registered->value,
                 WellnessRegistrationStatus::WaitingList->value,
             ])
@@ -134,7 +135,9 @@ class WellnessController extends Controller
                 'attended_at' => $registration->attended_at?->toDateTimeString(),
                 'registered_at' => $registration->registered_at?->toDateTimeString(),
                 'can_cancel' => $registration->status->canTransitionTo(WellnessRegistrationStatus::Cancelled),
-                'can_check_in' => $registration->status === WellnessRegistrationStatus::Confirmed
+                'confirm_due_at' => $registration->confirm_due_at?->toDateTimeString(),
+                'can_confirm' => $registration->canConfirm(),
+                'can_check_in' => $registration->status->consumesSlot()
                     && $registration->attended_at === null
                     && (bool) $registration->schedule?->isCheckInOpen(),
                 'can_submit_feedback' => $registration->canSubmitFeedback(),
@@ -250,6 +253,42 @@ class WellnessController extends Controller
     }
 
     /**
+     * Accept a seat that was offered. Only meaningful on a session carrying a
+     * confirmation deadline -- elsewhere a seat is already taken when granted.
+     */
+    public function confirm(Request $request): JsonResponse
+    {
+        $employeeId = $this->employeeId();
+
+        if ($employeeId instanceof JsonResponse) {
+            return $employeeId;
+        }
+
+        $request->validate(['registration_id' => 'required|string']);
+
+        try {
+            $registrationId = (int) Crypt::decryptString($request->input('registration_id'));
+        } catch (DecryptException) {
+            return response()->json(['error' => 'Registration not found'], 404);
+        }
+
+        $registration = WellnessActivityRegistration::with('schedule.activity')->find($registrationId);
+
+        // An employee may only confirm their own seat.
+        if (! $registration || $registration->employee_id !== $employeeId) {
+            return response()->json(['error' => 'Registration not found'], 404);
+        }
+
+        try {
+            $this->service->confirmSeat($registration);
+        } catch (WellnessRegistrationException $e) {
+            return response()->json(['error' => $e->getMessage(), 'reason' => $e->reason], 422);
+        }
+
+        return response()->json(['message' => 'Your seat is confirmed.']);
+    }
+
+    /**
      * Attendance check-in from a scanned session QR.
      */
     public function checkIn(Request $request): JsonResponse
@@ -351,7 +390,9 @@ class WellnessController extends Controller
             ->withCount([
                 'registrations as taken_seats' => fn ($q) => $q->whereIn('status', WellnessRegistrationStatus::slotConsumingValues()),
             ])
-            ->with(['registrations' => fn ($q) => $q->where('employee_id', $employeeId)])
+            // activity.type feeds isCheckInOpen() in the payload; without it each
+            // schedule lazy-loads both.
+            ->with(['activity.type', 'registrations' => fn ($q) => $q->where('employee_id', $employeeId)])
             ->orderBy('start_at')
             ->get();
 
@@ -374,6 +415,7 @@ class WellnessController extends Controller
             'registration_open' => $schedule->isRegistrationOpen(),
             'registration_start_at' => $schedule->registration_start_at?->toDateTimeString(),
             'registration_end_at' => $schedule->registration_end_at?->toDateTimeString(),
+            'confirmation_deadline' => $schedule->confirmation_deadline?->toDateTimeString(),
             'check_in_open' => $schedule->isCheckInOpen(),
         ];
 

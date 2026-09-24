@@ -10,7 +10,7 @@ import { useApiUrl } from '../components/Context/ApiContext';
 import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
-import { formatSession, seatLabel, statusStyle } from '../components/Helper/wellnessHelper';
+import { formatSession, seatLabel, statusLabel, statusStyle, wellnessError } from '../components/Helper/wellnessHelper';
 import { getImageUrl } from '../components/Helper/imagePath';
 import AppShell from '../components/Layout/AppShell';
 import {
@@ -47,7 +47,7 @@ export default function WellnessDetails() {
             showAlert({
                 icon: 'warning',
                 title: t('wellness.notAvailable'),
-                text: err.response?.data?.error || t('wellness.activityLoadFailed'),
+                text: wellnessError(err, 'wellness.activityLoadFailed'),
                 timer: 2500,
                 showConfirmButton: false,
             }).then(() => navigate('/wellness'));
@@ -100,7 +100,7 @@ export default function WellnessDetails() {
             await showAlert({
                 icon: 'success',
                 title: t('wellness.registerConfirm.doneTitle'),
-                text: res.data.message,
+                text: t(`wellness.registerDone.${res.data.status}`, { defaultValue: t('wellness.registerConfirm.doneTitle') }),
                 timer: 2600,
                 showConfirmButton: false,
             });
@@ -110,7 +110,7 @@ export default function WellnessDetails() {
             showAlert({
                 icon: 'error',
                 title: t('wellness.registerConfirm.failedTitle'),
-                text: err.response?.data?.error || t('alerts.genericRetry'),
+                text: wellnessError(err),
             });
         } finally {
             setSubmitting(null);
@@ -151,7 +151,7 @@ export default function WellnessDetails() {
             showAlert({
                 icon: 'error',
                 title: t('wellness.cancelConfirm.failedTitle'),
-                text: err.response?.data?.error || t('alerts.genericRetry'),
+                text: wellnessError(err),
             });
         } finally {
             setSubmitting(null);
@@ -245,7 +245,7 @@ export default function WellnessDetails() {
                                 <div className="mt-3 flex items-center gap-2">
                                     {registered && (
                                         <span className={`px-2 py-1 rounded-full text-[10px] font-semibold ${statusStyle(schedule.my_status)}`}>
-                                            {schedule.my_status_label}
+                                            {statusLabel(schedule.my_status, schedule.my_status_label)}
                                         </span>
                                     )}
 

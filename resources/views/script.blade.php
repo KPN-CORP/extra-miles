@@ -278,7 +278,7 @@
   
       endInput.addEventListener('change', function () {
         if (this.value < startInput.value) {
-          alert("End Date tidak boleh kurang dari Start Date!");
+          alert(@json(__('End Date cannot be earlier than Start Date!')));
           this.value = '';
         }
       });
@@ -432,14 +432,14 @@
                 content += `
                     <div class="mb-3">
                         <strong>${index + 1}. ${field.label}</strong><br>
-                        <em>Type:</em> ${field.type} |
-                        <em>Required:</em> ${field.required ? 'Yes' : 'No'} |
-                        <em>Validation:</em> ${field.validation || '-'}
+                        <em>${@json(__('Type'))}:</em> ${field.type} |
+                        <em>${@json(__('Required'))}:</em> ${field.required ? @json(__('Yes')) : @json(__('No'))} |
+                        <em>${@json(__('Validation'))}:</em> ${field.validation || '-'}
                     </div>
                 `;
             });
         } else {
-            content = '<p class="text-muted">No fields available.</p>';
+            content = '<p class="text-muted">' + @json(__('No fields available.')) + '</p>';
         }
     
         $('#schemaFields').html(content);
@@ -717,7 +717,7 @@
     
         function updateEventApproveButton() {
             const selectedCount = document.querySelectorAll('.row-checkbox:checked').length;
-            eventApproveSelectedBtn.textContent = `Approve Selected (${selectedCount})`;
+            eventApproveSelectedBtn.textContent = @json(__('Approve Selected (:count)', ['count' => '__COUNT__'])).replace('__COUNT__', selectedCount);
             eventApproveSelectedBtn.disabled = selectedCount === 0;
         }
     

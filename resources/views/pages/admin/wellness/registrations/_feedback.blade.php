@@ -36,15 +36,15 @@
                     <td>
                         @if ($entry->registration?->attended_at)
                             <span class="badge bg-success-subtle text-success">
-                                {{ $entry->registration->attended_at->format('d M H:i') }}
+                                {{ $entry->registration->attended_at->translatedFormat('d M H:i') }}
                             </span>
                         @else
                             <span class="badge bg-secondary-subtle text-secondary">{{ __('Not yet') }}</span>
                         @endif
                     </td>
                     <td>
-                        <span title="{{ $entry->submitted_at?->format('d M Y H:i') }}">
-                            {{ $entry->submitted_at?->format('d M H:i') }}
+                        <span title="{{ $entry->submitted_at?->translatedFormat('d M Y H:i') }}">
+                            {{ $entry->submitted_at?->translatedFormat('d M H:i') }}
                         </span>
                         @if ($entry->wasEdited())
                             <span class="badge bg-light text-muted ms-1" title="{{ __('The employee revised this feedback.') }}">

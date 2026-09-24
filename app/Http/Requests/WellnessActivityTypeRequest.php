@@ -32,6 +32,9 @@ class WellnessActivityTypeRequest extends FormRequest
             ],
             'description' => ['nullable', 'string', 'max:1000'],
             'is_active' => ['nullable', 'boolean'],
+            // Empty means "use the config default", so the column stays null.
+            'check_in_opens_minutes_before' => ['nullable', 'integer', 'min:0', 'max:1440'],
+            'check_in_closes_minutes_after' => ['nullable', 'integer', 'min:0', 'max:1440'],
         ];
     }
 

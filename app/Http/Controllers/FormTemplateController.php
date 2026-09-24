@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\FormTemplate;
+use Illuminate\Http\Request;
 
 class FormTemplateController extends Controller
 {
@@ -15,8 +15,8 @@ class FormTemplateController extends Controller
         $formTemplates = FormTemplate::latest()->get();
 
         $formTemplateArchive = FormTemplate::onlyTrashed()
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('pages.admin.form.index', [
             'link' => $link,
@@ -25,6 +25,7 @@ class FormTemplateController extends Controller
             'formTemplateArchive' => $formTemplateArchive,
         ]);
     }
+
     public function create()
     {
         $parentLink = 'Form Builder';
@@ -37,6 +38,7 @@ class FormTemplateController extends Controller
             'parentLink' => $parentLink,
         ]);
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -52,12 +54,12 @@ class FormTemplateController extends Controller
             $required = isset($request->required[$index]);
             $validation = $request->validation[$index] ?? '';
 
-            if (in_array($type, ['checkbox', 'radio']) && !empty($request->options[$index])) {
+            if (in_array($type, ['checkbox', 'radio']) && ! empty($request->options[$index])) {
                 $options = array_map('trim', explode(',', $request->options[$index]));
 
                 if ($type === 'radio' && isset($request->label_confirmation[$index])) {
                     $fields[] = [
-                        'name' => 'confirmation_' . ($index + 1),
+                        'name' => 'confirmation_'.($index + 1),
                         'type' => $type,
                         'label' => $label,
                         'options' => $options,
@@ -66,7 +68,7 @@ class FormTemplateController extends Controller
                     ];
 
                     $fields[] = [
-                        'name' => 'confirmation_' . ($index + 1) . '_reason',
+                        'name' => 'confirmation_'.($index + 1).'_reason',
                         'type' => 'text',
                         'label' => $request->label_confirmation[$index],
                         'required' => false,
@@ -74,7 +76,7 @@ class FormTemplateController extends Controller
                     ];
                 } else {
                     $fields[] = [
-                        'name' => 'question_' . ($index + 1),
+                        'name' => 'question_'.($index + 1),
                         'type' => $type,
                         'label' => $label,
                         'options' => $options,
@@ -84,7 +86,7 @@ class FormTemplateController extends Controller
                 }
             } else {
                 $fields[] = [
-                    'name' => 'question_' . ($index + 1),
+                    'name' => 'question_'.($index + 1),
                     'type' => $type,
                     'label' => $label,
                     'required' => $required,
@@ -105,8 +107,9 @@ class FormTemplateController extends Controller
             'form_schema' => json_encode($schema),
         ]);
 
-        return redirect()->route('form.index')->with('success', 'Form berhasil disimpan!');
+        return redirect()->route('form.index')->with('success', __('Form saved successfully!'));
     }
+
     public function edit($id)
     {
         $form = FormTemplate::findOrFail($id);
@@ -124,7 +127,7 @@ class FormTemplateController extends Controller
 
         $form->title = $request->input('title');
         $form->category = $request->input('category');
-        
+
         // dd($request->all());
         $fields = [];
         foreach ($request->type as $index => $type) {
@@ -132,12 +135,12 @@ class FormTemplateController extends Controller
             $required = isset($request->required[$index]);
             $validation = $request->validation[$index] ?? '';
 
-            if (in_array($type, ['checkbox', 'radio']) && !empty($request->options[$index])) {
+            if (in_array($type, ['checkbox', 'radio']) && ! empty($request->options[$index])) {
                 $options = array_map('trim', explode(',', $request->options[$index]));
 
                 if ($type === 'radio' && isset($request->label_confirmation[$index])) {
                     $fields[] = [
-                        'name' => 'confirmation_' . ($index + 1),
+                        'name' => 'confirmation_'.($index + 1),
                         'type' => $type,
                         'label' => $label,
                         'options' => $options,
@@ -146,7 +149,7 @@ class FormTemplateController extends Controller
                     ];
 
                     $fields[] = [
-                        'name' => 'confirmation_' . ($index + 1) . '_reason',
+                        'name' => 'confirmation_'.($index + 1).'_reason',
                         'type' => 'text',
                         'label' => $request->label_confirmation[$index],
                         'required' => false,
@@ -154,7 +157,7 @@ class FormTemplateController extends Controller
                     ];
                 } else {
                     $fields[] = [
-                        'name' => 'question_' . ($index + 1),
+                        'name' => 'question_'.($index + 1),
                         'type' => $type,
                         'label' => $label,
                         'options' => $options,
@@ -164,7 +167,7 @@ class FormTemplateController extends Controller
                 }
             } else {
                 $fields[] = [
-                    'name' => 'question_' . ($index + 1),
+                    'name' => 'question_'.($index + 1),
                     'type' => $type,
                     'label' => $label,
                     'required' => $required,
@@ -180,19 +183,21 @@ class FormTemplateController extends Controller
 
         $form->save();
 
-        return redirect()->route('form.index')->with('success', 'Form updated successfully.');
+        return redirect()->route('form.index')->with('success', __('Form updated successfully.'));
     }
+
     public function archive($id)
     {
         $form = FormTemplate::findOrFail($id);
         $form->delete(); // Ini soft delete
 
-        return redirect()->back()->with('success', 'Form archived (soft deleted) successfully.');
+        return redirect()->back()->with('success', __('Form archived (soft deleted) successfully.'));
     }
+
     public function getSchema($id)
     {
         $form = FormTemplate::findOrFail($id);
-        
+
         return response()->json(json_decode($form->form_schema, true));
     }
 }

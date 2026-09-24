@@ -2,407 +2,129 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Employee;
-use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
+use App\Services\DarwinboxClient;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use RealRashid\SweetAlert\Facades\Alert;
 
+/**
+ * Darwinbox SSO entry points. `dbauth` logs the employee into this app's
+ * admin; the others verify them the same way and hand them on to a partner
+ * system with a signed JWT (see services.sso_vendors).
+ */
 class SsoController extends Controller
 {
+    public function __construct(private DarwinboxClient $darwinbox) {}
+
     public function dbauth(Request $request)
     {
-        return $this->handleDbauth($request, route('admin.dashboard', absolute: false), 'kpnem');
-    }
+        [$user, $token] = $this->verify($request);
 
-    private function handleDbauth(Request $request, $redirectRoute, $sessionValue)
-    {
-        $encryptedData = $request->data;
-        $decodedData = base64_decode($encryptedData);
-
-        $key = '666666';
-        $decryptedDataxor = $this->xorDecrypt($decodedData, $key);
-        $decryptedData = base64_decode($decryptedDataxor);
-
-        $decryptedDataArray = json_decode($decryptedData, true);
-        $email = $decryptedDataArray['email'];
-        $token = $decryptedDataArray['token'];
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://kpncorporation.darwinbox.com/checkToken',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode(array(
-                "api_key" => "3bbfc6dfa28df2a81bd45192bf4f96b72628ae0ec9921a062aef937b7f25d6c704ccfc9539e70e5939a45cc43f3b7ce61477c7135a83bdbd6f85d5c38b5fc563",
-                "token" => $token,
-            )),
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json',
-                'Authorization: Basic S1BOX1NTTzpUTXNfJDU2T3BzJXB3',
-                'Cookie: __cf_bm=4uUEj1zmjV.MExppSaO8PotAtVYX3j1LC37K7VZbRrA-1712303016-1.0.1.1-t6I22efQWtYGVIwVMpn7P63eop_5tmi8pU7n_ju6i2_AD1YM846eQF2VlfbZKoC.ZwvzWCyaXDISwvp.JP2TPQ; _cfuvid=kEL.TVWTCuZAsepIdMuvd7X9.q7rTz4SP9.769IZWFQ-1712126032738-0.0.1.1-604800000; session=83c35e478c2cafccac60fced59ff2f30'
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-
-        $responseData = json_decode($response, true);
-        $status = $responseData['status'];
-
-        if($status==1){
-            $user = User::where('email', $email)->first();
-            if ($user) {
-                Auth::login($user);
-                $user->token = $token;
-                $user->email_log = $email;
-                $user->save();
-                $request->session()->put('system', $sessionValue);
-                $request->session()->regenerate();
-                return redirect()->intended($redirectRoute);
-            } else {
-                Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-                if (url()->previous()) {
-                    return redirect()->back();
-                } else {
-                    return redirect('https://kpncorporation.darwinbox.com/');
-                }
-            }
-        } else {
-            Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-            if (url()->previous()) {
-                return redirect()->back();
-            } else {
-                return redirect('https://kpncorporation.darwinbox.com/');
-            }
+        if (! $user) {
+            return $this->failed();
         }
+
+        Auth::login($user);
+        $user->token = $token;
+        $user->email_log = $user->email;
+        $user->save();
+        $request->session()->put('system', 'kpnem');
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 
     public function dbauthlms(Request $request)
     {
-        return $this->handleDbauthlms($request, route('admin.dashboard', absolute: false), 'kpnlms');
+        return $this->handOff($request, 'lms');
     }
-    
+
     public function dbauthcmpr(Request $request)
     {
-        return $this->handleDbauthcmpr($request, route('admin.dashboard', absolute: false), 'kpnlms');
+        return $this->handOff($request, 'cmpr');
     }
 
     public function dbauthexpl(Request $request)
     {
-        return $this->handleDbauthexpl($request, route('admin.dashboard', absolute: false), 'kpnlms');
+        return $this->handOff($request, 'expl');
     }
 
-    private function handleDbauthcmpr(Request $request, $redirectRoute, $sessionValue)
+    /**
+     * The user Darwinbox vouches for and their Darwinbox token, or nulls. The
+     * payload email is only trusted once DarwinboxClient has matched it to
+     * the token's owner.
+     *
+     * @return array{0: ?User, 1: ?string}
+     */
+    private function verify(Request $request): array
     {
-        $encryptedData = $request->data;
-        $decodedData = base64_decode($encryptedData);
+        $payload = $this->darwinbox->decodePayload($request->input('data'));
+        $email = $payload ? $this->darwinbox->verifiedEmail($payload['email'], $payload['token']) : null;
 
-        $key = '666666';
-        $decryptedDataxor = $this->xorDecrypt($decodedData, $key);
-        $decryptedData = base64_decode($decryptedDataxor);
-
-        $decryptedDataArray = json_decode($decryptedData, true);
-        $email = $decryptedDataArray['email'];
-        $token = $decryptedDataArray['token'];
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://kpncorporation.darwinbox.com/checkToken',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode(array(
-                "api_key" => "3bbfc6dfa28df2a81bd45192bf4f96b72628ae0ec9921a062aef937b7f25d6c704ccfc9539e70e5939a45cc43f3b7ce61477c7135a83bdbd6f85d5c38b5fc563",
-                "token" => $token,
-            )),
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json',
-                'Authorization: Basic S1BOX1NTTzpUTXNfJDU2T3BzJXB3',
-                'Cookie: __cf_bm=4uUEj1zmjV.MExppSaO8PotAtVYX3j1LC37K7VZbRrA-1712303016-1.0.1.1-t6I22efQWtYGVIwVMpn7P63eop_5tmi8pU7n_ju6i2_AD1YM846eQF2VlfbZKoC.ZwvzWCyaXDISwvp.JP2TPQ; _cfuvid=kEL.TVWTCuZAsepIdMuvd7X9.q7rTz4SP9.769IZWFQ-1712126032738-0.0.1.1-604800000; session=83c35e478c2cafccac60fced59ff2f30'
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-
-        $responseData = json_decode($response, true);
-        $status = $responseData['status'];
-
-        if($status==1){
-            $user = User::where('email', $email)->first();
-            if ($user) {
-                //disini akan ada proses pengiriman data $user->email, $user->employee_id dan JWT Token ke link vendor, token ini ada masa aktifnya jadi proses sinkronisasi ini tidak bisa lama. bantu buatkan scriptnya disini dan JWT tanpa firebase
-                $email = $user->email;
-                $employee_id = $user->employee_id;
-
-                $employee = Employee::where('employee_id', $user->employee_id)->first();
-                $secretKey = 'k9LandVU1e3gAAGxSTsyhJkW1qj0bY87VjvOcU4jiFpNV56tNaPDaZDeDY1ipjcy';
-
-                $payload = [
-                    'iss' => 'KPN',                 // issuer
-                    'aud' => 'VENDOR_LMS',          // audience
-                    'iat' => time(),                // issued at
-                    'exp' => time() + 2592000,           // expired dalam 120 detik
-                    'email' => $email,
-                    'employee_id' => $employee_id,
-                    'business_unit' => $employee->group_company,
-                    'division' => $employee->unit,
-                    'location' => $employee->office_area,
-                    'name' => $employee->fullname,
-                ];
-                
-                function base64UrlEncode($data)
-                {
-                    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-                }
-
-                $header = base64UrlEncode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
-                $payloadEncoded = base64UrlEncode(json_encode($payload));
-                $signature = base64UrlEncode(hash_hmac('sha256', "$header.$payloadEncoded", $secretKey, true));
-
-                $jwt = "$header.$payloadEncoded.$signature";
-
-                // === STEP 5: Redirect ke vendor dengan token ===
-                $vendorURL = "https://kpn-cmpr.bluebridgecorp.com/api/sso/darwinbox/receive?token=" . urlencode($jwt);
-                header("Location: $vendorURL");
-                exit;
-            } else {
-                Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-                if (url()->previous()) {
-                    return redirect()->back();
-                } else {
-                    return redirect('https://kpncorporation.darwinbox.com/');
-                }
-            }
-        } else {
-            Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-            if (url()->previous()) {
-                return redirect()->back();
-            } else {
-                return redirect('https://kpncorporation.darwinbox.com/');
-            }
+        if (! $email) {
+            return [null, null];
         }
+
+        return [User::where('email', $email)->first(), $payload['token']];
     }
 
-    private function handleDbauthlms(Request $request, $redirectRoute, $sessionValue)
+    private function handOff(Request $request, string $vendor): RedirectResponse
     {
-        $encryptedData = $request->data;
-        $decodedData = base64_decode($encryptedData);
+        $config = config("services.sso_vendors.$vendor");
+        [$user] = $this->verify($request);
+        $employee = $user ? Employee::where('employee_id', $user->employee_id)->first() : null;
 
-        $key = '666666';
-        $decryptedDataxor = $this->xorDecrypt($decodedData, $key);
-        $decryptedData = base64_decode($decryptedDataxor);
-
-        $decryptedDataArray = json_decode($decryptedData, true);
-        $email = $decryptedDataArray['email'];
-        $token = $decryptedDataArray['token'];
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://kpncorporation.darwinbox.com/checkToken',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode(array(
-                "api_key" => "3bbfc6dfa28df2a81bd45192bf4f96b72628ae0ec9921a062aef937b7f25d6c704ccfc9539e70e5939a45cc43f3b7ce61477c7135a83bdbd6f85d5c38b5fc563",
-                "token" => $token,
-            )),
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json',
-                'Authorization: Basic S1BOX1NTTzpUTXNfJDU2T3BzJXB3',
-                'Cookie: __cf_bm=4uUEj1zmjV.MExppSaO8PotAtVYX3j1LC37K7VZbRrA-1712303016-1.0.1.1-t6I22efQWtYGVIwVMpn7P63eop_5tmi8pU7n_ju6i2_AD1YM846eQF2VlfbZKoC.ZwvzWCyaXDISwvp.JP2TPQ; _cfuvid=kEL.TVWTCuZAsepIdMuvd7X9.q7rTz4SP9.769IZWFQ-1712126032738-0.0.1.1-604800000; session=83c35e478c2cafccac60fced59ff2f30'
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-
-        $responseData = json_decode($response, true);
-        $status = $responseData['status'];
-
-        if($status==1){
-            $user = User::where('email', $email)->first();
-            if ($user) {
-                //disini akan ada proses pengiriman data $user->email, $user->employee_id dan JWT Token ke link vendor, token ini ada masa aktifnya jadi proses sinkronisasi ini tidak bisa lama. bantu buatkan scriptnya disini dan JWT tanpa firebase
-                $email = $user->email;
-                $employee_id = $user->employee_id;
-
-                $employee = Employee::where('employee_id', $user->employee_id)->first();
-                $secretKey = 'k9LandVU1e3gAAGxSTsyhJkW1qj0bY87VjvOcU4jiFpNV56tNaPDaZDeDY1ipjcy';
-
-                $payload = [
-                    'iss' => 'KPN',                 // issuer
-                    'aud' => 'VENDOR_LMS',          // audience
-                    'iat' => time(),                // issued at
-                    'exp' => time() + 2592000,           // expired dalam 120 detik
-                    'email' => $email,
-                    'employee_id' => $employee_id,
-                    'business_unit' => $employee->group_company,
-                    'division' => $employee->unit,
-                    'location' => $employee->office_area,
-                    'name' => $employee->fullname,
-                ];
-                
-                function base64UrlEncode($data)
-                {
-                    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-                }
-
-                $header = base64UrlEncode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
-                $payloadEncoded = base64UrlEncode(json_encode($payload));
-                $signature = base64UrlEncode(hash_hmac('sha256', "$header.$payloadEncoded", $secretKey, true));
-
-                $jwt = "$header.$payloadEncoded.$signature";
-
-                // === STEP 5: Redirect ke vendor dengan token ===
-                $vendorURL = "https://kpn-lms.bluebridgecorp.com/api/sso/darwinbox/receive?token=" . urlencode($jwt);
-                header("Location: $vendorURL");
-                exit;
-            } else {
-                Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-                if (url()->previous()) {
-                    return redirect()->back();
-                } else {
-                    return redirect('https://kpncorporation.darwinbox.com/');
-                }
-            }
-        } else {
-            Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-            if (url()->previous()) {
-                return redirect()->back();
-            } else {
-                return redirect('https://kpncorporation.darwinbox.com/');
-            }
+        if (! $employee) {
+            return $this->failed();
         }
+
+        if (empty($config['secret'])) {
+            Log::error("SSO vendor '$vendor' has no signing secret configured");
+
+            return $this->failed();
+        }
+
+        $jwt = $this->signJwt([
+            'iss' => 'KPN',
+            'aud' => $config['audience'],
+            'iat' => time(),
+            'exp' => time() + config('services.sso_vendor_ttl'),
+            'email' => $user->email,
+            'employee_id' => $user->employee_id,
+            'business_unit' => $employee->group_company,
+            'division' => $employee->unit,
+            'location' => $employee->office_area,
+            'name' => $employee->fullname,
+        ], $config['secret']);
+
+        return redirect()->away($config['url'].'?token='.urlencode($jwt));
     }
 
-    private function handleDbauthexpl(Request $request, $redirectRoute, $sessionValue)
+    /**
+     * HS256 JWT, kept dependency-free because the vendors only need the
+     * standard compact form.
+     */
+    private function signJwt(array $payload, string $secret): string
     {
-        $encryptedData = $request->data;
-        $decodedData = base64_decode($encryptedData);
+        $encode = fn (string $data) => rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 
-        $key = '666666';
-        $decryptedDataxor = $this->xorDecrypt($decodedData, $key);
-        $decryptedData = base64_decode($decryptedDataxor);
+        $header = $encode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+        $body = $encode(json_encode($payload));
+        $signature = $encode(hash_hmac('sha256', "$header.$body", $secret, true));
 
-        $decryptedDataArray = json_decode($decryptedData, true);
-        $email = $decryptedDataArray['email'];
-        $token = $decryptedDataArray['token'];
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://kpncorporation.darwinbox.com/checkToken',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode(array(
-                "api_key" => "3bbfc6dfa28df2a81bd45192bf4f96b72628ae0ec9921a062aef937b7f25d6c704ccfc9539e70e5939a45cc43f3b7ce61477c7135a83bdbd6f85d5c38b5fc563",
-                "token" => $token,
-            )),
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json',
-                'Authorization: Basic S1BOX1NTTzpUTXNfJDU2T3BzJXB3',
-                'Cookie: __cf_bm=4uUEj1zmjV.MExppSaO8PotAtVYX3j1LC37K7VZbRrA-1712303016-1.0.1.1-t6I22efQWtYGVIwVMpn7P63eop_5tmi8pU7n_ju6i2_AD1YM846eQF2VlfbZKoC.ZwvzWCyaXDISwvp.JP2TPQ; _cfuvid=kEL.TVWTCuZAsepIdMuvd7X9.q7rTz4SP9.769IZWFQ-1712126032738-0.0.1.1-604800000; session=83c35e478c2cafccac60fced59ff2f30'
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-
-        $responseData = json_decode($response, true);
-        $status = $responseData['status'];
-
-        if($status==1){
-            $user = User::where('email', $email)->first();
-            if ($user) {
-                //disini akan ada proses pengiriman data $user->email, $user->employee_id dan JWT Token ke link vendor, token ini ada masa aktifnya jadi proses sinkronisasi ini tidak bisa lama. bantu buatkan scriptnya disini dan JWT tanpa firebase
-                $email = $user->email;
-                $employee_id = $user->employee_id;
-
-                $employee = Employee::where('employee_id', $user->employee_id)->first();
-                $secretKey = 'KPNPS2025';
-
-                $payload = [
-                    'iss' => 'KPN',                 // issuer
-                    'aud' => 'VENDOR_PS',          // audience
-                    'iat' => time(),                // issued at
-                    'exp' => time() + 2592000,           // expired dalam 120 detik
-                    'email' => $email,
-                    'employee_id' => $employee_id,
-                    'business_unit' => $employee->group_company,
-                    'division' => $employee->unit,
-                    'location' => $employee->office_area,
-                    'name' => $employee->fullname,
-                ];
-                
-                function base64UrlEncode($data)
-                {
-                    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-                }
-
-                $header = base64UrlEncode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
-                $payloadEncoded = base64UrlEncode(json_encode($payload));
-                $signature = base64UrlEncode(hash_hmac('sha256', "$header.$payloadEncoded", $secretKey, true));
-
-                $jwt = "$header.$payloadEncoded.$signature";
-
-                // === STEP 5: Redirect ke vendor dengan token === nastar-academy.com
-                // $vendorURL = "https://kpn-uxflow.primeskills.id/api/sso/darwinbox?token=" . urlencode($jwt);
-                $vendorURL = "https://nastar-academy.com/api/sso/darwinbox?token=" . urlencode($jwt);
-                header("Location: $vendorURL");
-                exit;
-            } else {
-                Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-                if (url()->previous()) {
-                    return redirect()->back();
-                } else {
-                    return redirect('https://kpncorporation.darwinbox.com/');
-                }
-            }
-        } else {
-            Alert::error('Login Failed, Please Contact Administrator')->showConfirmButton('OK');
-            if (url()->previous()) {
-                return redirect()->back();
-            } else {
-                return redirect('https://kpncorporation.darwinbox.com/');
-            }
-        }
+        return "$header.$body.$signature";
     }
 
+    private function failed(): RedirectResponse
+    {
+        Alert::error(__('Login Failed, Please Contact Administrator'))->showConfirmButton(__('OK'));
 
-    private function xorDecrypt($data, $key) {
-        $keyLength = strlen($key);
-        $dataLength = strlen($data);
-        $decrypted = '';
-    
-        // Loop melalui data dan melakukan XOR dengan key
-        for ($i = 0; $i < $dataLength; $i++) {
-            $decrypted .= $data[$i] ^ $key[$i % $keyLength];
-        }
-    
-        return $decrypted;
+        return url()->previous()
+            ? redirect()->back()
+            : redirect()->away('https://kpncorporation.darwinbox.com/');
     }
 }

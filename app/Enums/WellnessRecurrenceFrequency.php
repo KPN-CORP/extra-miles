@@ -37,9 +37,9 @@ enum WellnessRecurrenceFrequency: string
     public function label(): string
     {
         return match ($this) {
-            self::Daily => 'Daily',
-            self::Weekly => 'Weekly',
-            self::Monthly => 'Monthly',
+            self::Daily => __('Daily'),
+            self::Weekly => __('Weekly'),
+            self::Monthly => __('Monthly'),
         };
     }
 

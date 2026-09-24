@@ -31,6 +31,7 @@ class WellnessActivityRegistration extends Model
         'status',
         'source',
         'registered_at',
+        'confirm_due_at',
         'attended_at',
         'attendance_note',
         'created_by',
@@ -41,12 +42,34 @@ class WellnessActivityRegistration extends Model
         'status' => WellnessRegistrationStatus::class,
         'source' => WellnessRegistrationSource::class,
         'registered_at' => 'datetime',
+        'confirm_due_at' => 'datetime',
         'attended_at' => 'datetime',
     ];
 
     public function getEncryptedIdAttribute(): string
     {
         return Crypt::encryptString($this->id);
+    }
+
+    /**
+     * Whether the employee can still accept this seat. A seat with no due date
+     * was granted on a session that does not ask for confirmation.
+     */
+    public function canConfirm(?Carbon $at = null): bool
+    {
+        return $this->status->awaitsConfirmation()
+            && $this->confirm_due_at !== null
+            && ($at ?? now())->lte($this->confirm_due_at);
+    }
+
+    /**
+     * Held a seat but let the window lapse. The sweep has not reached it yet.
+     */
+    public function confirmationExpired(?Carbon $at = null): bool
+    {
+        return $this->status->awaitsConfirmation()
+            && $this->confirm_due_at !== null
+            && ($at ?? now())->gt($this->confirm_due_at);
     }
 
     public function schedule()

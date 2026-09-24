@@ -4,6 +4,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useApiUrl } from './ApiContext';
 import { SSO_URL } from '../Helper/ssoRedirect';
+import { translate } from '../Helper/localeHelper';
 
 const AuthContext = createContext();
 
@@ -39,8 +40,8 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       Swal.fire({
         icon: 'warning',
-        title: 'Connection Ended',
-        text: 'Unable to connect to the server. Please try again later.',
+        title: translate('alerts.connectionEnded'),
+        text: translate('alerts.connectionEndedText'),
         timer: 2500,
         showConfirmButton: false,
       }).then(() => {

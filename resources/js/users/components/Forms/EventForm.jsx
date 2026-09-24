@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, Field } from 'formik';
 import { PulseLoader } from 'react-spinners';
-import { useApiUrl } from '../context/ApiContext';
+import { useApiUrl } from '../Context/ApiContext';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom'; // Import useParams to get id from endpoint
 import { showAlert } from '../Helper/alertHelper';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../Context/AuthContext';
 import PageLoader from '../Loader/PageLoader';
 
 import { generateValidationSchema } from '../Helper/generateValidationSchema';
@@ -127,7 +127,7 @@ export default function EventForm() {
                 showAlert({
                     icon: 'success',
                     title: t('event.registrationSuccessful'),
-                    text: response.data.message || t('event.registrationSuccessfulText'),
+                    text: t('event.registrationSuccessfulText'),
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
@@ -137,7 +137,7 @@ export default function EventForm() {
                 showAlert({
                     icon: 'error',
                     title: t('event.registrationFailed'),
-                    text: response.data.message || t('event.registrationFailedText'),
+                    text: t('event.registrationFailedText'),
                     timer: 2500,
                     showConfirmButton: false,
                 }).then(() => {
@@ -146,7 +146,17 @@ export default function EventForm() {
             }
         } catch (error) {
             console.error("Error submitting form:", error);
-            alert(t('alerts.submitFormError'));
+            // 409 = sudah terdaftar; pesan backend-nya berbahasa Inggris, jadi
+            // yang ditampilkan teks terjemahan.
+            if (error.response?.status === 409) {
+                showAlert({
+                    icon: 'warning',
+                    title: t('event.alreadyRegistered'),
+                    text: t('event.alreadyRegisteredText'),
+                });
+            } else {
+                alert(t('alerts.submitFormError'));
+            }
         } finally {
             setSubmitting(false);
             setIsSubmitting(false);
@@ -185,7 +195,7 @@ export default function EventForm() {
                     showAlert({
                         icon: 'success',
                         title: t('event.registrationSuccessful'),
-                        text: response.data.message || t('event.registrationSuccessfulText'),
+                        text: t('event.registrationSuccessfulText'),
                         timer: 2500,
                         showConfirmButton: false,
                     }).then(() => {
@@ -195,7 +205,7 @@ export default function EventForm() {
                     showAlert({
                         icon: 'error',
                         title: t('event.registrationFailed'),
-                        text: response.data.message || t('alerts.somethingWentWrong'),
+                        text: t('alerts.somethingWentWrong'),
                         timer: 2500,
                         showConfirmButton: false,
                     }).then(() => {

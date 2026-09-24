@@ -8,20 +8,20 @@
                 <!-- Logo light -->
                 <a href="{{ Url('/') }}" class="logo-light">
                     <span class="logo-lg">
-                        <img src="{{ asset('storage/img/logo.png') }}" alt="logo">
+                        <img src="{{ asset('storage/img/logo.png') }}" alt="{{ __('Logo') }}">
                     </span>
                     <span class="logo-sm">
-                        <img src="{{ asset('storage/img/logo-sm.png') }}" alt="small logo">
+                        <img src="{{ asset('storage/img/logo-sm.png') }}" alt="{{ __('Small logo') }}">
                     </span>
                 </a>
 
                 <!-- Logo Dark -->
                 <a href="{{ Url('/') }}" class="logo-dark">
                     <span class="logo-lg">
-                        <img src="{{ asset('storage/img/logo-dark.png') }}" alt="dark logo">
+                        <img src="{{ asset('storage/img/logo-dark.png') }}" alt="{{ __('Dark logo') }}">
                     </span>
                     <span class="logo-sm">
-                        <img src="{{ asset('storage/img/logo-sm.png') }}" alt="small logo">
+                        <img src="{{ asset('storage/img/logo-sm.png') }}" alt="{{ __('Small logo') }}">
                     </span>
                 </a>
             </div>
@@ -49,7 +49,7 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-animated dropdown-lg p-0">
                     <form class="p-3">
-                        <input type="search" class="form-control" placeholder="{{ __('Search ...') }}" aria-label="Recipient's username">
+                        <input type="search" class="form-control" placeholder="{{ __('Search ...') }}" aria-label="{{ __('Search') }}">
                     </form>
                 </div>
             </li>
@@ -96,7 +96,7 @@
             <li class="dropdown">
                 <a class="nav-link dropdown-toggle arrow-none nav-user px-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     <span class="account-user-avatar">
-                        <img src="{{ asset('storage/img/profiles/user.png') }}" alt="user-image" width="32" class="rounded-circle">
+                        <img src="{{ asset('storage/img/profiles/user.png') }}" alt="{{ __('User avatar') }}" width="32" class="rounded-circle">
                     </span>
                     <span class="d-flex flex-column gap-1">
                         <h5 class="my-0">

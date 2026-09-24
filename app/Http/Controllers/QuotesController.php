@@ -16,8 +16,8 @@ class QuotesController extends Controller
         $listQuotes = Quotes::whereNull('deleted_at')->get();
 
         $quoteArchive = Quotes::onlyTrashed()
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('pages.admin.quotes.index', [
             'link' => $link,
@@ -26,6 +26,7 @@ class QuotesController extends Controller
             'quoteArchive' => $quoteArchive,
         ]);
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -36,14 +37,15 @@ class QuotesController extends Controller
         Quotes::whereNull('deleted_at')->update(['deleted_at' => now()]);
 
         Quotes::create([
-            'author'     => $request->author,
-            'quotes'     => $request->quote,
+            'author' => $request->author,
+            'quotes' => $request->quote,
             'created_by' => Auth::id(),
             'created_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Quote successfully created!');
+        return redirect()->back()->with('success', __('Quote successfully created!'));
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -57,13 +59,14 @@ class QuotesController extends Controller
             'quotes' => $request->quotes,
         ]);
 
-        return redirect()->back()->with('success', 'Quote updated successfully.');
+        return redirect()->back()->with('success', __('Quote updated successfully.'));
     }
+
     public function destroy($id)
     {
         $quote = Quotes::findOrFail($id);
         $quote->delete();
 
-        return redirect()->back()->with('success', 'Quote archived successfully.');
+        return redirect()->back()->with('success', __('Quote archived successfully.'));
     }
 }

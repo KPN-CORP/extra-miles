@@ -250,13 +250,13 @@ export default function Survey() {
                                     <img
                                         className="w-10 h-12 object-cover"
                                         src={getImageUrl(apiUrl, data.icon)}
-                                        alt="Survey"
+                                        alt=""
                                         />
                                     </div>
                                     <div className="flex-1 py-2 flex justify-start items-center overflow-hidden">
                                         <div className="self-stretch flex flex-col justify-start items-start gap-1">
                                             <div className="min-w-40 justify-start text-stone-700 text-sm font-semibold leading-none capitalize">
-                                                {data.category}: {data.title}
+                                                {t(`survey.category.${data.category}`, { defaultValue: data.category })}: {data.title}
                                             </div>
                                             <div className="self-stretch flex flex-col justify-center items-start">
                                                 <div className="self-stretch inline-flex justify-start items-center gap-4">

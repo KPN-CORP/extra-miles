@@ -1,4 +1,3 @@
-import { log } from 'handlebars';
 import $ from 'jquery';
 
 $(document).ready(function() {

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\social;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SocialController extends Controller
@@ -13,11 +13,11 @@ class SocialController extends Controller
         $parentLink = 'Dashboard';
         $link = 'Social Media';
 
-        $listSocial = Social::whereNull('deleted_at')->get();
+        $listSocial = social::whereNull('deleted_at')->get();
 
-        $socialArchive = Social::onlyTrashed()
-        ->orderBy('created_at', 'desc')
-        ->get();
+        $socialArchive = social::onlyTrashed()
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('pages.admin.social.index', [
             'link' => $link,
@@ -26,6 +26,7 @@ class SocialController extends Controller
             'socialArchive' => $socialArchive,
         ]);
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -34,16 +35,17 @@ class SocialController extends Controller
             'link' => 'required|string',
         ]);
 
-        Social::create([
-            'category'      => $request->category,
-            'businessUnit'  => $request->businessunit,
-            'link'          => $request->link,
+        social::create([
+            'category' => $request->category,
+            'businessUnit' => $request->businessunit,
+            'link' => $request->link,
             'created_by' => Auth::id(),
             'created_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Social successfully created!');
+        return redirect()->back()->with('success', __('Social successfully created!'));
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -52,20 +54,21 @@ class SocialController extends Controller
             'link' => 'required|string',
         ]);
 
-        $social = Social::findOrFail($id);
+        $social = social::findOrFail($id);
         $social->update([
             'category' => $request->category,
             'businessUnit' => $request->businessunit,
             'link' => $request->link,
         ]);
 
-        return redirect()->back()->with('success', 'Social updated successfully.');
+        return redirect()->back()->with('success', __('Social updated successfully.'));
     }
+
     public function destroy($id)
     {
-        $quote = Social::findOrFail($id);
+        $quote = social::findOrFail($id);
         $quote->delete();
 
-        return redirect()->back()->with('success', 'Social archived successfully.');
+        return redirect()->back()->with('success', __('Social archived successfully.'));
     }
 }

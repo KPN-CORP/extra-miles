@@ -16,6 +16,7 @@ import { showAlert } from "../components/Helper/alertHelper";
 import { useAuth } from "../components/Context/AuthContext";
 import PageLoader from "../components/Loader/PageLoader";
 import { dateTimeHelper } from "../components/Helper/dateTimeHelper";
+import { localeTag } from "../components/Helper/localeHelper";
 import { getImageUrl } from "../components/Helper/imagePath";
 import { useSwipeable } from 'react-swipeable';
 import { AnimatePresence, motion } from "motion/react";
@@ -189,6 +190,7 @@ export default function Event() {
             <div className="calendar-container">
                 <div {...swipeHandlers}>
                     <Calendar
+                    locale={localeTag()}
                     activeStartDate={new Date(activeYear, activeMonth, 1)}
                     onChange={handleDateChange}
                     value={selectedDate}
@@ -345,7 +347,7 @@ export default function Event() {
                             </div>
 
                             {/* Thumbnail */}
-                            <img src={getImageUrl(apiUrl, event.image)} alt="Event Thumbnail" className="object-cover w-20 h-20" />
+                            <img src={getImageUrl(apiUrl, event.image)} alt={event.title} className="object-cover w-20 h-20" />
                             </div>
                         </motion.div>
                         ) : null;

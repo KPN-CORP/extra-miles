@@ -94,6 +94,7 @@ class WellnessScheduleRecurrenceService
             'status' => $schedule->status->value,
             'registration_start_at' => $schedule->registration_start_at,
             'registration_end_at' => $schedule->registration_end_at,
+            'confirmation_deadline' => $schedule->confirmation_deadline,
         ]);
 
         return DB::transaction(function () use ($following, $shape, $startShift, $userId) {
@@ -157,6 +158,7 @@ class WellnessScheduleRecurrenceService
             'duration' => (int) $start->diffInSeconds($end, false),
             'registration_start_offset' => $offset($attributes['registration_start_at'] ?? null),
             'registration_end_offset' => $offset($attributes['registration_end_at'] ?? null),
+            'confirmation_deadline_offset' => $offset($attributes['confirmation_deadline'] ?? null),
             'location' => $attributes['location'] ?? null,
             'quota' => $attributes['quota'] ?? null,
             'status' => $attributes['status'],
@@ -180,6 +182,9 @@ class WellnessScheduleRecurrenceService
             'registration_end_at' => $shape['registration_end_offset'] === null
                 ? null
                 : $start->copy()->addSeconds($shape['registration_end_offset']),
+            'confirmation_deadline' => $shape['confirmation_deadline_offset'] === null
+                ? null
+                : $start->copy()->addSeconds($shape['confirmation_deadline_offset']),
             'location' => $shape['location'],
             'quota' => $shape['quota'],
             'status' => $shape['status'],

@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { Scanner } from '@yudiel/react-qr-scanner';
-import { useApiUrl } from '../context/ApiContext';
-import { useAuth } from '../context/AuthContext';
+import { useApiUrl } from '../Context/ApiContext';
+import { useAuth } from '../Context/AuthContext';
 
 export default function QRScannerModal({ isOpen, onClose, event, onScanSuccess }) {
   const [result, setResult] = useState('');

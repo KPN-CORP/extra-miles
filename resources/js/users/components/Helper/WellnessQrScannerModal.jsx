@@ -5,6 +5,7 @@ import { Scanner } from '@yudiel/react-qr-scanner';
 
 import { useApiUrl } from '../Context/ApiContext';
 import { useAuth } from '../Context/AuthContext';
+import { formatDateTime, wellnessError } from './wellnessHelper';
 
 /** "08:00 - 10:00" dari payload sesi yang dikembalikan backend. */
 function sessionRange(session) {
@@ -71,12 +72,12 @@ export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess 
 
                 if (onScanSuccess) onScanSuccess();
             } catch (err) {
-                setError(err.response?.data?.error || t('wellness.qr.failed'));
+                setError(wellnessError(err, 'wellness.qr.failed'));
             } finally {
                 setBusy(false);
             }
         },
-        [apiUrl, token, busy, result, onScanSuccess]
+        [apiUrl, token, busy, result, onScanSuccess, t]
     );
 
     useEffect(() => {
@@ -154,7 +155,7 @@ export default function WellnessQrScannerModal({ isOpen, onClose, onScanSuccess 
                                 {result.session.location ? ` · ${result.session.location}` : ''}
                             </p>
                         )}
-                        <p className="text-gray-400 text-xs mt-1">{result.attended_at}</p>
+                        <p className="text-gray-400 text-xs mt-1">{result.attended_at ? t('wellness.qr.recordedAt', { time: formatDateTime(result.attended_at) }) : ''}</p>
                     </div>
                 ) : error ? (
                     <div className="mx-4 p-3 rounded-md bg-red-50 text-red-700 text-sm text-center">

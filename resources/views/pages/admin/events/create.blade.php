@@ -22,9 +22,9 @@
                     <label for="category" class="form-label">{{ __('Category') }}</label>
                     <select class="form-select" id="category" name="category" required>
                         <option selected disabled>{{ __('Please select') }}</option>
-                        <option value="Event">Event</option>
-                        <option value="Sport">Sport</option>
-                        <option value="Training">Training</option>
+                        <option value="Event">{{ __('Event') }}</option>
+                        <option value="Sport">{{ __('Sport') }}</option>
+                        <option value="Training">{{ __('Training') }}</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -134,7 +134,7 @@
                         <select class="form-select" id="form_id" name="form_id">
                             <option selected disabled>{{ __('Please select') }}</option>
                             @foreach($formTemplates as $form)
-                                <option value="{{ $form->id }}">{{ $form->title." (".$form->created_at->format('d M Y').")" }}</option>
+                                <option value="{{ $form->id }}">{{ $form->title." (".$form->created_at->translatedFormat('d M Y').")" }}</option>
                             @endforeach
                         </select>
                     </div>

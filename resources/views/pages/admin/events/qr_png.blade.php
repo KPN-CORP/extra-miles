@@ -69,8 +69,8 @@
             </div>
             <div class="detail">
                 <div class="label">{{ __('Schedule') }} :</div>
-                <span>{{ __('Start') }} : {{ \Carbon\Carbon::parse($event->start_date)->format('j F Y').', '.$event->time_start }}</span>
-                <span>{{ __('End') }} : {{ \Carbon\Carbon::parse($event->end_date)->format('j F Y').', '.$event->time_end }}</span>
+                <span>{{ __('Start') }} : {{ \Carbon\Carbon::parse($event->start_date)->translatedFormat('j F Y').', '.$event->time_start }}</span>
+                <span>{{ __('End') }} : {{ \Carbon\Carbon::parse($event->end_date)->translatedFormat('j F Y').', '.$event->time_end }}</span>
             </div>
             <div class="detail">
                 <div class="label">{{ __('Description') }} :</div>

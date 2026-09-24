@@ -44,7 +44,7 @@ export function dateTimeHelper(event) {
     const startTime = event.time_start?.replace(/:/g, ':').slice(0, 5) || '';
     const endTime = event.time_end
     ? event.time_end.replace(/:/g, ':').slice(0, 5)
-    : 'end';
+    : translate('date.end');
 
     const daysUntilCalc = () => {
         const now = new Date();

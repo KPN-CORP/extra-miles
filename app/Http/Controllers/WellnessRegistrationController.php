@@ -80,8 +80,9 @@ class WellnessRegistrationController extends Controller
     }
 
     /**
-     * Admin adds an employee. Confirms the seat straight away -- an admin
-     * putting someone on the list is the decision.
+     * Admin adds an employee. The seat is granted straight away -- an admin
+     * putting someone on the list is the decision -- though on a session with a
+     * confirmation deadline the employee still has to accept it.
      */
     public function store(StoreWellnessRegistrationRequest $request, string $encryptedId)
     {
@@ -90,7 +91,7 @@ class WellnessRegistrationController extends Controller
         $employee = Employee::where('employee_id', $request->validated('employee_id'))->first();
 
         if (! $employee) {
-            return redirect()->back()->with('error', 'Employee not found in the HR database.');
+            return redirect()->back()->with('error', __('Employee not found in the HR database.'));
         }
 
         try {
@@ -113,17 +114,68 @@ class WellnessRegistrationController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', $employee->fullname.' has been registered and confirmed.');
+        $schedule->refresh();
+
+        return redirect()->back()->with('success', $schedule->requiresConfirmation()
+            ? __(':name has been registered and asked to confirm.', ['name' => $employee->fullname])
+            : __(':name has been registered and confirmed.', ['name' => $employee->fullname]));
     }
 
+    /**
+     * Give the employee the seat. On a session with a confirmation deadline
+     * this only offers it -- the employee still has to accept before it lapses.
+     */
     public function confirm(Request $request, string $encryptedId)
     {
-        return $this->transition($request, $encryptedId, WellnessRegistrationStatus::Confirmed, 'confirmed');
+        $registration = WellnessActivityRegistration::with('schedule.activity')
+            ->findOrFail($this->decryptId($encryptedId));
+
+        $request->validate(['remark' => ['nullable', 'string', 'max:500']]);
+
+        try {
+            $this->service->grantSeat($registration, $request->input('remark'), Auth::id());
+        } catch (WellnessRegistrationException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        $name = ['name' => $this->nameFor($registration)];
+
+        return redirect()->back()->with('success', $registration->status->awaitsConfirmation()
+            ? __(':name has been given a seat and asked to confirm.', $name)
+            : __(':name has been confirmed.', $name));
     }
 
     public function cancel(Request $request, string $encryptedId)
     {
         return $this->transition($request, $encryptedId, WellnessRegistrationStatus::Cancelled, 'cancelled');
+    }
+
+    /**
+     * Take a seat back. The freed seat is offered to the next person in the
+     * FIFO queue automatically; under Selection it returns to the admin.
+     */
+    public function revoke(Request $request, string $encryptedId)
+    {
+        $registration = WellnessActivityRegistration::with('schedule.activity')
+            ->findOrFail($this->decryptId($encryptedId));
+
+        $validated = $request->validate(['remark' => ['nullable', 'string', 'max:500']]);
+
+        try {
+            $this->service->transitionTo(
+                $registration,
+                WellnessRegistrationStatus::Cancelled,
+                $validated['remark'] ?? 'Seat revoked by an administrator.',
+                Auth::id(),
+            );
+        } catch (WellnessRegistrationException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', __(
+            'The seat held by :name has been revoked.',
+            ['name' => $this->nameFor($registration)]
+        ));
     }
 
     /**
@@ -143,7 +195,7 @@ class WellnessRegistrationController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', $this->nameFor($registration).' has been moved back to the queue.');
+        return redirect()->back()->with('success', __(':name has been moved back to the queue.', ['name' => $this->nameFor($registration)]));
     }
 
     /**
@@ -173,7 +225,7 @@ class WellnessRegistrationController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', $this->nameFor($registration).' has been blacklisted.');
+        return redirect()->back()->with('success', __(':name has been blacklisted.', ['name' => $this->nameFor($registration)]));
     }
 
     public function bulkConfirm(Request $request)
@@ -201,7 +253,7 @@ class WellnessRegistrationController extends Controller
             }
 
             try {
-                $this->service->confirm($registration, 'Bulk confirmed.', Auth::id());
+                $this->service->grantSeat($registration, 'Bulk confirmed.', Auth::id());
                 $confirmed++;
             } catch (WellnessRegistrationException $e) {
                 // Quota can run out partway through; report which ones missed
@@ -210,12 +262,15 @@ class WellnessRegistrationController extends Controller
             }
         }
 
-        $message = $confirmed.' registration(s) confirmed.';
+        $message = __(':count registration(s) confirmed.', ['count' => $confirmed]);
 
         if ($failures) {
             return redirect()->back()
                 ->with('success', $message)
-                ->with('error', 'Skipped '.count($failures).': '.implode(' | ', array_slice($failures, 0, 3)));
+                ->with('error', __('Skipped :count: :failures', [
+                    'count' => count($failures),
+                    'failures' => implode(' | ', array_slice($failures, 0, 3)),
+                ]));
         }
 
         return redirect()->back()->with('success', $message);
@@ -285,7 +340,13 @@ class WellnessRegistrationController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', $this->nameFor($registration).' has been '.$verb.'.');
+        $name = ['name' => $this->nameFor($registration)];
+
+        return redirect()->back()->with('success', match ($verb) {
+            'confirmed' => __(':name has been confirmed.', $name),
+            'cancelled' => __(':name has been cancelled.', $name),
+            default => __(':name has been updated.', $name),
+        });
     }
 
     protected function nameFor(WellnessActivityRegistration $registration): string

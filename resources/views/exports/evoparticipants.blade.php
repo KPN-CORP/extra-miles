@@ -32,7 +32,7 @@
                 <td>{{ $p->unit }}</td>
                 <td>{{ $p->business_unit }}</td>
                 <td>{{ $p->location }}</td>
-                <td>{{ $p->created_at->format('d M Y H:i') }}</td>
+                <td>{{ $p->created_at->translatedFormat('d M Y H:i') }}</td>
                 <td>{{ $phone }}</td>
                 {{-- <td>{{ $questionList ?: '-' }}</td> --}}
             </tr>

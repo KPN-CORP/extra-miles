@@ -16,13 +16,16 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureDevelopmentMode
 {
     /**
-     * Whether DEVELOPMENT_MODE in .env holds the expected key.
+     * Whether DEVELOPMENT_MODE in .env holds the expected key. The key is in
+     * source, so it is only a switch -- the local-environment check is what
+     * keeps these SSO-bypassing logins off a server.
      */
     public static function enabled(): bool
     {
         $key = config('app.development_mode_key');
 
-        return is_string($key) && $key !== '' && config('app.development_mode') === $key;
+        return app()->environment('local')
+            && is_string($key) && $key !== '' && config('app.development_mode') === $key;
     }
 
     public function handle(Request $request, Closure $next): Response

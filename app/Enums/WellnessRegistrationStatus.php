@@ -10,8 +10,16 @@ namespace App\Enums;
  */
 enum WellnessRegistrationStatus: string
 {
-    /** Has a seat. The only status that counts against the quota. */
+    /** Has a seat, and has taken it. */
     case Confirmed = 'confirmed';
+
+    /**
+     * Holds a seat but has not accepted it yet. Counts against the quota just
+     * like Confirmed -- the seat is spoken for -- but is revoked automatically
+     * once `confirm_due_at` passes. Only ever used on schedules that carry a
+     * confirmation deadline.
+     */
+    case AwaitingConfirmation = 'awaiting_confirmation';
 
     /** FIFO queue: registered, waiting for a seat to free up. */
     case Registered = 'registered';
@@ -25,12 +33,13 @@ enum WellnessRegistrationStatus: string
     case Cancelled = 'cancelled';
 
     /**
-     * Only a confirmed seat consumes quota. Queued, blacklisted and cancelled
-     * registrations do not.
+     * A seat that is spoken for, whether or not the employee has accepted it.
+     * An unconfirmed seat still holds quota -- releasing it early would let the
+     * session be oversubscribed while its holder is still entitled to confirm.
      */
     public function consumesSlot(): bool
     {
-        return $this === self::Confirmed;
+        return in_array($this, [self::Confirmed, self::AwaitingConfirmation], true);
     }
 
     /**
@@ -38,7 +47,15 @@ enum WellnessRegistrationStatus: string
      */
     public static function slotConsumingValues(): array
     {
-        return [self::Confirmed->value];
+        return [self::Confirmed->value, self::AwaitingConfirmation->value];
+    }
+
+    /**
+     * Holds a seat that still needs the employee's acceptance.
+     */
+    public function awaitsConfirmation(): bool
+    {
+        return $this === self::AwaitingConfirmation;
     }
 
     /**
@@ -49,7 +66,12 @@ enum WellnessRegistrationStatus: string
      */
     public function isActive(): bool
     {
-        return in_array($this, [self::Confirmed, self::Registered, self::WaitingList], true);
+        return in_array($this, [
+            self::Confirmed,
+            self::AwaitingConfirmation,
+            self::Registered,
+            self::WaitingList,
+        ], true);
     }
 
     /**
@@ -74,10 +96,21 @@ enum WellnessRegistrationStatus: string
     public function allowedTransitions(): array
     {
         return match ($this) {
-            self::Registered, self::WaitingList => [self::Confirmed, self::Blacklisted, self::Cancelled],
-            self::Confirmed => [self::Blacklisted, self::Cancelled, self::Registered, self::WaitingList],
-            self::Blacklisted => [self::Confirmed, self::Registered, self::WaitingList, self::Cancelled],
-            self::Cancelled => [self::Confirmed, self::Registered, self::WaitingList],
+            self::Registered, self::WaitingList => [
+                self::Confirmed, self::AwaitingConfirmation, self::Blacklisted, self::Cancelled,
+            ],
+            self::AwaitingConfirmation => [
+                self::Confirmed, self::Blacklisted, self::Cancelled, self::Registered, self::WaitingList,
+            ],
+            self::Confirmed => [
+                self::AwaitingConfirmation, self::Blacklisted, self::Cancelled, self::Registered, self::WaitingList,
+            ],
+            self::Blacklisted => [
+                self::Confirmed, self::AwaitingConfirmation, self::Registered, self::WaitingList, self::Cancelled,
+            ],
+            self::Cancelled => [
+                self::Confirmed, self::AwaitingConfirmation, self::Registered, self::WaitingList,
+            ],
         };
     }
 
@@ -89,11 +122,12 @@ enum WellnessRegistrationStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Confirmed => 'Confirmed',
-            self::Registered => 'Registered',
-            self::WaitingList => 'Waiting List',
-            self::Blacklisted => 'Blacklisted',
-            self::Cancelled => 'Cancelled',
+            self::Confirmed => __('Confirmed'),
+            self::AwaitingConfirmation => __('Awaiting Confirmation'),
+            self::Registered => __('Registered'),
+            self::WaitingList => __('Waiting List'),
+            self::Blacklisted => __('Blacklisted'),
+            self::Cancelled => __('Cancelled'),
         };
     }
 
@@ -104,6 +138,7 @@ enum WellnessRegistrationStatus: string
     {
         return match ($this) {
             self::Confirmed => 'bg-success-subtle text-success',
+            self::AwaitingConfirmation => 'bg-warning-subtle text-warning',
             self::Registered => 'bg-info-subtle text-info',
             self::WaitingList => 'bg-warning-subtle text-warning',
             self::Blacklisted => 'bg-dark-subtle text-dark',

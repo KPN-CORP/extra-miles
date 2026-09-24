@@ -70,13 +70,13 @@
                                                 <td>
                                                     @if ($entry->end_date)
                                                         <span class="badge bg-warning-subtle text-warning">
-                                                            {{ __('until :date', ['date' => $entry->end_date->format('d M Y')]) }}
+                                                            {{ __('until :date', ['date' => $entry->end_date->translatedFormat('d M Y')]) }}
                                                         </span>
                                                     @else
                                                         <span class="badge bg-dark-subtle text-dark">{{ __('No expiry') }}</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $entry->created_at?->format('d M Y') }}</td>
+                                                <td>{{ $entry->created_at?->translatedFormat('d M Y') }}</td>
                                                 <td>
                                                     <button type="button" class="btn btn-outline-warning btn-sm js-edit-blacklist"
                                                         data-url="{{ route('wellness.blacklist.update', $entry->encrypted_id) }}"
@@ -139,7 +139,7 @@
                                                 <td class="fw-semibold">{{ $entry->fullname ?: '-' }}</td>
                                                 <td>{{ $entry->employee_id }}</td>
                                                 <td>{{ \Illuminate\Support\Str::limit($entry->reason, 80) }}</td>
-                                                <td>{{ $entry->end_date?->format('d M Y') }}</td>
+                                                <td>{{ $entry->end_date?->translatedFormat('d M Y') }}</td>
                                             </tr>
                                         @empty
                                             {{-- DataTables renders its own empty-table row. --}}
@@ -170,7 +170,7 @@
                                                 <td class="fw-semibold">{{ $entry->fullname ?: '-' }}</td>
                                                 <td>{{ $entry->employee_id }}</td>
                                                 <td>{{ \Illuminate\Support\Str::limit($entry->reason, 80) }}</td>
-                                                <td>{{ $entry->deleted_at?->format('d M Y H:i') }}</td>
+                                                <td>{{ $entry->deleted_at?->translatedFormat('d M Y H:i') }}</td>
                                                 <td>
                                                     <form action="{{ route('wellness.blacklist.restore', $entry->encrypted_id) }}" method="POST">
                                                         @csrf

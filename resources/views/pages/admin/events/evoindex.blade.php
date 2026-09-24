@@ -58,7 +58,7 @@
         <div>
             <div class="text-muted small">
                 <span class="me-3 fs-5">
-                    <i class="ri-calendar-line me-1"></i>{{ date('l, d F Y') }}
+                    <i class="ri-calendar-line me-1"></i>{{ now()->translatedFormat('l, d F Y') }}
                 </span>
                 <span class="me-3">
                     <i class="ri-time-line me-1"></i><span id="currentTime"></span> {{ __('WIB') }}
@@ -189,7 +189,7 @@
                                     <td>{{ $p->unit }}</td>
                                     <td>{{ $p->business_unit }}</td>
                                     <td>{{ $p->location }}</td>
-                                    <td>{{ $p->created_at->format('d M Y H:i') }}</td>
+                                    <td>{{ $p->created_at->translatedFormat('d M Y H:i') }}</td>
                                     <td>
                                     @if($number)
                                         <a href="https://wa.me/{{ ltrim($phone, '+') }}?text={{ $encodedMessage }}"

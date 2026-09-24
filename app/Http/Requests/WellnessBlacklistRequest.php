@@ -33,8 +33,8 @@ class WellnessBlacklistRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'employee_id.exists' => 'That employee ID was not found in the HR database.',
-            'end_date.after_or_equal' => 'The blacklist end date cannot be in the past.',
+            'employee_id.exists' => __('That employee ID was not found in the HR database.'),
+            'end_date.after_or_equal' => __('The blacklist end date cannot be in the past.'),
         ];
     }
 }

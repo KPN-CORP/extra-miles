@@ -11,7 +11,7 @@ import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
 import WellnessQrScannerModal from '../components/Helper/WellnessQrScannerModal';
-import { formatSession, statusStyle } from '../components/Helper/wellnessHelper';
+import { formatSession, statusLabel, statusStyle, wellnessError } from '../components/Helper/wellnessHelper';
 import {
     ACTIVITIES_KEY,
     getCached,
@@ -97,7 +97,7 @@ export default function MyWellness() {
             showAlert({
                 icon: 'error',
                 title: t('wellness.cancelConfirm.failedTitle'),
-                text: err.response?.data?.error || t('alerts.genericRetry'),
+                text: wellnessError(err),
             });
         } finally {
             setBusyId(null);
@@ -149,7 +149,10 @@ export default function MyWellness() {
             showAlert({
                 icon: 'error',
                 title: t('wellness.feedback.failedTitle'),
-                text: err.response?.data?.error || t('alerts.genericRetry'),
+                text: wellnessError(
+                    err,
+                    err.response?.status === 422 ? 'wellness.feedback.notAllowed' : 'alerts.genericRetry'
+                ),
             });
         } finally {
             setBusyId(null);
@@ -227,7 +230,7 @@ export default function MyWellness() {
 
                                 <div className="mt-3 flex items-center gap-2 flex-wrap">
                                     <span className={`px-2 py-1 rounded-full text-[10px] font-semibold ${statusStyle(registration.status)}`}>
-                                        {registration.status_label}
+                                        {statusLabel(registration.status, registration.status_label)}
                                     </span>
 
                                     {registration.attended_at && (

@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { PulseLoader } from 'react-spinners';
-import { useApiUrl } from '../context/ApiContext';
+import { useApiUrl } from '../Context/ApiContext';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom'; // Import useParams to get id from endpoint
 import { showAlert } from '../Helper/alertHelper';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../Context/AuthContext';
 import { getImageUrl } from '../Helper/imagePath';
 import VoteProgressBar from '../Helper/progressBar';
 import StarRatingField from '../Helper/starRatingField';
@@ -33,20 +33,20 @@ export function generateValidationSchema(fields) {
         case 'select':
         case 'radio':
           schema = Yup.string();
-          if (isRequired) schema = schema.required(translate('validation.required'));
-          if (min !== null) schema = schema.min(min, translate('validation.minChars', { min }));
-          if (max !== null) schema = schema.max(max, translate('validation.maximumChars', { max }));
+          if (isRequired) schema = schema.required(() => translate('validation.required'));
+          if (min !== null) schema = schema.min(min, () => translate('validation.minChars', { min }));
+          if (max !== null) schema = schema.max(max, () => translate('validation.maximumChars', { max }));
           break;
   
         case 'checkbox':
           if (field.options) {
             schema = Yup.array();
             if (isRequired || min !== null) {
-              schema = schema.min(min || 1, translate('validation.selectAtLeast', { min: min || 1 }));
+              schema = schema.min(min || 1, () => translate('validation.selectAtLeast', { min: min || 1 }));
             }
           } else {
             schema = Yup.boolean();
-            if (isRequired) schema = schema.oneOf([true], translate('validation.mustBeChecked'));
+            if (isRequired) schema = schema.oneOf([true], () => translate('validation.mustBeChecked'));
           }
           break;
   
@@ -285,7 +285,7 @@ export default function VotingForm({ participated, setParticipated, eventEnded }
                           >
                             <img
                               src={getImageUrl(apiUrl, 'assets/images/surveys/vote/vote-default-img.png')}
-                              alt="Profile"
+                              alt=""
                               className="w-12 h-12 rounded-full hidden"
                             />
                             <div className="flex-1 flex flex-col justify-center gap-2">

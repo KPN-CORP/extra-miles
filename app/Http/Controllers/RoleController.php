@@ -13,44 +13,48 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use PhpParser\Node\Stmt\TryCatch;
 use Spatie\Permission\PermissionRegistrar;
 
 class RoleController extends Controller
 {
-    
     protected $link;
+
     protected $userId;
 
-    function __construct()
+    public function __construct()
     {
         $this->link = 'Roles';
         $this->userId = Auth()->user()->id;
     }
 
-    function index() {
+    public function index()
+    {
 
-        $parentLink = "Settings";
+        $parentLink = 'Settings';
         $link = $this->link;
         $active = '';
 
         return view('pages.admin.roles.app', compact('link', 'parentLink', 'active'));
     }
-    function assign() {
+
+    public function assign()
+    {
         $roles = Role::all();
 
         if (Auth()->user()->roles->first()->name != 'superadmin') {
             $roles = $roles->where('name', '!=', 'superadmin');
         }
-        
+
         $parentLink = $this->link;
-        $link = "Assign";
+        $link = 'Assign';
         $active = 'assign';
 
         return view('pages.admin.roles.assign', compact('roles', 'link', 'parentLink', 'active'));
     }
-    function create() {    
-        $permissions = Permission::orderBy('group_name')->orderBy('display_name')->get();    
+
+    public function create()
+    {
+        $permissions = Permission::orderBy('group_name')->orderBy('display_name')->get();
 
         $locations = Employee::select('office_area', 'work_area_code', 'group_company')->orderBy('work_area_code')->distinct()->get();
 
@@ -59,26 +63,30 @@ class RoleController extends Controller
         $companies = Company::select('contribution_level', 'contribution_level_code')->orderBy('contribution_level_code')->get();
 
         $parentLink = $this->link;
-        $link = "Create";
+        $link = 'Create';
         $active = 'create';
 
         return view('pages.admin.roles.create', compact('link', 'parentLink', 'active', 'permissions', 'locations', 'groupCompanies', 'companies'));
     }
-    function manage() {
+
+    public function manage()
+    {
 
         $roles = Role::all();
 
         if (Auth()->user()->roles->first()->name != 'superadmin') {
             $roles = $roles->where('name', '!=', 'superadmin');
         }
-        
+
         $parentLink = $this->link;
-        $link = "Manage";
+        $link = 'Manage';
         $active = 'manage';
 
         return view('pages.admin.roles.manage', compact('roles', 'link', 'parentLink', 'active'));
     }
-    function getAssignment(Request $request) {
+
+    public function getAssignment(Request $request)
+    {
 
         $roleId = $request->input('roleId');
 
@@ -96,15 +104,18 @@ class RoleController extends Controller
         $roles = ModelHasRole::with(['role'])->whereHas('role', function ($query) use ($roleId) {
             $query->where('id', $roleId);
         })->get();
-        
+
         $users = Employee::select('id', 'fullname', 'employee_id', 'designation')->get();
-        
+
         $parentLink = $this->link;
-        $link = "Manage";
+        $link = 'Manage';
         $active = 'manage';
+
         return view('pages.admin.roles.assignform', compact('roles', 'link', 'parentLink', 'active', 'users', 'roleId', 'locations', 'groupCompanies', 'companies'));
     }
-    function getPermission(Request $request) {
+
+    public function getPermission(Request $request)
+    {
 
         $roleId = $request->input('roleId');
 
@@ -123,20 +134,21 @@ class RoleController extends Controller
         // $permissions = Permission::orderBy('id')->pluck('id')->toArray();
         $permissions = Permission::orderBy('group_name')->orderBy('display_name')->get();
 
-        $permissionNames = Permission::leftJoin('role_has_permissions', function($join) use ($roleId) {
+        $permissionNames = Permission::leftJoin('role_has_permissions', function ($join) use ($roleId) {
             $join->on('role_has_permissions.permission_id', '=', 'permissions.id')
                 ->where('role_has_permissions.role_id', '=', $roleId);
         })
-        ->select('permissions.id', 'permissions.name', 'role_has_permissions.permission_id')
+            ->select('permissions.id', 'permissions.name', 'role_has_permissions.permission_id')
         // ->whereBetween('permissions.id', [1, 9])
-        ->orderBy('permissions.id')
-        ->pluck('role_has_permissions.permission_id')
-        ->toArray();
+            ->orderBy('permissions.id')
+            ->pluck('role_has_permissions.permission_id')
+            ->toArray();
         // dd($permissionNames);
-        
+
         $parentLink = $this->link;
-        $link = "Create";
+        $link = 'Create';
         $active = 'create';
+
         return view('pages.admin.roles.manageform', compact('link', 'parentLink', 'active', 'roles', 'permissions', 'permissionNames', 'roleId', 'locations', 'groupCompanies', 'companies'));
     }
 
@@ -154,17 +166,17 @@ class RoleController extends Controller
             $userIdsToDelete = array_diff($previouslySavedUserIds, $selectedUserIds);
 
             // Perform deletion for the user IDs that need to be removed
-            if (!empty($userIdsToDelete)) {
+            if (! empty($userIdsToDelete)) {
                 ModelHasRole::where('role_id', $roleId)
-                            ->whereIn('model_id', $userIdsToDelete)
-                            ->delete();
+                    ->whereIn('model_id', $userIdsToDelete)
+                    ->delete();
             }
 
             // Now, you can loop through the selected user IDs and save them as needed
             foreach ($selectedUserIds as $userId) {
                 // Save the user ID or perform any other action here
                 // Check if the user ID is already associated with the role
-                if (!in_array($userId, $previouslySavedUserIds)) {
+                if (! in_array($userId, $previouslySavedUserIds)) {
                     // If not associated, save the association
                     ModelHasRole::create([
                         'role_id' => $roleId,
@@ -178,14 +190,14 @@ class RoleController extends Controller
 
             $userIds = json_encode($selectedUserIds);
 
-            Log::info('Roles module: ' . $this->userId . ' Assigned user role to ' . $userIds . ' on RoleId ' . $role->name);
+            Log::info('Roles module: '.$this->userId.' Assigned user role to '.$userIds.' on RoleId '.$role->name);
 
             app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
             // Optionally, you can redirect back to the form or another page after saving
-            return redirect()->route('roles')->with('success', 'Users saved successfully!');
+            return redirect()->route('roles')->with('success', __('Users saved successfully!'));
         } catch (\Exception $e) {
-            return redirect()->route('roles')->with('error', 'Users updated failed!');
+            return redirect()->route('roles')->with('error', __('Users updated failed!'));
         }
     }
 
@@ -203,7 +215,7 @@ class RoleController extends Controller
             'group_company' => empty($groupCompany) ? null : $groupCompany,
             'contribution_level_code' => empty($company) ? null : $company,
         ];
-        
+
         // Konversi ke JSON format
         $restriction = json_encode($data);
 
@@ -211,7 +223,7 @@ class RoleController extends Controller
 
         if ($existingRole) {
             // Role with the same name already exists, handle accordingly (e.g., show error message)
-            return redirect()->back()->with('error', 'Role with the same name already exists.');
+            return redirect()->back()->with('error', __('Role with the same name already exists.'));
         }
 
         // $permissions = [
@@ -245,8 +257,8 @@ class RoleController extends Controller
         $role->restriction = $restriction;
         $role->save();
 
-        Log::info('Roles module: ' . $this->userId . ' Create Role & Permission ' . $roleName . '. Restriction ' . $restriction);
-        
+        Log::info('Roles module: '.$this->userId.' Create Role & Permission '.$roleName.'. Restriction '.$restriction);
+
         // Loop through permissions and create new permission records
         foreach ($permissions as $key) {
             if ($key) {
@@ -256,37 +268,36 @@ class RoleController extends Controller
                 $rolepermission->permission_id = $key;
                 $rolepermission->save();
 
-                Log::info('Roles module: ' . $this->userId . ' Add Permission '. $key .' on Create Role & Permission ' . $roleName);
+                Log::info('Roles module: '.$this->userId.' Add Permission '.$key.' on Create Role & Permission '.$roleName);
             }
         }
 
         app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        return redirect()->route('roles')->with('success', 'Role created successfully!');
+        return redirect()->route('roles')->with('success', __('Role created successfully!'));
     }
 
     public function update(Request $request): RedirectResponse
-
     {
         try {
-            //code...
+            // code...
             $roleId = $request->roleId;
-            
+
             RoleHasPermission::where('role_id', $roleId)->delete();
-    
+
             $groupCompany = $request->input('group_company', []);
             $company = $request->input('contribution_level_code', []);
             $location = $request->input('work_area_code', []);
-    
+
             $data = [
                 'work_area_code' => empty($location) ? null : $location,
                 'group_company' => empty($groupCompany) ? null : $groupCompany,
                 'contribution_level_code' => empty($company) ? null : $company,
             ];
-            
+
             // // Konversi ke JSON format
             $restriction = json_encode($data);
-    
+
             // $permissions = [
             //     'adminMenu' => $request->input('adminMenu', false), // 9 = adminmenu
             //     'onBehalfView' => $request->input('onBehalfView', false), // Use false as default value if not set
@@ -302,24 +313,24 @@ class RoleController extends Controller
             // ];
             // Ambil semua permissions dari database
             $permissionsFromDb = Permission::pluck('name')->toArray();
-    
+
             // Loop melalui setiap permission untuk mengisi data request
             $permissions = [];
             foreach ($permissionsFromDb as $permissionName) {
                 // Setiap permission diambil dari request, default false jika tidak ada
                 $permissions[$permissionName] = $request->input($permissionName, false);
             }
-    
+
             // Build permission_id string
             $permission_id = '';
-    
+
             $role = Role::find($roleId);
             $role->restriction = $restriction;
-    
-            Log::info('Roles module: ' . $this->userId . ' Updated Role & Permission ' . $role->name . '. Restriction ' . $restriction);
-    
+
+            Log::info('Roles module: '.$this->userId.' Updated Role & Permission '.$role->name.'. Restriction '.$restriction);
+
             $role->save();
-    
+
             // Loop through permissions and create new permission records
             foreach ($permissions as $key) {
                 if ($key) {
@@ -330,17 +341,16 @@ class RoleController extends Controller
                     $rolepermission->save();
                 }
             }
-            
+
             app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
-    
-            return redirect()->route('roles')->with('success', 'Role updated successfully!');
+
+            return redirect()->route('roles')->with('success', __('Role updated successfully!'));
         } catch (\Exception $e) {
-            return redirect()->route('roles')->with('error', 'Role updated failed!');
+            return redirect()->route('roles')->with('error', __('Role updated failed!'));
         }
     }
 
     public function destroy($id): RedirectResponse
-
     {
         try {
 
@@ -348,20 +358,21 @@ class RoleController extends Controller
 
             if ($role) {
 
-                Log::info('Roles module: ' . $this->userId . ' Deleted Role ' . $role->name);
+                Log::info('Roles module: '.$this->userId.' Deleted Role '.$role->name);
 
                 $role->delete();
-            
+
                 RoleHasPermission::where('role_id', $id)->delete();
                 ModelHasRole::where('role_id', $id)->delete();
 
                 app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
-        
-                return redirect()->route('roles')->with('success', 'Role deleted successfully!');
+
+                return redirect()->route('roles')->with('success', __('Role deleted successfully!'));
             }
-            return redirect()->route('roles')->with('error', 'Role not found.');
+
+            return redirect()->route('roles')->with('error', __('Role not found.'));
         } catch (\Exception $e) {
-            return redirect()->route('roles')->with('error', 'Role deleted failed!');
+            return redirect()->route('roles')->with('error', __('Role deleted failed!'));
         }
 
     }

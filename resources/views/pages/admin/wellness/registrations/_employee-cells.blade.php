@@ -18,8 +18,8 @@
 <td>{{ $registration->unit ?: '-' }}</td>
 <td>{{ $registration->job_level ?: '-' }}</td>
 <td>
-    <span title="{{ $registration->registered_at?->format('d M Y H:i') }}">
-        {{ $registration->registered_at?->format('d M H:i') }}
+    <span title="{{ $registration->registered_at?->translatedFormat('d M Y H:i') }}">
+        {{ $registration->registered_at?->translatedFormat('d M H:i') }}
     </span>
 </td>
 <td>

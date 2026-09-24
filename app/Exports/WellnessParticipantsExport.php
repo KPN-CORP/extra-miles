@@ -40,7 +40,7 @@ class WellnessParticipantsExport implements FromCollection, ShouldAutoSize, With
                 'Registered Via' => $item->source->label(),
                 'Registered At' => $item->registered_at?->format('Y-m-d H:i'),
                 'Attended At' => $item->attended_at?->format('Y-m-d H:i'),
-                'Attended' => $item->attended_at ? 'Yes' : 'No',
+                'Attended' => $item->attended_at ? __('Attended') : __('Not yet'),
                 'Last Remark' => $latest?->remark,
             ];
         });
@@ -53,19 +53,19 @@ class WellnessParticipantsExport implements FromCollection, ShouldAutoSize, With
     {
         return [
             'No',
-            'Employee ID',
-            'Full Name',
-            'Business Unit',
-            'Unit',
-            'Job Level',
-            'Location',
-            'Method',
-            'Status',
-            'Registered Via',
-            'Registered At',
-            'Attended At',
-            'Attended',
-            'Last Remark',
+            __('Employee ID'),
+            __('Full Name'),
+            __('Business Unit'),
+            __('Unit'),
+            __('Job Level'),
+            __('Location'),
+            __('Method'),
+            __('Status'),
+            __('Registered Via'),
+            __('Registered At'),
+            __('Attended At'),
+            __('Attended'),
+            __('Last Remark'),
         ];
     }
 

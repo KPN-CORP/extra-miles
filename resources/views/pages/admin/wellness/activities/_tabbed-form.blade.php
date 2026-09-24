@@ -13,6 +13,9 @@
     // the error marker on load.
     $scheduleHasErrors = collect($errors->keys())->contains(fn ($key) => str_starts_with($key, 'schedules'));
     $detailsHasErrors = collect($errors->keys())->contains(fn ($key) => ! str_starts_with($key, 'schedules'));
+
+    // Short month names for the collapsed session summary, in the admin's language.
+    $monthLabels = array_map(fn ($month) => __($month), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
 @endphp
 
 <ul class="nav nav-tabs nav-bordered mb-3" id="wa_tabs" role="tablist">
@@ -116,12 +119,51 @@
                 return null;
             }
 
-            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            var months = @json($monthLabels);
 
             return {
                 date: pad(+m[3]) + ' ' + months[+m[2] - 1] + ' ' + m[1],
                 time: m[4] + ':' + m[5]
             };
+        }
+
+        // Mirrors the schedule modal, so the same field block reads the same way
+        // on both screens.
+        var HINTS = {
+            confirmOff: @json(__('Seats are given out and taken straight away.')),
+            confirmOn: @json(__('Employees must confirm their seat by this time, or it passes to the next person in the queue.')),
+            endsBefore: @json(__('Ends before it starts.'))
+        };
+
+        function fillHints(row) {
+            var duration = row.querySelector('.js-duration-hint');
+            var confirmHint = row.querySelector('.js-confirm-hint');
+
+            if (duration) {
+                var from = Date.parse(row.querySelector('.js-start-at').value);
+                var to = Date.parse(row.querySelector('.js-end-at').value);
+
+                if (isNaN(from) || isNaN(to)) {
+                    duration.innerHTML = '&nbsp;';
+                    duration.classList.remove('text-danger');
+                } else if (to <= from) {
+                    duration.textContent = HINTS.endsBefore;
+                    duration.classList.add('text-danger');
+                } else {
+                    var minutes = Math.round((to - from) / 60000);
+                    duration.textContent = Math.floor(minutes / 60) + 'h ' + pad(minutes % 60) + 'm';
+                    duration.classList.remove('text-danger');
+                }
+            }
+
+            if (confirmHint) {
+                var confirmBy = row.querySelector('.js-confirm-by');
+                var on = confirmBy && confirmBy.value !== '';
+
+                confirmHint.textContent = on ? HINTS.confirmOn : HINTS.confirmOff;
+                confirmHint.className = 'alert alert-' + (on ? 'info' : 'secondary')
+                    + ' py-2 px-3 mb-0 w-100 small js-confirm-hint';
+            }
         }
 
         function summarise(row) {
@@ -139,7 +181,7 @@
                 parts.push(location);
             }
 
-            parts.push(quota ? quota + ' ' + @json(__('seats')) : @json(__('Unlimited seats')));
+            parts.push(quota ? @json(__(':count seats')).replace(':count', quota) : @json(__('Unlimited seats')));
 
             return start ? parts.join('  ·  ') : @json(__('Not scheduled yet'));
         }
@@ -175,6 +217,15 @@
             var end = row.querySelector('.js-end-at');
             var regStart = row.querySelector('.js-reg-start');
             var regEnd = row.querySelector('.js-reg-end');
+            var confirmBy = row.querySelector('.js-confirm-by');
+
+            // Confirming has to happen before the session it is for, and not
+            // before sign-ups open -- mirrors the server rule so the picker
+            // never offers a value the save would reject.
+            if (confirmBy) {
+                confirmBy.min = regStart ? regStart.value : '';
+                confirmBy.max = start.value || '';
+            }
 
             var hasWindow = regStart && regEnd;
 
@@ -232,6 +283,7 @@
 
             all.forEach(function (row, i) {
                 refreshRow(row, i + 1);
+                fillHints(row);
             });
 
             counter.textContent = all.length;
@@ -291,13 +343,22 @@
             if (event.target.closest('.js-duplicate-schedule')) {
                 var copy = addRow();
 
-                ['.js-start-at', '.js-end-at', '.js-location', '.js-quota', '.js-status'].forEach(function (sel) {
-                    copy.querySelector(sel).value = row.querySelector(sel).value;
+                ['.js-start-at', '.js-end-at', '.js-location', '.js-quota', '.js-status',
+                    '.js-reg-start', '.js-reg-end', '.js-confirm-by'].forEach(function (sel) {
+                    var source = row.querySelector(sel);
+                    var target = copy.querySelector(sel);
+
+                    if (source && target) {
+                        target.value = source.value;
+                    }
                 });
 
-                ['.js-start-at', '.js-end-at'].forEach(function (sel) {
+                // Every date moves together, so the copy keeps the same shape a
+                // week later -- a registration window or deadline left on the
+                // original week would already be in the past.
+                ['.js-start-at', '.js-end-at', '.js-reg-start', '.js-reg-end', '.js-confirm-by'].forEach(function (sel) {
                     var field = copy.querySelector(sel);
-                    var stamp = Date.parse(field.value);
+                    var stamp = field ? Date.parse(field.value) : NaN;
 
                     if (!isNaN(stamp)) {
                         field.value = toLocalValue(new Date(stamp + 7 * 24 * 60 * 60 * 1000));

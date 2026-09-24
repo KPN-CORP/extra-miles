@@ -33,16 +33,16 @@
                                 @foreach ($news as $index => $row)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ $row->category }}</td>
+                                        <td>{{ __($row->category) }}</td>
                                         <td>{{ \Illuminate\Support\Str::limit($row->title, 35, '...') }}</td>
                                         <td>{{ $row->news_views_count }}</td>
                                         <td>{{ $row->news_likes_count }}</td>
-                                        <td>{{ $row->created_at->format('d M Y H:m:s') }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($row->publish_date)->format('d M Y') }}</td>
+                                        <td>{{ $row->created_at->translatedFormat('d M Y H:i:s') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($row->publish_date)->translatedFormat('d M Y') }}</td>
                                         <td class="text-center"><span class="badge {{ $row->status == 'Publish' ? 'bg-info' : 'bg-secondary' }}">{{ __($row->status) }}</span></td>
                                         <td>
                                             <a href="{{ route('news.edit', $row->encrypted_id) }}" class="btn btn-outline-warning btn-sm"><i class="ri-edit-box-line"></i></a>
-                                            <form action="{{ route('news.archive', $row->encrypted_id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('{{ __('Archive this news?') }}')">
+                                            <form action="{{ route('news.archive', $row->encrypted_id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm({{ Js::from(__('Archive this news?')) }})">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-outline-secondary btn-sm">

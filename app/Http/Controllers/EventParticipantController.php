@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\EventParticipant;
-use App\Models\Event;
-use App\Models\Employee;
-use Illuminate\Support\Facades\Crypt;
 use App\Exports\ParticipantsExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Employee;
+use App\Models\Event;
+use App\Models\EventParticipant;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EventParticipantController extends Controller
 {
@@ -24,23 +24,23 @@ class EventParticipantController extends Controller
         $event = Event::findOrFail($id);
 
         $participants = EventParticipant::where('event_id', $id)->orderBy('status', 'desc')->get();
-        
+
         $waitinglists = EventParticipant::where('event_id', $id)
-                        ->where('status', 'Waiting List')->get();
-        
+            ->where('status', 'Waiting List')->get();
+
         $approveparticipants = EventParticipant::with('employee')
-                        ->where('event_id', $id)
-                        ->whereIn('status', ['Registered', 'Confirmation'])
-                        ->get();
-        
+            ->where('event_id', $id)
+            ->whereIn('status', ['Registered', 'Confirmation'])
+            ->get();
+
         $attending = EventParticipant::where('event_id', $id)
-                        ->whereIn('status', ['Registered', 'Confirmation'])
-                        ->where('attending_status', '!=','')
-                        ->whereIn('attending_status', ['Attending','Not Attending'])->get();
-        
+            ->whereIn('status', ['Registered', 'Confirmation'])
+            ->where('attending_status', '!=', '')
+            ->whereIn('attending_status', ['Attending', 'Not Attending'])->get();
+
         $notattending = EventParticipant::where('event_id', $id)
-                        ->whereIn('status', ['Registered', 'Confirmation'])
-                        ->where('attending_status', 'Not Attending')->get();
+            ->whereIn('status', ['Registered', 'Confirmation'])
+            ->where('attending_status', 'Not Attending')->get();
 
         // Hitung status
         $countRequest = EventParticipant::where('event_id', $id)->count();
@@ -51,7 +51,7 @@ class EventParticipantController extends Controller
             ->count();
         $countConfirmed = EventParticipant::where('event_id', $id)
             ->whereIn('status', ['Registered', 'Confirmation'])
-            ->where('attending_status', '!=','')
+            ->where('attending_status', '!=', '')
             ->count();
         $countAttending = EventParticipant::where('event_id', $id)
             ->whereIn('status', ['Registered', 'Confirmation'])
@@ -69,25 +69,27 @@ class EventParticipantController extends Controller
             'countConfirmation', 'countConfirmed', 'countAttending', 'countNotAttending', 'parentLink', 'link', 'waitinglists', 'approveparticipants', 'attending', 'notattending', 'countCanceled'
         ));
     }
-    
+
     public function approve($id)
     {
-        
+
         $participant = EventParticipant::findOrFail($id);
 
         $event = Event::findOrFail($participant->event_id);
         $approveparticipants = EventParticipant::where('event_id', $participant->event_id)
-                        ->whereIn('status', ['Registered', 'Confirmation'])->count();
+            ->whereIn('status', ['Registered', 'Confirmation'])->count();
 
-        if($approveparticipants >= $event->quota){
+        if ($approveparticipants >= $event->quota) {
             $encryptedId = Crypt::encryptString($participant->event_id);
-            return redirect()->route('events.participants', $encryptedId)->with('error', 'Full Quota.');
-        }else{
+
+            return redirect()->route('events.participants', $encryptedId)->with('error', __('Full Quota.'));
+        } else {
             $participant->status = 'Confirmation';
             $participant->save();
 
             $encryptedId = Crypt::encryptString($participant->event_id);
-            return redirect()->route('events.participants', $encryptedId)->with('success', 'Participant Registered.');
+
+            return redirect()->route('events.participants', $encryptedId)->with('success', __('Participant Registered.'));
         }
     }
 
@@ -103,20 +105,21 @@ class EventParticipantController extends Controller
         $participant->save();
 
         $encryptedId = Crypt::encryptString($participant->event_id);
-        return redirect()->route('events.participants', $encryptedId)->with('success', 'Participant Canceled.');
+
+        return redirect()->route('events.participants', $encryptedId)->with('success', __('Participant Canceled.'));
     }
 
     public function export($event_id)
     {
         return Excel::download(new ParticipantsExport($event_id), 'participants_event_'.$event_id.'.xlsx');
     }
-    
+
     public function bulkApprove(Request $request)
     {
         $participantIds = $request->input('selected_ids', []);
 
         if (empty($participantIds)) {
-            return back()->with('error', 'No participants selected.');
+            return back()->with('error', __('No participants selected.'));
         }
 
         // Ambil peserta pertama untuk dapatkan event_id
@@ -125,15 +128,16 @@ class EventParticipantController extends Controller
 
         // Hitung jumlah yang sudah di-approve
         $approvedCount = EventParticipant::where('event_id', $event->id)
-                        ->whereIn('status', ['Registered', 'Confirmation'])
-                        ->count();
+            ->whereIn('status', ['Registered', 'Confirmation'])
+            ->count();
 
         $quota = $event->quota;
         $availableSlots = $quota - $approvedCount;
 
         if ($availableSlots <= 0) {
             $encryptedId = Crypt::encryptString($event->id);
-            return redirect()->route('events.participants', $encryptedId)->with('error', 'Full Quota.');
+
+            return redirect()->route('events.participants', $encryptedId)->with('error', __('Full Quota.'));
         }
 
         // Ambil ID yang masih bisa di-approve sesuai slot
@@ -143,8 +147,9 @@ class EventParticipantController extends Controller
             ->update(['status' => 'Confirmation']);
 
         $encryptedId = Crypt::encryptString($event->id);
+
         return redirect()->route('events.participants', $encryptedId)
-            ->with('success', count($toApprove) . ' participants approved.');
+            ->with('success', __(':count participants approved.', ['count' => count($toApprove)]));
     }
 
     public function search(Request $request)
@@ -161,15 +166,15 @@ class EventParticipantController extends Controller
     public function store(Request $request, $eventId)
     {
         $user = Auth::user();
-        
+
         $request->validate([
             'employee_id' => 'required',
             'status' => 'required',
         ]);
-        
+
         $employees = Employee::where('employee_id', $request->employee_id)->first();
         $formId = Event::where('id', $eventId)->pluck('form_id')->first();
-        
+
         $participant = EventParticipant::create([
             'event_id' => $eventId,
             'employee_id' => $request->employee_id,
@@ -184,6 +189,6 @@ class EventParticipantController extends Controller
             'created_by' => Auth::id(),
         ]);
 
-        return redirect()->back()->with('success', 'Participant added successfully.');
+        return redirect()->back()->with('success', __('Participant added successfully.'));
     }
 }

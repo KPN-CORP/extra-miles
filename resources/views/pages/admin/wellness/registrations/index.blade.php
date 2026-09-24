@@ -14,7 +14,7 @@
         <div>
             <div class="fw-semibold">{{ $schedule->activity->name }}</div>
             <small class="text-muted">
-                {{ $schedule->start_at->format('d M Y, H:i') }} &ndash; {{ $schedule->end_at->format('H:i') }}
+                {{ $schedule->start_at->translatedFormat('d M Y, H:i') }} &ndash; {{ $schedule->end_at->format('H:i') }}
                 @if ($schedule->location) &middot; {{ $schedule->location }} @endif
                 &middot;
                 <span class="badge {{ $method->badgeClass() }}">
@@ -110,7 +110,8 @@
                                 // checkbox on the queue tab and Attendance on Confirmed.
                                 $columnCount = 8
                                     + ($isQueueTab ? 1 : 0)
-                                    + ($status === WellnessRegistrationStatus::Confirmed ? 1 : 0);
+                                    + ($status === WellnessRegistrationStatus::Confirmed ? 1 : 0)
+                                    + ($status === WellnessRegistrationStatus::AwaitingConfirmation ? 1 : 0);
                             @endphp
                             <div class="tab-pane fade @if ($loop->first) show active @endif"
                                 id="tab-{{ $status->value }}" role="tabpanel">
@@ -121,7 +122,11 @@
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <small class="text-muted">
                                                 @if ($method->autoConfirms())
-                                                    {{ __('Listed in registration order. A freed seat is confirmed automatically from the top, skipping blacklisted employees.') }}
+                                                    @if ($schedule->requiresConfirmation())
+                                                        {{ __('Listed in registration order. A freed seat is offered automatically from the top, and the employee has to confirm it.') }}
+                                                    @else
+                                                        {{ __('Listed in registration order. A freed seat is confirmed automatically from the top, skipping blacklisted employees.') }}
+                                                    @endif
                                                 @else
                                                     {{ __('Listed in registration order. Select who gets a seat.') }}
                                                 @endif
@@ -154,6 +159,9 @@
                                                 @if ($status === WellnessRegistrationStatus::Confirmed)
                                                     <th>{{ __('Attendance') }}</th>
                                                 @endif
+                                                @if ($status === WellnessRegistrationStatus::AwaitingConfirmation)
+                                                    <th>{{ __('Confirm By') }}</th>
+                                                @endif
                                                 <th class="no-sort">{{ __('Action') }}</th>
                                             </tr>
                                         </thead>
@@ -174,11 +182,28 @@
                                                         'blacklisted' => $blacklisted,
                                                     ])
 
+                                                    @if ($status === WellnessRegistrationStatus::AwaitingConfirmation)
+                                                        <td data-order="{{ $registration->confirm_due_at?->timestamp ?? 0 }}">
+                                                            @if ($registration->confirmationExpired())
+                                                                {{-- Between the deadline and the next sweep. --}}
+                                                                <span class="badge bg-danger-subtle text-danger">
+                                                                    {{ __('Lapsed') }}
+                                                                </span>
+                                                            @elseif ($registration->confirm_due_at)
+                                                                <span class="badge bg-warning-subtle text-warning">
+                                                                    {{ $registration->confirm_due_at->translatedFormat('D, d M H:i') }}
+                                                                </span>
+                                                            @else
+                                                                <span class="text-muted">-</span>
+                                                            @endif
+                                                        </td>
+                                                    @endif
+
                                                     @if ($status === WellnessRegistrationStatus::Confirmed)
                                                         <td>
                                                             @if ($registration->attended_at)
                                                                 <span class="badge bg-success-subtle text-success">
-                                                                    {{ $registration->attended_at->format('d M H:i') }}
+                                                                    {{ $registration->attended_at->translatedFormat('d M H:i') }}
                                                                 </span>
                                                             @else
                                                                 <span class="badge bg-secondary-subtle text-secondary">{{ __('Not yet') }}</span>

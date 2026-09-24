@@ -28,6 +28,9 @@ class WellnessActivityScheduleRequest extends FormRequest
             'quota' => ['nullable', 'integer', 'min:1', 'max:100000'],
             'registration_start_at' => ['nullable', 'date'],
             'registration_end_at' => ['nullable', 'date', 'after_or_equal:registration_start_at', 'before_or_equal:end_at'],
+            // Must leave a window to act in: after registration opens, and before
+            // the session itself starts.
+            'confirmation_deadline' => ['nullable', 'date', 'after_or_equal:registration_start_at', 'before_or_equal:start_at'],
             'status' => ['required', Rule::enum(WellnessScheduleStatus::class)],
         ];
 
@@ -85,11 +88,13 @@ class WellnessActivityScheduleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'end_at.after' => 'The end time must be later than the start time.',
-            'registration_end_at.before_or_equal' => 'Registration must close no later than the session ends.',
-            'quota.min' => 'Leave the quota empty for unlimited seats, or set it to at least 1.',
-            'repeat_until.required' => 'Choose the date the repetition should run until.',
-            'repeat_until.after_or_equal' => 'The repeat-until date cannot be before the first session.',
+            'end_at.after' => __('The end time must be later than the start time.'),
+            'registration_end_at.before_or_equal' => __('Registration must close no later than the session ends.'),
+            'quota.min' => __('Leave the quota empty for unlimited seats, or set it to at least 1.'),
+            'confirmation_deadline.before_or_equal' => __('The confirmation deadline must fall before the session starts.'),
+            'confirmation_deadline.after_or_equal' => __('The confirmation deadline cannot be before registration opens.'),
+            'repeat_until.required' => __('Choose the date the repetition should run until.'),
+            'repeat_until.after_or_equal' => __('The repeat-until date cannot be before the first session.'),
         ];
     }
 }

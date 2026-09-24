@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { PulseLoader } from 'react-spinners';
-import { useApiUrl } from '../context/ApiContext';
+import { useApiUrl } from '../Context/ApiContext';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom'; // Import useParams to get id from endpoint
 import { showAlert } from '../Helper/alertHelper';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../Context/AuthContext';
 import { translate } from '../Helper/localeHelper';
 
 export function generateValidationSchema(fields) {
@@ -30,20 +30,20 @@ export function generateValidationSchema(fields) {
         case 'select':
         case 'radio':
           schema = Yup.string();
-          if (isRequired) schema = schema.required(translate('validation.required'));
-          if (min !== null) schema = schema.min(min, translate('validation.minChars', { min }));
-          if (max !== null) schema = schema.max(max, translate('validation.maximumChars', { max }));
+          if (isRequired) schema = schema.required(() => translate('validation.required'));
+          if (min !== null) schema = schema.min(min, () => translate('validation.minChars', { min }));
+          if (max !== null) schema = schema.max(max, () => translate('validation.maximumChars', { max }));
           break;
   
         case 'checkbox':
           if (field.options) {
             schema = Yup.array();
             if (isRequired || min !== null) {
-              schema = schema.min(min || 1, translate('validation.selectAtLeast', { min: min || 1 }));
+              schema = schema.min(min || 1, () => translate('validation.selectAtLeast', { min: min || 1 }));
             }
           } else {
             schema = Yup.boolean();
-            if (isRequired) schema = schema.oneOf([true], translate('validation.mustBeChecked'));
+            if (isRequired) schema = schema.oneOf([true], () => translate('validation.mustBeChecked'));
           }
           break;
   

@@ -83,6 +83,12 @@ class WellnessActivityRequest extends FormRequest
                 'after_or_equal:schedules.*.registration_start_at',
                 'before_or_equal:schedules.*.end_at',
             ],
+            'schedules.*.confirmation_deadline' => [
+                'nullable',
+                'date',
+                'after_or_equal:schedules.*.registration_start_at',
+                'before_or_equal:schedules.*.start_at',
+            ],
             'schedules.*.status' => ['required', Rule::enum(WellnessScheduleStatus::class)],
         ];
     }
@@ -93,12 +99,14 @@ class WellnessActivityRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'schedules.*.end_at.after' => 'Session :position: the end time must be later than the start time.',
+            'schedules.*.end_at.after' => __('Session :position: the end time must be later than the start time.'),
             // Spelled out because :position is not substituted inside the name of
             // a *referenced* field, which would leak the raw placeholder.
-            'schedules.*.registration_end_at.after_or_equal' => 'Session :position: registration must close no earlier than it opens.',
-            'schedules.*.registration_end_at.before_or_equal' => 'Session :position: registration must close no later than the session ends.',
-            'schedules.*.quota.min' => 'Session :position: leave the quota empty for unlimited seats, or set it to at least 1.',
+            'schedules.*.registration_end_at.after_or_equal' => __('Session :position: registration must close no earlier than it opens.'),
+            'schedules.*.registration_end_at.before_or_equal' => __('Session :position: registration must close no later than the session ends.'),
+            'schedules.*.quota.min' => __('Session :position: leave the quota empty for unlimited seats, or set it to at least 1.'),
+            'schedules.*.confirmation_deadline.before_or_equal' => __('Session :position: the confirmation deadline must fall before the session starts.'),
+            'schedules.*.confirmation_deadline.after_or_equal' => __('Session :position: the confirmation deadline cannot be before registration opens.'),
         ];
     }
 
@@ -108,16 +116,17 @@ class WellnessActivityRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'wellness_activity_type_id' => 'activity type',
-            'registration_method' => 'registration method',
+            'wellness_activity_type_id' => __('activity type'),
+            'registration_method' => __('registration method'),
             // Without these the messages would read "schedules.0.start_at".
-            'schedules.*.start_at' => 'session :position start time',
-            'schedules.*.end_at' => 'session :position end time',
-            'schedules.*.location' => 'session :position location',
-            'schedules.*.quota' => 'session :position quota',
-            'schedules.*.registration_start_at' => 'session :position registration opening time',
-            'schedules.*.registration_end_at' => 'session :position registration closing time',
-            'schedules.*.status' => 'session :position status',
+            'schedules.*.start_at' => __('session :position start time'),
+            'schedules.*.end_at' => __('session :position end time'),
+            'schedules.*.location' => __('session :position location'),
+            'schedules.*.quota' => __('session :position quota'),
+            'schedules.*.registration_start_at' => __('session :position registration opening time'),
+            'schedules.*.registration_end_at' => __('session :position registration closing time'),
+            'schedules.*.confirmation_deadline' => __('session :position confirmation deadline'),
+            'schedules.*.status' => __('session :position status'),
         ];
     }
 }

@@ -134,7 +134,8 @@ export default function Social() {
           <img
             className="w-full h-full object-cover"
             src={getImageUrl(apiUrl, 'assets/images/Element Extra Mile 2.png')}
-            alt="attribute"
+            alt=""
+            aria-hidden="true"
           />
         </div>
         <motion.div

@@ -141,7 +141,7 @@
                             <i class="ri-arrow-right-line mx-1"></i>
                             <span class="badge {{ $history->status->badgeClass() }}">{{ $history->status->label() }}</span>
                         </div>
-                        <small class="text-muted">{{ $history->changed_at->format('d M Y H:i') }}</small>
+                        <small class="text-muted">{{ $history->changed_at->translatedFormat('d M Y H:i') }}</small>
                     </div>
                     <div class="small text-muted mt-1">
                         {{ $history->remark ?: __('No remark') }}

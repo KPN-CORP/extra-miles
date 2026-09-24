@@ -12,12 +12,12 @@ class LiveContentController extends Controller
     {
         $parentLink = 'Dashboard';
         $link = 'Live Content';
-        
-        $liveContents = LiveContent::latest()->get(); 
+
+        $liveContents = LiveContent::latest()->get();
 
         $liveArchive = LiveContent::onlyTrashed()
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('pages.admin.live.index', [
             'link' => $link,
@@ -43,13 +43,14 @@ class LiveContentController extends Controller
             'created_at' => now(),
         ]);
 
-        return redirect()->route('live.index')->with('success', 'Live content created successfully.');
+        return redirect()->route('live.index')->with('success', __('Live content created successfully.'));
     }
 
     public function destroy($id)
     {
         $live = LiveContent::findOrFail($id);
         $live->delete(); // Soft delete
-        return redirect()->route('live.index')->with('success', 'Live content archived successfully.');
+
+        return redirect()->route('live.index')->with('success', __('Live content archived successfully.'));
     }
 }

@@ -35,7 +35,7 @@ class WellnessBlacklistController extends Controller
             'created_by' => Auth::id(),
         ]);
 
-        return redirect()->back()->with('success', ($employee?->fullname ?: $request->validated('employee_id')).' has been added to the blacklist.');
+        return redirect()->back()->with('success', __(':name has been added to the blacklist.', ['name' => $employee?->fullname ?: $request->validated('employee_id')]));
     }
 
     public function update(WellnessBlacklistRequest $request, string $encryptedId)
@@ -49,7 +49,7 @@ class WellnessBlacklistController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        return redirect()->back()->with('success', 'Blacklist entry updated.');
+        return redirect()->back()->with('success', __('Blacklist entry updated.'));
     }
 
     /**
@@ -64,7 +64,7 @@ class WellnessBlacklistController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        return redirect()->back()->with('success', ($entry->fullname ?: $entry->employee_id).' is no longer blacklisted.');
+        return redirect()->back()->with('success', __(':name is no longer blacklisted.', ['name' => $entry->fullname ?: $entry->employee_id]));
     }
 
     public function archive(string $encryptedId)
@@ -72,7 +72,7 @@ class WellnessBlacklistController extends Controller
         $entry = WellnessBlacklist::findOrFail($this->decryptId($encryptedId));
         $entry->delete();
 
-        return redirect()->back()->with('success', 'Blacklist entry archived.');
+        return redirect()->back()->with('success', __('Blacklist entry archived.'));
     }
 
     public function restore(string $encryptedId)
@@ -80,6 +80,6 @@ class WellnessBlacklistController extends Controller
         $entry = WellnessBlacklist::onlyTrashed()->findOrFail($this->decryptId($encryptedId));
         $entry->restore();
 
-        return redirect()->back()->with('success', 'Blacklist entry restored.');
+        return redirect()->back()->with('success', __('Blacklist entry restored.'));
     }
 }

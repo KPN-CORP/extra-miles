@@ -15,7 +15,7 @@ import VotingForm from '../components/Forms/VotingForm';
 import BannerLoader from "../components/Loader/BannerLoader";
 import { motion } from "motion/react";
 import SurveyLoader from "../components/Loader/SurveyLoader";
-import CountdownTimer from "../components/Helper/countdownTImer";
+import CountdownTimer from "../components/Helper/CountdownTimer";
 import parse from "html-react-parser";
 import { SSO_URL } from '../components/Helper/ssoRedirect';
 
@@ -116,7 +116,7 @@ export default function VoteList() {
                             {loadingBanner && <BannerLoader className='w-full object-fill rounded-3xl' />}
                             <img
                             src={getImageUrl(apiUrl, data.banner)}
-                            alt="Banner"
+                            alt={data.title}
                             onLoad={handleImageLoad}
                             onError={handleImageLoad}
                             className={`w-full object-fill rounded-3xl border-2 border-white transition-opacity duration-500 ${

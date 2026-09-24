@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
-import { useApiUrl } from '../context/ApiContext';
+import { useAuth } from '../Context/AuthContext';
+import { useApiUrl } from '../Context/ApiContext';
 
 const heartColors = [
   'text-red-500',

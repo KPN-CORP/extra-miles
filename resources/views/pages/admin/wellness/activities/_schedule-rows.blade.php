@@ -48,6 +48,7 @@
             'quota' => $s->quota,
             'registration_start_at' => $s->registration_start_at?->format('Y-m-d\TH:i'),
             'registration_end_at' => $s->registration_end_at?->format('Y-m-d\TH:i'),
+            'confirmation_deadline' => $s->confirmation_deadline?->format('Y-m-d\TH:i'),
             'status' => $s->status->value,
         ])->all();
     } else {
@@ -152,106 +153,15 @@
                                 </div>
                             @endif
 
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">{{ __('Starts At') }} <span class="text-danger">*</span></label>
-                                    <input type="datetime-local"
-                                        class="form-control js-start-at @error("schedules.$index.start_at") is-invalid @enderror"
-                                        name="schedules[{{ $index }}][start_at]"
-                                        value="{{ $row['start_at'] ?? '' }}">
-                                    @error("schedules.$index.start_at")
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">{{ __('Ends At') }} <span class="text-danger">*</span></label>
-                                    <input type="datetime-local"
-                                        class="form-control js-end-at @error("schedules.$index.end_at") is-invalid @enderror"
-                                        name="schedules[{{ $index }}][end_at]"
-                                        value="{{ $row['end_at'] ?? '' }}">
-                                    @error("schedules.$index.end_at")
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-md-5">
-                                    <label class="form-label">{{ __('Location') }}</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="ri-map-pin-line"></i></span>
-                                        <input type="text"
-                                            class="form-control js-location @error("schedules.$index.location") is-invalid @enderror"
-                                            name="schedules[{{ $index }}][location]" maxlength="150"
-                                            placeholder="{{ __('e.g. Studio A') }}"
-                                            value="{{ $row['location'] ?? '' }}">
-                                        @error("schedules.$index.location")
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <label class="form-label">{{ __('Quota') }}</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="ri-group-line"></i></span>
-                                        <input type="number"
-                                            class="form-control js-quota @error("schedules.$index.quota") is-invalid @enderror"
-                                            name="schedules[{{ $index }}][quota]"
-                                            min="{{ $locked ? $seats['taken'] : 1 }}" placeholder="{{ __('Unlimited') }}"
-                                            value="{{ $row['quota'] ?? '' }}">
-                                        @error("schedules.$index.quota")
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-text">{{ __('Empty = unlimited.') }}</div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="form-label">{{ __('Status') }} <span class="text-danger">*</span></label>
-                                    <select class="form-select js-status @error("schedules.$index.status") is-invalid @enderror"
-                                        name="schedules[{{ $index }}][status]">
-                                        @foreach ($scheduleStatuses as $value => $label)
-                                            <option value="{{ $value }}"
-                                                @selected(($row['status'] ?? 'open') === $value)>{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error("schedules.$index.status")
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <div class="form-text">{!! __('Only :status takes registrations.', ['status' => '<strong>'.__('Open').'</strong>']) !!}</div>
-                                </div>
-
-                                <div class="col-12">
-                                    <div class="border rounded p-2 bg-light-subtle">
-                                        <div class="small fw-semibold text-muted mb-2">
-                                            <i class="ri-time-line me-1"></i>{{ __('Registration Window') }}
-                                            <span class="fw-normal">&mdash; {{ __('leave empty to accept sign-ups any time before the session.') }}</span>
-                                        </div>
-                                        <div class="row g-2">
-                                            <div class="col-md-6">
-                                                <label class="form-label small mb-1">{{ __('Opens') }}</label>
-                                                <input type="datetime-local"
-                                                    class="form-control form-control-sm js-reg-start @error("schedules.$index.registration_start_at") is-invalid @enderror"
-                                                    name="schedules[{{ $index }}][registration_start_at]"
-                                                    value="{{ $row['registration_start_at'] ?? '' }}">
-                                                @error("schedules.$index.registration_start_at")
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label small mb-1">{{ __('Closes') }}</label>
-                                                <input type="datetime-local"
-                                                    class="form-control form-control-sm js-reg-end @error("schedules.$index.registration_end_at") is-invalid @enderror"
-                                                    name="schedules[{{ $index }}][registration_end_at]"
-                                                    value="{{ $row['registration_end_at'] ?? '' }}">
-                                                @error("schedules.$index.registration_end_at")
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @include('pages.admin.wellness.schedules._session-fields', [
+                                'nameFor' => fn (string $field) => "schedules[$index][$field]",
+                                'idFor' => fn (string $field) => "wa_sched_{$index}_{$field}",
+                                'valueFor' => fn (string $field) => $row[$field] ?? null,
+                                'errorFor' => fn (string $field) => $errors->first("schedules.$index.$field"),
+                                'statuses' => $scheduleStatuses,
+                                'wide' => true,
+                                'quotaMin' => $locked ? $seats['taken'] : 1,
+                            ])
 
                             @error("schedules.$index.id")
                                 <div class="alert alert-danger py-2 small mb-0 mt-3">{{ $message }}</div>
@@ -301,66 +211,14 @@
 
         <div class="collapse show" id="wa_sched_body___INDEX__">
             <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">{{ __('Starts At') }} <span class="text-danger">*</span></label>
-                        <input type="datetime-local" class="form-control js-start-at" name="schedules[__INDEX__][start_at]">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ __('Ends At') }} <span class="text-danger">*</span></label>
-                        <input type="datetime-local" class="form-control js-end-at" name="schedules[__INDEX__][end_at]">
-                    </div>
-
-                    <div class="col-md-5">
-                        <label class="form-label">{{ __('Location') }}</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="ri-map-pin-line"></i></span>
-                            <input type="text" class="form-control js-location" name="schedules[__INDEX__][location]"
-                                maxlength="150" placeholder="{{ __('e.g. Studio A') }}">
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label">{{ __('Quota') }}</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="ri-group-line"></i></span>
-                            <input type="number" class="form-control js-quota" name="schedules[__INDEX__][quota]"
-                                min="1" placeholder="{{ __('Unlimited') }}">
-                        </div>
-                        <div class="form-text">{{ __('Empty = unlimited.') }}</div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label">{{ __('Status') }} <span class="text-danger">*</span></label>
-                        <select class="form-select js-status" name="schedules[__INDEX__][status]">
-                            @foreach ($scheduleStatuses as $value => $label)
-                                <option value="{{ $value }}" @selected($value === 'open')>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        <div class="form-text">{!! __('Only :status takes registrations.', ['status' => '<strong>'.__('Open').'</strong>']) !!}</div>
-                    </div>
-
-                    <div class="col-12">
-                        <div class="border rounded p-2 bg-light-subtle">
-                            <div class="small fw-semibold text-muted mb-2">
-                                <i class="ri-time-line me-1"></i>{{ __('Registration Window') }}
-                                <span class="fw-normal">&mdash; {{ __('leave empty to accept sign-ups any time before the session.') }}</span>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <label class="form-label small mb-1">{{ __('Opens') }}</label>
-                                    <input type="datetime-local" class="form-control form-control-sm js-reg-start"
-                                        name="schedules[__INDEX__][registration_start_at]">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small mb-1">{{ __('Closes') }}</label>
-                                    <input type="datetime-local" class="form-control form-control-sm js-reg-end"
-                                        name="schedules[__INDEX__][registration_end_at]">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @include('pages.admin.wellness.schedules._session-fields', [
+                    'nameFor' => fn (string $field) => "schedules[__INDEX__][$field]",
+                    'idFor' => fn (string $field) => "wa_sched___INDEX___{$field}",
+                    'valueFor' => fn (string $field) => null,
+                    'errorFor' => fn (string $field) => null,
+                    'statuses' => $scheduleStatuses,
+                                'wide' => true,
+                ])
             </div>
         </div>
     </div>

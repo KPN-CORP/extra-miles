@@ -137,7 +137,7 @@
                         <select class="form-select" id="form_id" name="form_id">
                             <option selected disabled>{{ __('Please select') }}</option>
                             @foreach($formTemplates as $form)
-                                <option value="{{ $form->id }}">{{ $form->title." (".$form->created_at->format('d M Y').")" }}</option>
+                                <option value="{{ $form->id }}">{{ $form->title." (".$form->created_at->translatedFormat('d M Y').")" }}</option>
                             @endforeach
                         </select>
                     </div>

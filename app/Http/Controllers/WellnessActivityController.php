@@ -45,12 +45,9 @@ class WellnessActivityController extends Controller
         }
 
         $activities = WellnessActivity::query()
-            ->with([
-                'type',
-                // Loaded up front so the list's expandable Schedules row has its
-                // sessions to hand -- clicking one must not cost a request.
-                'schedules' => fn ($q) => $q->withSeatCounts()->orderBy('start_at'),
-            ])
+            // Only the count. An activity's sessions are a page of their own --
+            // one can hold a year of daily sessions, so the list never loads them.
+            ->with('type')
             ->withCount('schedules')
             ->when($filters['type'], fn ($q, $type) => $q->where('wellness_activity_type_id', $type))
             ->when($method, fn ($q) => $q->where('registration_method', $method->value))
@@ -123,7 +120,7 @@ class WellnessActivityController extends Controller
 
         // The activity and the sessions entered on its Schedules tab are saved
         // together, so a bad session cannot leave a half-configured activity
-        // behind. qr_token is filled in by the model's creating hook.
+        // behind. Sessions carry no QR of their own; the type's code covers them.
         $activity = DB::transaction(function () use ($request, $schedules, $image) {
             $activity = WellnessActivity::create($request->safe()->only([
                 'wellness_activity_type_id', 'registration_method', 'name', 'description', 'status',
@@ -140,8 +137,8 @@ class WellnessActivityController extends Controller
         });
 
         $message = $schedules === []
-            ? 'Activity created. Add its schedules below.'
-            : 'Activity created with '.count($schedules).' schedule(s).';
+            ? __('Activity created. Add its schedules below.')
+            : __('Activity created with :count schedule(s).', ['count' => count($schedules)]);
 
         return redirect()
             ->route('admin.wellness.schedules.index', $activity->encrypted_id)
@@ -190,7 +187,7 @@ class WellnessActivityController extends Controller
             }
 
             if ($id === false) {
-                $errors["schedules.$i.id"] = 'This session could not be identified. Reload the page and try again.';
+                $errors["schedules.$i.id"] = __('This session could not be identified. Reload the page and try again.');
 
                 continue;
             }
@@ -200,7 +197,7 @@ class WellnessActivityController extends Controller
             if (! $schedule) {
                 // An id that is not one of this activity's own sessions -- stale
                 // form or tampering. Refuse rather than quietly creating a row.
-                $errors["schedules.$i.id"] = 'This session no longer exists. Reload the page and try again.';
+                $errors["schedules.$i.id"] = __('This session no longer exists. Reload the page and try again.');
 
                 continue;
             }
@@ -210,7 +207,7 @@ class WellnessActivityController extends Controller
             // Shrinking the quota under the seats already held would silently put
             // the session over capacity; mirrors WellnessActivityScheduleController.
             if (($row['quota'] ?? null) !== null && $row['quota'] < $schedule->taken_seats) {
-                $errors["schedules.$i.quota"] = 'Quota cannot be lower than the '.$schedule->taken_seats.' seat(s) already held.';
+                $errors["schedules.$i.quota"] = __('Quota cannot be lower than the :count seat(s) already held.', ['count' => $schedule->taken_seats]);
 
                 continue;
             }
@@ -223,8 +220,10 @@ class WellnessActivityController extends Controller
 
         foreach ($removed as $schedule) {
             if ($schedule->taken_seats > 0) {
-                $errors['schedules'] = 'The session on '.$schedule->start_at->format('d M Y H:i').' still has '
-                    .$schedule->taken_seats.' active registration(s), so it cannot be removed. Cancel them first.';
+                $errors['schedules'] = __('The session on :date still has :count active registration(s), so it cannot be removed. Cancel them first.', [
+                    'date' => $schedule->start_at->format('d M Y H:i'),
+                    'count' => $schedule->taken_seats,
+                ]);
             }
         }
 
@@ -269,7 +268,7 @@ class WellnessActivityController extends Controller
 
         return redirect()
             ->route('admin.wellness.activities.index')
-            ->with('success', 'Activity updated.');
+            ->with('success', __('Activity updated.'));
     }
 
     /**
@@ -299,7 +298,7 @@ class WellnessActivityController extends Controller
         $activity = WellnessActivity::findOrFail($this->decryptId($encryptedId));
         $activity->delete();
 
-        return redirect()->back()->with('success', 'Activity archived.');
+        return redirect()->back()->with('success', __('Activity archived.'));
     }
 
     public function restore(string $encryptedId)
@@ -307,7 +306,7 @@ class WellnessActivityController extends Controller
         $activity = WellnessActivity::onlyTrashed()->findOrFail($this->decryptId($encryptedId));
         $activity->restore();
 
-        return redirect()->back()->with('success', 'Activity restored.');
+        return redirect()->back()->with('success', __('Activity restored.'));
     }
 
     /**

@@ -57,6 +57,7 @@ Route::middleware('auth.token')->group(function () {
     Route::get('/wellness/activities/{id}', [WellnessController::class, 'getActivityDetails']);
     Route::get('/wellness/my-registrations', [WellnessController::class, 'myRegistrations']);
     Route::post('/wellness/registrations', [WellnessController::class, 'register']);
+    Route::post('/wellness/registrations/confirm', [WellnessController::class, 'confirm']);
     Route::post('/wellness/registrations/cancel', [WellnessController::class, 'cancel']);
     Route::post('/wellness/check-in', [WellnessController::class, 'checkIn']);
     Route::post('/wellness/feedback', [WellnessController::class, 'submitFeedback']);

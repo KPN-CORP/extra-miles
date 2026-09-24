@@ -50,9 +50,9 @@
                                 <select class="form-select" id="category" name="category" required>
                                     <option value="" selected disabled>{{ __('Please select') }}</option>
                                     <option value="CSR">CSR</option>
-                                    <option value="Event">Event</option>
-                                    <option value="Sport">Sport</option>
-                                    <option value="Training">Training</option>
+                                    <option value="Event">{{ __('Event') }}</option>
+                                    <option value="Sport">{{ __('Sport') }}</option>
+                                    <option value="Training">{{ __('Training') }}</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     {{ $invalidFeedback }}

@@ -97,13 +97,7 @@
                                                 </td>
                                                 <td data-order="{{ $activity->schedules_count }}">
                                                     @if ($activity->schedules_count)
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-link p-0 text-decoration-none js-toggle-schedules"
-                                                            data-target="wa-sched-{{ $activity->id }}"
-                                                            aria-expanded="false">
-                                                            <i class="ri-arrow-right-s-line js-chevron"></i>
-                                                            {{ __(':count session(s)', ['count' => $activity->schedules_count]) }}
-                                                        </button>
+                                                        {{ __(':count session(s)', ['count' => $activity->schedules_count]) }}
                                                     @else
                                                         <span class="text-muted">{{ __('None') }}</span>
                                                     @endif
@@ -111,7 +105,7 @@
                                                 <td>
                                                     <span class="badge {{ $activity->status->badgeClass() }}">{{ $activity->status->label() }}</span>
                                                 </td>
-                                                <td>{{ $activity->created_at?->format('d M Y') }}</td>
+                                                <td>{{ $activity->created_at?->translatedFormat('d M Y') }}</td>
                                                 <td>
                                                     <a href="{{ route('admin.wellness.schedules.index', $activity->encrypted_id) }}"
                                                         class="btn btn-outline-primary btn-sm" title="{{ __('Manage schedules') }}">
@@ -140,17 +134,6 @@
                             </div>
                             @endif
 
-                            {{-- Session panels live here until a row is expanded, then
-                                 they are moved into that row's DataTables child. --}}
-                            <div class="d-none">
-                                @foreach ($activities as $activity)
-                                    @if ($activity->schedules_count)
-                                        <div id="wa-sched-{{ $activity->id }}">
-                                            @include('pages.admin.wellness.activities._schedule-detail', ['activity' => $activity])
-                                        </div>
-                                    @endif
-                                @endforeach
-                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="activity-archive" role="tabpanel">
@@ -171,7 +154,7 @@
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $activity->name }}</td>
                                                 <td>{{ $activity->type?->name ?? '-' }}</td>
-                                                <td>{{ $activity->deleted_at?->format('d M Y H:i') }}</td>
+                                                <td>{{ $activity->deleted_at?->translatedFormat('d M Y H:i') }}</td>
                                                 <td>
                                                     <form action="{{ route('wellness.activities.restore', $activity->encrypted_id) }}" method="POST">
                                                         @csrf
@@ -199,43 +182,4 @@
     @include('layouts_.shared.admin-datatable-js')
     @include('pages.admin.wellness.partials.confirm-js')
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Expanding uses DataTables' own child-row API rather than inserting a
-            // <tr> by hand: DataTables owns the tbody, and a hand-inserted row
-            // would be dropped the moment the table is sorted, searched or paged.
-            document.addEventListener('click', function (event) {
-                var toggle = event.target.closest('.js-toggle-schedules');
-
-                if (!toggle) {
-                    return;
-                }
-
-                var tr = toggle.closest('tr');
-                var table = window.jQuery(tr).closest('table');
-
-                if (!table.length || !window.jQuery.fn.DataTable.isDataTable(table[0])) {
-                    return;
-                }
-
-                var row = table.DataTable().row(tr);
-                var chevron = toggle.querySelector('.js-chevron');
-
-                if (row.child.isShown()) {
-                    // hide() only detaches the child row; DataTables keeps the node,
-                    // so the panel is still there when it is shown again.
-                    row.child.hide();
-                    chevron.className = 'ri-arrow-right-s-line js-chevron';
-                    toggle.setAttribute('aria-expanded', 'false');
-
-                    return;
-                }
-
-                var panel = document.getElementById(toggle.dataset.target);
-                row.child(panel).show();
-                chevron.className = 'ri-arrow-down-s-line js-chevron';
-                toggle.setAttribute('aria-expanded', 'true');
-            });
-        });
-    </script>
 @endpush

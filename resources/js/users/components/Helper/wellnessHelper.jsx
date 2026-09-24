@@ -53,6 +53,50 @@ export function statusStyle(status) {
     }
 }
 
+/**
+ * Label status pendaftaran dalam bahasa aktif. Backend juga mengirim
+ * `status_label`, tapi itu selalu bahasa Inggris; label itu hanya dipakai
+ * sebagai cadangan untuk status yang belum dikenal SPA.
+ */
+export function statusLabel(status, fallback = '') {
+    if (!status) return fallback;
+
+    return translate(`wellness.status.${status}`, { defaultValue: fallback || status });
+}
+
+/** "2026-09-02 08:05:00" -> tanggal + jam sesuai bahasa aktif. */
+export function formatDateTime(value) {
+    const date = parseSessionDate(value);
+    if (!date || Number.isNaN(date.getTime())) return value ?? '';
+
+    return date.toLocaleString(localeTag(), {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+/**
+ * Pesan galat API wellness dalam bahasa aktif.
+ *
+ * Backend (WellnessRegistrationException) mengirim `reason` yang bisa dibaca
+ * mesin di samping `error` berbahasa Inggris, jadi yang diterjemahkan adalah
+ * `reason`-nya; teks backend tidak ditampilkan langsung.
+ */
+export function wellnessError(err, fallbackKey = 'alerts.genericRetry') {
+    const data = err?.response?.data ?? {};
+
+    if (data.reason) {
+        return translate(`wellness.errors.${data.reason}`, { defaultValue: translate(fallbackKey) });
+    }
+
+    if (err?.response?.status === 404) return translate('wellness.errors.not_found');
+
+    return translate(fallbackKey);
+}
+
 export function seatLabel(schedule) {
     if (!schedule) return '';
     if (schedule.quota === null || schedule.quota === undefined) return translate('wellness.seats.unlimited');

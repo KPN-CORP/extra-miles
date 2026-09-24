@@ -85,6 +85,12 @@
                                             @else
                                                 <small class="text-muted">{{ __('Always open') }}</small>
                                             @endif
+                                            @if ($schedule->confirmation_deadline)
+                                                <small class="d-block text-warning-emphasis"
+                                                    title="{{ __('Seats must be confirmed by this time or they pass to the queue.') }}">
+                                                    <i class="ri-check-double-line me-1"></i>{{ $schedule->confirmation_deadline->translatedFormat('D, d M H:i') }}
+                                                </small>
+                                            @endif
                                         </td>
                                         <td>
                                             @if ($schedule->quota === null)
@@ -111,6 +117,7 @@
                                                 data-quota="{{ $schedule->quota }}"
                                                 data-regstart="{{ $schedule->registration_start_at?->format('Y-m-d\TH:i') }}"
                                                 data-regend="{{ $schedule->registration_end_at?->format('Y-m-d\TH:i') }}"
+                                                data-confirmby="{{ $schedule->confirmation_deadline?->format('Y-m-d\TH:i') }}"
                                                 data-status="{{ $schedule->status->value }}"
                                                 data-following="{{ $series ? $series['total'] - $series['position'] : 0 }}"
                                                 data-label="{{ $schedule->start_at->translatedFormat('D, d M Y H:i') }}"
@@ -207,7 +214,10 @@
                 pickUntil: @json(__('Pick a repeat-until date.')),
                 summary: @json(__(':count sessions, last on :date')),
                 capped: @json(__('Capped at the maximum number of sessions.')),
-                endsBefore: @json(__('Ends before it starts.'))
+                endsBefore: @json(__('Ends before it starts.')),
+                confirmOff: @json(__('Seats are given out and taken straight away.')),
+                confirmOn: @json(__('Employees must confirm their seat by this time, or it passes to the next person in the queue.')),
+                duration: @json(__(':hoursh :minutesm'))
             };
 
             function pad(n) { return (n < 10 ? '0' : '') + n; }
@@ -272,7 +282,9 @@
                         return;
                     }
                     hint.classList.remove('text-danger');
-                    hint.textContent = Math.floor(minutes / 60) + 'h ' + pad(minutes % 60) + 'm';
+                    hint.textContent = TEXT.duration
+                        .replace(':hours', Math.floor(minutes / 60))
+                        .replace(':minutes', pad(minutes % 60));
                 }
 
                 startEl.addEventListener('change', sync);
@@ -282,6 +294,32 @@
 
             var syncCreateDuration = wireDuration('create');
             var syncEditDuration = wireDuration('edit');
+
+            // -------------------------------------------- confirmation step
+            // Setting this one field changes how every seat on the session is
+            // handed out, so the panel next to it spells out which mode is on.
+            function wireConfirmHint(prefix) {
+                var field = document.getElementById(prefix + '-confirmation_deadline');
+                var hint = document.querySelector('#' + prefix + 'ScheduleModal .js-confirm-hint');
+
+                if (!field || !hint) {
+                    return function () {};
+                }
+
+                function sync() {
+                    var on = field.value !== '';
+                    hint.innerHTML = on ? TEXT.confirmOn : TEXT.confirmOff;
+                    hint.className = 'alert alert-' + (on ? 'info' : 'secondary')
+                        + ' py-2 px-3 mb-0 w-100 small js-confirm-hint';
+                }
+
+                field.addEventListener('change', sync);
+
+                return sync;
+            }
+
+            var syncCreateConfirm = wireConfirmHint('create');
+            var syncEditConfirm = wireConfirmHint('edit');
 
             // ------------------------------------------------------- repeat
             var frequency = document.getElementById('create-repeat_frequency');
@@ -356,9 +394,11 @@
                     document.getElementById('edit-quota').value = data.quota || '';
                     document.getElementById('edit-registration_start_at').value = data.regstart || '';
                     document.getElementById('edit-registration_end_at').value = data.regend || '';
+                    document.getElementById('edit-confirmation_deadline').value = data.confirmby || '';
                     document.getElementById('edit-status').value = data.status || 'open';
                     editSubtitle.textContent = data.label || '';
                     syncEditDuration();
+                    syncEditConfirm();
 
                     // The choice is only offered when there is something after
                     // this occurrence to carry the edit to.
@@ -370,6 +410,7 @@
             });
 
             syncCreateDuration();
+            syncCreateConfirm();
             syncRepeat();
 
             // A bounced submit keeps the typed values through old(); reopen the

@@ -51,9 +51,9 @@
                                 <select class="form-select" id="category" name="category" required>
                                     <option value="" selected disabled>{{ __('Please select') }}</option>
                                     <option value="CSR" {{ $news->category == 'CSR' ? 'selected' : '' }}>CSR</option>
-                                    <option value="Event" {{ $news->category == 'Event' ? 'selected' : '' }}>Event</option>
-                                    <option value="Sport" {{ $news->category == 'Sport' ? 'selected' : '' }} >Sport</option>
-                                    <option value="Training" {{ $news->category == 'Training' ? 'selected' : '' }} >Training</option>
+                                    <option value="Event" {{ $news->category == 'Event' ? 'selected' : '' }}>{{ __('Event') }}</option>
+                                    <option value="Sport" {{ $news->category == 'Sport' ? 'selected' : '' }} >{{ __('Sport') }}</option>
+                                    <option value="Training" {{ $news->category == 'Training' ? 'selected' : '' }} >{{ __('Training') }}</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     {{ $invalidFeedback }}
