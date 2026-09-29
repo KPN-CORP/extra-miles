@@ -64,7 +64,15 @@ class SsoController extends Controller
         $payload = $this->darwinbox->decodePayload($request->input('data'));
 
         if (! $payload) {
-            Log::warning('SSO payload missing or undecodable', ['path' => $request->path()]);
+            // Shapes only, never values: enough to tell a missing parameter,
+            // an unset DARWINBOX_PAYLOAD_KEY and a wrong key apart.
+            Log::warning('SSO payload missing or undecodable', [
+                'path' => $request->path(),
+                'has_data' => $request->filled('data'),
+                'data_length' => strlen((string) $request->input('data')),
+                'payload_key_configured' => (string) config('services.darwinbox.payload_key') !== '',
+                'config_cached' => app()->configurationIsCached(),
+            ]);
 
             return [null, null];
         }

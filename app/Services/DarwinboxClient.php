@@ -41,6 +41,8 @@ class DarwinboxClient
         }
 
         $key = (string) config('services.darwinbox.payload_key');
+        // An unencoded "+" in the query string arrives as a space.
+        $data = strtr(trim($data), ' ', '+');
         // Non-strict, as before: Darwinbox's encoding has been accepted this way.
         $xored = base64_decode($data);
 
