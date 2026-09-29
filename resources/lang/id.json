@@ -691,6 +691,7 @@
     "Role updated successfully!": "Peran berhasil diperbarui!",
     "Role updated failed!": "Gagal memperbarui peran!",
     "Role deleted successfully!": "Peran berhasil dihapus!",
+    "Role is also used by other apps, so only its permissions in this app were removed.": "Role ini juga dipakai aplikasi lain, jadi hanya permission di aplikasi ini yang dihapus.",
     "Role not found.": "Peran tidak ditemukan.",
     "Role deleted failed!": "Gagal menghapus peran!",
     "Social successfully created!": "Media sosial berhasil dibuat!",
@@ -767,5 +768,7 @@
     "Assign": "Tetapkan",
     "Manage": "Kelola",
     "home": "beranda",
-    "starter": "starter"
+    "starter": "starter",
+    "Login Failed": "Login Gagal",
+    "Back to Darwinbox": "Kembali ke Darwinbox"
 }

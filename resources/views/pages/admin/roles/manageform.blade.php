@@ -16,12 +16,14 @@
         </div>
       </div>
     </div>
-      @foreach ($roles as $role)
       @php
-          // Decode the JSON string
-          $restriction = json_decode($role->restriction, true);
+          $role = $roles->first();
+          $restriction = [
+              'group_company' => $role->business_unit ?? [],
+              'contribution_level_code' => $role->company ?? [],
+              'work_area_code' => $role->location ?? [],
+          ];
       @endphp
-      @endforeach
       <div class="row mb-3">
         <div class="col-md-8">
           <div class="form-group">
@@ -52,7 +54,7 @@
             <label for="roleName">{{ __('Restrict Location (Keeping blank means no restrictions)') }}</label>
               <select class="form-control select2" name="work_area_code[]" multiple="multiple">
                 @foreach ($locations as $location)
-                    <option value="{{ $location->work_area_code }}" {{ isset($restriction['work_area_code']) && in_array($location->work_area, $restriction['work_area_code']) ? 'selected' : '' }}>{{ $location->office_area.' ('.$location->group_company.')' }}</option>
+                    <option value="{{ $location->work_area_code }}" {{ isset($restriction['work_area_code']) && in_array($location->work_area_code, $restriction['work_area_code']) ? 'selected' : '' }}>{{ $location->office_area.' ('.$location->group_company.')' }}</option>
                 @endforeach
               </select>
           </div>
@@ -86,26 +88,24 @@
                 </ul>
                 <div class="tab-pane fade p-3 active show" id="list-setting-accessibility" role="tabpanel" aria-labelledby="setting-accessibility">
                   @php
-                      $onbehalfsPermissions = $permissions->filter(function($permission) {
-                          return stripos($permission->group_name, 'extramile') !== false;
-                      });
+                      $onbehalfsPermissions = $permissions;
                       $previousGroup = null;
                   @endphp
                   @foreach($onbehalfsPermissions as $permission)
-                      @if($previousGroup != $permission->group_name)
+                      @if($previousGroup != $permission->group)
                           <div class="form-check mb-3 bg-dark-subtle">
-                              <label class="form-check-label" for="{{ $permission->group_name }}">
-                                  <strong>{{ explode('_', $permission->group_name)[1] }}</strong>
+                              <label class="form-check-label" for="{{ $permission->group }}">
+                                  <strong>{{ $permission->group }}</strong>
                               </label>
                           </div>
                           @php
-                              $previousGroup = $permission->group_name;
+                              $previousGroup = $permission->group;
                           @endphp
                       @endif
                       <div class="form-check mb-3">
                           <input class="form-check-input" type="checkbox" id="{{ $permission->name }}" value="{{ $permission->id }}" name="{{ $permission->name }}" @if(in_array($permission->id, $permissionNames)) checked @endif>
                           <label class="form-check-label" for="{{ $permission->name }}">
-                              {{ $permission->display_name }} <i class="ri-information-line" title="{{ $permission->desc }}"></i>
+                              {{ $permission->label }}
                           </label>
                       </div>
                   @endforeach

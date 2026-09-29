@@ -14,8 +14,14 @@ class ModelHasRole extends Model
         'model_type',
         'model_id',
     ];
-    
-    protected $connection = 'kpncorp';
+
+    protected $connection = 'sys_permission';
+
+    // Composite-key pivot with no timestamp columns.
+    public $incrementing = false;
+
+    public $timestamps = false;
+
     protected $table = 'model_has_roles';
 
     public function role()

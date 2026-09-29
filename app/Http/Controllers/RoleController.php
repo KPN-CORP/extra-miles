@@ -39,7 +39,7 @@ class RoleController extends Controller
 
     public function assign()
     {
-        $roles = Role::all();
+        $roles = Role::inCurrentDomain()->orderBy('name')->get();
 
         if (Auth()->user()->roles->first()->name != 'superadmin') {
             $roles = $roles->where('name', '!=', 'superadmin');
@@ -54,7 +54,7 @@ class RoleController extends Controller
 
     public function create()
     {
-        $permissions = Permission::orderBy('group_name')->orderBy('display_name')->get();
+        $permissions = Permission::orderBy('group')->orderBy('label')->get();
 
         $locations = Employee::select('office_area', 'work_area_code', 'group_company')->orderBy('work_area_code')->distinct()->get();
 
@@ -72,7 +72,7 @@ class RoleController extends Controller
     public function manage()
     {
 
-        $roles = Role::all();
+        $roles = Role::inCurrentDomain()->orderBy('name')->get();
 
         if (Auth()->user()->roles->first()->name != 'superadmin') {
             $roles = $roles->where('name', '!=', 'superadmin');
@@ -131,19 +131,12 @@ class RoleController extends Controller
 
         $companies = Company::select('contribution_level', 'contribution_level_code')->orderBy('contribution_level_code')->get();
 
-        // $permissions = Permission::orderBy('id')->pluck('id')->toArray();
-        $permissions = Permission::orderBy('group_name')->orderBy('display_name')->get();
+        $permissions = Permission::orderBy('group')->orderBy('label')->get();
 
-        $permissionNames = Permission::leftJoin('role_has_permissions', function ($join) use ($roleId) {
-            $join->on('role_has_permissions.permission_id', '=', 'permissions.id')
-                ->where('role_has_permissions.role_id', '=', $roleId);
-        })
-            ->select('permissions.id', 'permissions.name', 'role_has_permissions.permission_id')
-        // ->whereBetween('permissions.id', [1, 9])
-            ->orderBy('permissions.id')
-            ->pluck('role_has_permissions.permission_id')
+        $permissionNames = RoleHasPermission::where('role_id', $roleId)
+            ->whereIn('permission_id', $permissions->pluck('id'))
+            ->pluck('permission_id')
             ->toArray();
-        // dd($permissionNames);
 
         $parentLink = $this->link;
         $link = 'Create';
@@ -206,70 +199,25 @@ class RoleController extends Controller
         $roleName = $request->roleName;
         $guardName = 'web';
 
-        $groupCompany = $request->input('group_company', []);
-        $company = $request->input('contribution_level_code', []);
-        $location = $request->input('work_area_code', []);
-
-        $data = [
-            'work_area_code' => empty($location) ? null : $location,
-            'group_company' => empty($groupCompany) ? null : $groupCompany,
-            'contribution_level_code' => empty($company) ? null : $company,
-        ];
-
-        // Konversi ke JSON format
-        $restriction = json_encode($data);
-
-        $existingRole = Role::where('name', $roleName)->first();
+        $existingRole = Role::where('name', $roleName)->where('guard_name', $guardName)->first();
 
         if ($existingRole) {
             // Role with the same name already exists, handle accordingly (e.g., show error message)
             return redirect()->back()->with('error', __('Role with the same name already exists.'));
         }
 
-        // $permissions = [
-        //     'adminMenu' => $request->input('adminMenu', false), // 9 = adminmenu
-        //     'onBehalfView' => $request->input('onBehalfView', false), // Use false as default value if not set
-        //     'onBehalfApproval' => $request->input('onBehalfApproval', false),
-        //     'onBehalfSendback' => $request->input('onBehalfSendback', false),
-        //     'reportView' => $request->input('reportView', false),
-        //     'settingView' => $request->input('settingView', false),
-        //     'scheduleView' => $request->input('scheduleView', false),
-        //     'layerView' => $request->input('layerView', false),
-        //     'roleView' => $request->input('roleView', false),
-        //     'addGuide' => $request->input('addGuide', false),
-        //     'removeGuide' => $request->input('removeGuide', false),
-        // ];
-        $permissionsFromDb = Permission::pluck('name')->toArray();
-
-        // Loop melalui setiap permission untuk mengisi data request
-        $permissions = [];
-        foreach ($permissionsFromDb as $permissionName) {
-            // Setiap permission diambil dari request, default false jika tidak ada
-            $permissions[$permissionName] = $request->input($permissionName, false);
-        }
-
-        // Build permission_id string
-        $permission_id = '';
-
         $role = new Role;
         $role->name = $roleName;
         $role->guard_name = $guardName;
-        $role->restriction = $restriction;
+        $role->fill($this->restrictionAttributes($request));
         $role->save();
 
-        Log::info('Roles module: '.$this->userId.' Create Role & Permission '.$roleName.'. Restriction '.$restriction);
+        Log::info('Roles module: '.$this->userId.' Create Role & Permission '.$roleName.'. Restriction '.json_encode($role->only(['business_unit', 'company', 'location'])));
 
-        // Loop through permissions and create new permission records
-        foreach ($permissions as $key) {
-            if ($key) {
-                // Create a new permission record
-                $rolepermission = new RoleHasPermission;
-                $rolepermission->role_id = $role->id;
-                $rolepermission->permission_id = $key;
-                $rolepermission->save();
+        foreach ($this->selectedPermissionIds($request) as $permissionId) {
+            RoleHasPermission::create(['role_id' => $role->id, 'permission_id' => $permissionId]);
 
-                Log::info('Roles module: '.$this->userId.' Add Permission '.$key.' on Create Role & Permission '.$roleName);
-            }
+            Log::info('Roles module: '.$this->userId.' Add Permission '.$permissionId.' on Create Role & Permission '.$roleName);
         }
 
         app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
@@ -283,63 +231,20 @@ class RoleController extends Controller
             // code...
             $roleId = $request->roleId;
 
-            RoleHasPermission::where('role_id', $roleId)->delete();
+            $role = Role::findOrFail($roleId);
+            $role->fill($this->restrictionAttributes($request));
 
-            $groupCompany = $request->input('group_company', []);
-            $company = $request->input('contribution_level_code', []);
-            $location = $request->input('work_area_code', []);
-
-            $data = [
-                'work_area_code' => empty($location) ? null : $location,
-                'group_company' => empty($groupCompany) ? null : $groupCompany,
-                'contribution_level_code' => empty($company) ? null : $company,
-            ];
-
-            // // Konversi ke JSON format
-            $restriction = json_encode($data);
-
-            // $permissions = [
-            //     'adminMenu' => $request->input('adminMenu', false), // 9 = adminmenu
-            //     'onBehalfView' => $request->input('onBehalfView', false), // Use false as default value if not set
-            //     'onBehalfApproval' => $request->input('onBehalfApproval', false),
-            //     'onBehalfSendback' => $request->input('onBehalfSendback', false),
-            //     'reportView' => $request->input('reportView', false),
-            //     'settingView' => $request->input('settingView', false),
-            //     'scheduleView' => $request->input('scheduleView', false),
-            //     'layerView' => $request->input('layerView', false),
-            //     'roleView' => $request->input('roleView', false),
-            //     'addGuide' => $request->input('addGuide', false),
-            //     'removeGuide' => $request->input('removeGuide', false),
-            // ];
-            // Ambil semua permissions dari database
-            $permissionsFromDb = Permission::pluck('name')->toArray();
-
-            // Loop melalui setiap permission untuk mengisi data request
-            $permissions = [];
-            foreach ($permissionsFromDb as $permissionName) {
-                // Setiap permission diambil dari request, default false jika tidak ada
-                $permissions[$permissionName] = $request->input($permissionName, false);
-            }
-
-            // Build permission_id string
-            $permission_id = '';
-
-            $role = Role::find($roleId);
-            $role->restriction = $restriction;
-
-            Log::info('Roles module: '.$this->userId.' Updated Role & Permission '.$role->name.'. Restriction '.$restriction);
+            Log::info('Roles module: '.$this->userId.' Updated Role & Permission '.$role->name.'. Restriction '.json_encode($role->only(['business_unit', 'company', 'location'])));
 
             $role->save();
 
-            // Loop through permissions and create new permission records
-            foreach ($permissions as $key) {
-                if ($key) {
-                    // Create a new permission record
-                    $rolepermission = new RoleHasPermission;
-                    $rolepermission->role_id = $roleId;
-                    $rolepermission->permission_id = $key;
-                    $rolepermission->save();
-                }
+            // The role may also hold other apps' permissions -- only replace ours.
+            RoleHasPermission::where('role_id', $roleId)
+                ->whereIn('permission_id', Permission::query()->select('id'))
+                ->delete();
+
+            foreach ($this->selectedPermissionIds($request) as $permissionId) {
+                RoleHasPermission::create(['role_id' => $roleId, 'permission_id' => $permissionId]);
             }
 
             app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
@@ -355,6 +260,19 @@ class RoleController extends Controller
         try {
 
             $role = Role::find($id);
+
+            if ($role && $role->isSharedWithOtherDomains()) {
+                // Other apps still use this role: drop only our permissions.
+                RoleHasPermission::where('role_id', $id)
+                    ->whereIn('permission_id', Permission::query()->select('id'))
+                    ->delete();
+
+                Log::info('Roles module: '.$this->userId.' Removed Extra Miles permissions from shared Role '.$role->name);
+
+                app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
+
+                return redirect()->route('roles')->with('success', __('Role is also used by other apps, so only its permissions in this app were removed.'));
+            }
 
             if ($role) {
 
@@ -375,5 +293,35 @@ class RoleController extends Controller
             return redirect()->route('roles')->with('error', __('Role deleted failed!'));
         }
 
+    }
+
+    /**
+     * Restriction selects on the role form -> the role's data-access columns.
+     */
+    private function restrictionAttributes(Request $request): array
+    {
+        $businessUnit = array_values(array_filter((array) $request->input('group_company', [])));
+        $company = array_values(array_filter((array) $request->input('contribution_level_code', [])));
+        $location = array_values(array_filter((array) $request->input('work_area_code', [])));
+
+        return [
+            'business_unit' => $businessUnit ?: null,
+            'company' => $company ?: null,
+            'location' => $location ?: null,
+            'is_data_access' => $businessUnit || $company || $location,
+        ];
+    }
+
+    /**
+     * Ids of this app's permissions whose checkbox is ticked. The ids come from
+     * the database, never from the posted value, so another app's permission
+     * cannot be attached.
+     */
+    private function selectedPermissionIds(Request $request): array
+    {
+        return Permission::pluck('id', 'name')
+            ->filter(fn ($id, $name) => $request->filled($name))
+            ->values()
+            ->all();
     }
 }

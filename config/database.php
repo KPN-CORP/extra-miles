@@ -81,6 +81,27 @@ return [
             ]) : [],
         ],
 
+        // Shared role & permission store for several HCIS apps. Permissions
+        // belong to a domain (see config/permission.php 'domain').
+        'sys_permission' => [
+            'driver' => 'mysql',
+            'host' => env('SYS_PERM_DB_HOST', '127.0.0.1'),
+            'port' => env('SYS_PERM_DB_PORT', '3306'),
+            'database' => env('SYS_PERM_DB_DATABASE', 'laravel'),
+            'username' => env('SYS_PERM_DB_USERNAME', 'root'),
+            'password' => env('SYS_PERM_DB_PASSWORD', ''),
+            'unix_socket' => env('SYS_PERM_DB_SOCKET', ''),
+            'charset' => env('SYS_PERM_DB_CHARSET', 'utf8mb4'),
+            'collation' => env('SYS_PERM_DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('SYS_PERM_MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

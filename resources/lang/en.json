@@ -691,6 +691,7 @@
     "Role updated successfully!": "Role updated successfully!",
     "Role updated failed!": "Role updated failed!",
     "Role deleted successfully!": "Role deleted successfully!",
+    "Role is also used by other apps, so only its permissions in this app were removed.": "Role is also used by other apps, so only its permissions in this app were removed.",
     "Role not found.": "Role not found.",
     "Role deleted failed!": "Role deleted failed!",
     "Social successfully created!": "Social successfully created!",
@@ -767,5 +768,7 @@
     "Assign": "Assign",
     "Manage": "Manage",
     "home": "home",
-    "starter": "starter"
+    "starter": "starter",
+    "Login Failed": "Login Failed",
+    "Back to Darwinbox": "Back to Darwinbox"
 }

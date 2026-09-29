@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\User;
 use App\Services\DarwinboxClient;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use RealRashid\SweetAlert\Facades\Alert;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Darwinbox SSO entry points. `dbauth` logs the employee into this app's
@@ -63,16 +62,31 @@ class SsoController extends Controller
     private function verify(Request $request): array
     {
         $payload = $this->darwinbox->decodePayload($request->input('data'));
-        $email = $payload ? $this->darwinbox->verifiedEmail($payload['email'], $payload['token']) : null;
 
-        if (! $email) {
+        if (! $payload) {
+            Log::warning('SSO payload missing or undecodable', ['path' => $request->path()]);
+
             return [null, null];
         }
 
-        return [User::where('email', $email)->first(), $payload['token']];
+        $email = $this->darwinbox->verifiedEmail($payload['email'], $payload['token']);
+
+        if (! $email) {
+            Log::warning('SSO token rejected by Darwinbox checkToken', ['path' => $request->path()]);
+
+            return [null, null];
+        }
+
+        $user = User::where('email', $email)->first();
+
+        if (! $user) {
+            Log::warning('SSO email has no matching user', ['email' => $email]);
+        }
+
+        return [$user, $payload['token']];
     }
 
-    private function handOff(Request $request, string $vendor): RedirectResponse
+    private function handOff(Request $request, string $vendor): Response
     {
         $config = config("services.sso_vendors.$vendor");
         [$user] = $this->verify($request);
@@ -119,12 +133,13 @@ class SsoController extends Controller
         return "$header.$body.$signature";
     }
 
-    private function failed(): RedirectResponse
+    /**
+     * A page of its own rather than redirect()->back(): url()->previous() falls
+     * back to "/" when there is no Referer, and "/" is the employee SPA, so a
+     * failed admin login used to land on its "Mobile Only" screen.
+     */
+    private function failed(): Response
     {
-        Alert::error(__('Login Failed, Please Contact Administrator'))->showConfirmButton(__('OK'));
-
-        return url()->previous()
-            ? redirect()->back()
-            : redirect()->away('https://kpncorporation.darwinbox.com/');
+        return response()->view('errors.sso-failed', [], 403);
     }
 }

@@ -243,8 +243,12 @@
 
 
         <div class="error-actions">
-            <a href="{{ url('/') }}" class="btn btn-primary">{{ __('Back to Home') }}</a>
-            <button type="button" class="btn btn-ghost" onclick="history.back()">{{ __('Go Back') }}</button>
+            @hasSection('actions')
+                @yield('actions')
+            @else
+                <a href="{{ url('/') }}" class="btn btn-primary">{{ __('Back to Home') }}</a>
+                <button type="button" class="btn btn-ghost" onclick="history.back()">{{ __('Go Back') }}</button>
+            @endif
         </div>
 
         <p class="error-footer">{{ __('If the problem keeps happening, please contact your administrator.') }}</p>

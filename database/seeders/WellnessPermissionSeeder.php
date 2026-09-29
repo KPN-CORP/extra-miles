@@ -10,15 +10,9 @@ use Spatie\Permission\PermissionRegistrar;
  *
  * Resolves the Role/Permission classes through config/permission.php rather
  * than importing Spatie's own -- this app maps them to App\Models\Role and
- * App\Models\Permission, which live on the `kpncorp` connection. Using
- * Spatie's classes directly would hit the default connection, where those
- * tables do not exist.
- *
- * `group_name`, `display_name` and `desc` are extra columns on that shared
- * permissions table. The role settings screen (pages/admin/roles/manageform)
- * lists only permissions whose group_name contains "extramile", renders
- * explode('_', group_name)[1] as the section heading, and shows `desc` as the
- * tooltip -- so a permission with a null group_name never appears there.
+ * App\Models\Permission, which live on the `sys_permission` connection.
+ * Permission stamps domain_id with this app's domain (DOMAIN_SYS_PERM) on
+ * create, and the role settings screen groups permissions by `group`.
  */
 class WellnessPermissionSeeder extends Seeder
 {
@@ -31,15 +25,13 @@ class WellnessPermissionSeeder extends Seeder
         $permissions = [
             [
                 'name' => 'viewmenuwellness',
-                'group_name' => 'extramile_Wellness',
-                'display_name' => 'Menu Wellness',
-                'desc' => 'Manage wellness activities, schedules, participants and attendance QR.',
+                'group' => 'Wellness',
+                'label' => 'Menu Wellness',
             ],
             [
                 'name' => 'viewmenuwellnesstype',
-                'group_name' => 'extramile_Wellness',
-                'display_name' => 'Menu Wellness Type',
-                'desc' => 'Manage the wellness activity type master data.',
+                'group' => 'Wellness',
+                'label' => 'Menu Wellness Type',
             ],
         ];
 
@@ -47,9 +39,8 @@ class WellnessPermissionSeeder extends Seeder
             $permissionClass::updateOrCreate(
                 ['name' => $permission['name'], 'guard_name' => $guard],
                 [
-                    'group_name' => $permission['group_name'],
-                    'display_name' => $permission['display_name'],
-                    'desc' => $permission['desc'],
+                    'group' => $permission['group'],
+                    'label' => $permission['label'],
                 ]
             );
         }
