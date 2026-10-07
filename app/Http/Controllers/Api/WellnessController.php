@@ -438,14 +438,29 @@ class WellnessController extends Controller
         // employee, so `registrations` holds at most their own row.
         $taken = (int) ($schedule->taken_seats ?? 0);
         $mine = $schedule->relationLoaded('registrations') ? $schedule->registrations->first() : null;
+        $mine?->setRelation('schedule', $schedule);
+
+        // Only a registration that still holds them counts as "theirs" here. A
+        // cancelled one is history -- they may register again -- and a rejected
+        // one is hidden from them, same as in myRegistrations.
+        $holding = $mine && $mine->status->holdsTheEmployee() ? $mine : null;
+        // Never the raw status: blacklisting is an admin matter and is shown
+        // as the ordinary queue status.
+        $shown = $holding?->employeeFacingStatus();
 
         return $payload + [
             'taken_seats' => $taken,
             'remaining_seats' => $schedule->quota === null ? null : max(0, $schedule->quota - $taken),
             'is_full' => $schedule->quota !== null && $taken >= $schedule->quota,
-            'my_status' => $mine?->status->value,
-            'my_status_label' => $mine?->status->label(),
-            'my_registration_id' => $mine?->encrypted_id,
+            'my_status' => $shown?->value,
+            'my_status_label' => $shown?->label(),
+            'my_registration_id' => $holding?->encrypted_id,
+            // The SPA decides its buttons from these, not by matching statuses.
+            'can_register' => $schedule->isRegistrationOpen()
+                && (! $mine || $mine->status === WellnessRegistrationStatus::Cancelled),
+            'can_cancel' => (bool) $holding?->status->canTransitionTo(WellnessRegistrationStatus::Cancelled),
+            'can_confirm' => (bool) $holding?->canConfirm(),
+            'confirm_due_at' => $holding?->confirm_due_at?->toDateTimeString(),
         ];
     }
 

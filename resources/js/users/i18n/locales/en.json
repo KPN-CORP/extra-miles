@@ -307,7 +307,26 @@
       "failed": "We could not record your attendance.",
       "sessionAt": "Session at {{time}}"
     },
-    "noSessionsOnDate": "No wellness sessions on this date. Pick another day."
+    "noSessionsOnDate": "No wellness sessions on this date. Pick another day.",
+    "status": {
+      "confirmed": "Confirmed",
+      "awaiting_confirmation": "Awaiting Confirmation",
+      "registered": "Registered",
+      "waiting_list": "Waiting List",
+      "cancelled": "Cancelled",
+      "rejected": "Not Accepted"
+    },
+    "confirmBy": "Confirm by {{date}}",
+    "confirmSeat": {
+      "button": "Confirm",
+      "title": "Confirm your seat?",
+      "text": "Your seat is held until the deadline. Confirm it now to keep it.",
+      "yes": "Yes, confirm",
+      "no": "Not now",
+      "doneTitle": "Seat confirmed",
+      "doneText": "See you there!",
+      "failedTitle": "Could not confirm"
+    }
   },
   "evo": {
     "title": "Employee Volunteer",

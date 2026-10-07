@@ -38,11 +38,13 @@ export function formatSession(schedule) {
 // Matches the badge colours used by the admin side, so both surfaces read the same.
 export function statusStyle(status) {
     switch (status) {
-        case 'approved':
+        case 'confirmed':
             return 'bg-green-100 text-green-700';
-        case 'pending':
+        case 'awaiting_confirmation':
+            return 'bg-orange-100 text-orange-700';
+        case 'registered':
             return 'bg-blue-100 text-blue-700';
-        case 'waitlisted':
+        case 'waiting_list':
             return 'bg-yellow-100 text-yellow-700';
         case 'rejected':
             return 'bg-red-100 text-red-700';

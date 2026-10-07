@@ -10,7 +10,7 @@ import { useApiUrl } from '../components/Context/ApiContext';
 import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
-import { formatSession, seatLabel, statusLabel, statusStyle, wellnessError } from '../components/Helper/wellnessHelper';
+import { formatDateTime, formatSession, seatLabel, statusLabel, statusStyle, wellnessError } from '../components/Helper/wellnessHelper';
 import { getImageUrl } from '../components/Helper/imagePath';
 import AppShell from '../components/Layout/AppShell';
 import {
@@ -110,6 +110,47 @@ export default function WellnessDetails() {
             showAlert({
                 icon: 'error',
                 title: t('wellness.registerConfirm.failedTitle'),
+                text: wellnessError(err),
+            });
+        } finally {
+            setSubmitting(null);
+        }
+    };
+
+    const handleConfirm = async (schedule) => {
+        const confirmed = await showAlert({
+            icon: 'question',
+            title: t('wellness.confirmSeat.title'),
+            text: t('wellness.confirmSeat.text'),
+            showCancelButton: true,
+            confirmButtonText: t('wellness.confirmSeat.yes'),
+            cancelButtonText: t('wellness.confirmSeat.no'),
+        });
+
+        if (!confirmed.isConfirmed) return;
+
+        setSubmitting(schedule.id);
+
+        try {
+            await axios.post(
+                `${apiUrl}/api/wellness/registrations/confirm`,
+                { registration_id: schedule.my_registration_id },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            await showAlert({
+                icon: 'success',
+                title: t('wellness.confirmSeat.doneTitle'),
+                text: t('wellness.confirmSeat.doneText'),
+                timer: 2200,
+                showConfirmButton: false,
+            });
+
+            refreshAfterWrite();
+        } catch (err) {
+            showAlert({
+                icon: 'error',
+                title: t('wellness.confirmSeat.failedTitle'),
                 text: wellnessError(err),
             });
         } finally {
@@ -220,9 +261,9 @@ export default function WellnessDetails() {
                     activity.schedules.map((schedule) => {
                         const when = formatSession(schedule);
                         const busy = submitting === schedule.id;
+                        // Masked by the API: a blacklisted registration arrives as
+                        // the ordinary queue status, a cancelled or rejected one as none.
                         const registered = Boolean(schedule.my_status);
-                        const canCancel = registered
-                            && ['pending', 'approved', 'waitlisted'].includes(schedule.my_status);
 
                         return (
                             <div key={schedule.id} className="bg-white rounded-xl shadow-sm p-3">
@@ -244,31 +285,55 @@ export default function WellnessDetails() {
 
                                 <div className="mt-3 flex items-center gap-2">
                                     {registered && (
-                                        <span className={`px-2 py-1 rounded-full text-[10px] font-semibold ${statusStyle(schedule.my_status)}`}>
-                                            {statusLabel(schedule.my_status, schedule.my_status_label)}
-                                        </span>
+                                        <div className="flex flex-col gap-0.5 min-w-0">
+                                            <span className={`self-start px-2 py-1 rounded-full text-[10px] font-semibold ${statusStyle(schedule.my_status)}`}>
+                                                {statusLabel(schedule.my_status, schedule.my_status_label)}
+                                            </span>
+                                            {schedule.can_confirm && schedule.confirm_due_at && (
+                                                <span className="text-[10px] text-stone-500">
+                                                    {t('wellness.confirmBy', { date: formatDateTime(schedule.confirm_due_at) })}
+                                                </span>
+                                            )}
+                                        </div>
                                     )}
 
                                     <div className="flex-1"></div>
 
-                                    {canCancel ? (
-                                        <button
-                                            disabled={busy}
-                                            onClick={() => handleCancel(schedule)}
-                                            className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-white text-red-700 ring-1 ring-red-700 ring-inset disabled:opacity-50"
-                                        >
-                                            {busy ? t('common.pleaseWait') : t('wellness.cancel')}
-                                        </button>
-                                    ) : !schedule.registration_open ? (
-                                        <span className="text-[10px] text-stone-400">{t('wellness.registrationClosed')}</span>
-                                    ) : (
+                                    {/* Already registered: never offer Register again,
+                                        only what can be done with the seat they have. */}
+                                    {registered ? (
+                                        <div className="flex gap-2">
+                                            {schedule.can_cancel && (
+                                                <button
+                                                    disabled={busy}
+                                                    onClick={() => handleCancel(schedule)}
+                                                    className="tap px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-white text-red-700 ring-1 ring-red-700 ring-inset disabled:opacity-50"
+                                                >
+                                                    {busy ? t('common.pleaseWait') : t('wellness.cancel')}
+                                                </button>
+                                            )}
+                                            {schedule.can_confirm && (
+                                                <button
+                                                    disabled={busy}
+                                                    onClick={() => handleConfirm(schedule)}
+                                                    className="tap px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white shadow-sm disabled:opacity-50"
+                                                >
+                                                    {busy ? t('common.pleaseWait') : t('wellness.confirmSeat.button')}
+                                                </button>
+                                            )}
+                                        </div>
+                                    ) : schedule.can_register ? (
                                         <button
                                             disabled={busy}
                                             onClick={() => handleRegister(schedule)}
-                                            className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white shadow-sm disabled:opacity-50"
+                                            className="tap px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white shadow-sm disabled:opacity-50"
                                         >
                                             {busy ? t('common.pleaseWait') : schedule.is_full ? t('wellness.joinWaitlist') : t('wellness.register')}
                                         </button>
+                                    ) : (
+                                        <span className="text-[10px] text-stone-400">
+                                            {schedule.registration_open ? t('wellness.notAvailable') : t('wellness.registrationClosed')}
+                                        </span>
                                     )}
                                 </div>
                             </div>

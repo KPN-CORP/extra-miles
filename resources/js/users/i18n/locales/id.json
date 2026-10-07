@@ -307,7 +307,26 @@
       "failed": "Kami tidak dapat mencatat kehadiran Anda.",
       "sessionAt": "Sesi pukul {{time}}"
     },
-    "noSessionsOnDate": "Tidak ada sesi wellness pada tanggal ini. Pilih hari lain."
+    "noSessionsOnDate": "Tidak ada sesi wellness pada tanggal ini. Pilih hari lain.",
+    "status": {
+      "confirmed": "Terkonfirmasi",
+      "awaiting_confirmation": "Menunggu Konfirmasi",
+      "registered": "Terdaftar",
+      "waiting_list": "Daftar Tunggu",
+      "cancelled": "Dibatalkan",
+      "rejected": "Tidak Diterima"
+    },
+    "confirmBy": "Konfirmasi sebelum {{date}}",
+    "confirmSeat": {
+      "button": "Konfirmasi",
+      "title": "Konfirmasi kursi Anda?",
+      "text": "Kursi Anda disimpan sampai batas waktu. Konfirmasi sekarang agar tidak hilang.",
+      "yes": "Ya, konfirmasi",
+      "no": "Nanti saja",
+      "doneTitle": "Kursi terkonfirmasi",
+      "doneText": "Sampai jumpa di sana!",
+      "failedTitle": "Gagal mengonfirmasi"
+    }
   },
   "evo": {
     "title": "Employee Volunteer",
