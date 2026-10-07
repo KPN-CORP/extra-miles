@@ -205,6 +205,7 @@
 @push('scripts')
     @include('layouts_.shared.admin-datatable-js')
     @include('pages.admin.wellness.partials.confirm-js')
+    @include('pages.admin.wellness.schedules._range-js')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var MAX_OCCURRENCES = {{ (int) config('wellness.recurrence.max_occurrences', 260) }};
@@ -294,6 +295,36 @@
 
             var syncCreateDuration = wireDuration('create');
             var syncEditDuration = wireDuration('edit');
+
+            // ------------------------------------------------- date rules
+            // The same bounds and messages as the Schedule tab of the activity
+            // form (schedules/_range-js), so a date the server would refuse is
+            // refused in the picker instead of after a round trip.
+            function wireRange(prefix, syncDuration) {
+                var form = document.querySelector('#' + prefix + 'ScheduleModal form');
+
+                if (!form) {
+                    return function () {};
+                }
+
+                function sync() {
+                    WellnessSessionRange.enforce(form);
+                }
+
+                form.addEventListener('input', sync);
+                form.addEventListener('change', function (event) {
+                    if (event.target.classList.contains('js-start-at')) {
+                        WellnessSessionRange.defaultEnd(form);
+                        syncDuration();
+                    }
+                    sync();
+                });
+
+                return sync;
+            }
+
+            var syncCreateRange = wireRange('create', syncCreateDuration);
+            var syncEditRange = wireRange('edit', syncEditDuration);
 
             // -------------------------------------------- confirmation step
             // Setting this one field changes how every seat on the session is
@@ -406,6 +437,7 @@
                 editSubtitle.textContent = data.label || '';
                 syncEditDuration();
                 syncEditConfirm();
+                syncEditRange();
 
                 // The choice is only offered when there is something after
                 // button occurrence to carry the edit to.
@@ -417,6 +449,7 @@
 
             syncCreateDuration();
             syncCreateConfirm();
+            syncCreateRange();
             syncRepeat();
 
             // A bounced submit keeps the typed values through old(); reopen the

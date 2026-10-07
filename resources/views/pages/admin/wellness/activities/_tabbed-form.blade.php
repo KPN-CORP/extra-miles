@@ -70,6 +70,7 @@
 </div>
 
 @push('scripts')
+@include('pages.admin.wellness.schedules._range-js')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var form = document.getElementById('wa_form');
@@ -83,12 +84,6 @@
         if (!form || !rows || !template || !addButton) {
             return;
         }
-
-        var MESSAGES = {
-            endAfterStart: @json(__('End time must be later than the start time.')),
-            regOrder: @json(__('Registration must close no earlier than it opens.')),
-            regWithin: @json(__('Registration must close no later than the session ends.'))
-        };
 
         var BADGES = {
             open: 'bg-success-subtle text-success',
@@ -105,10 +100,7 @@
             return (n < 10 ? '0' : '') + n;
         }
 
-        function toLocalValue(date) {
-            return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate())
-                + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
-        }
+        var toLocalValue = WellnessSessionRange.toLocalValue;
 
         // "2026-10-01T08:00" -> parts. Parsed by hand rather than through Date()
         // so a half-typed value never renders as "Invalid Date".
@@ -186,88 +178,9 @@
             return start ? parts.join('  ·  ') : @json(__('Not scheduled yet'));
         }
 
-        // The later of two values, ignoring blanks. Bounds are built from this so
-        // a field is held by every rule that applies to it at once.
-        function laterOf(a, b) {
-            if (!a) {
-                return b || '';
-            }
-
-            if (!b) {
-                return a || '';
-            }
-
-            return a > b ? a : b;
-        }
-
-        // Mirrors the date rules in WellnessActivityRequest so the browser refuses
-        // exactly what the server would, instead of the admin finding out after a
-        // round trip.
-        //
-        // `min`/`max` steer the native picker, but the real check is
-        // setCustomValidity: `min` is inclusive while the server wants the end
-        // strictly after the start. Values are "YYYY-MM-DDTHH:mm", where string
-        // order is chronological order, so they compare directly.
-        //
-        // Every pair is bounded in both directions -- session start/end, and
-        // registration opens/closes -- so neither half of a pair can be moved
-        // through the other.
-        function enforceRange(row) {
-            var start = row.querySelector('.js-start-at');
-            var end = row.querySelector('.js-end-at');
-            var regStart = row.querySelector('.js-reg-start');
-            var regEnd = row.querySelector('.js-reg-end');
-            var confirmBy = row.querySelector('.js-confirm-by');
-
-            // Confirming has to happen before the session it is for, and not
-            // before sign-ups open -- mirrors the server rule so the picker
-            // never offers a value the save would reject.
-            if (confirmBy) {
-                confirmBy.min = regStart ? regStart.value : '';
-                confirmBy.max = start.value || '';
-            }
-
-            var hasWindow = regStart && regEnd;
-
-            // Each pair is bounded from BOTH sides, so whichever field the admin
-            // is editing is the one the picker restrains -- a one-sided bound
-            // leaves the other field free to break the rule and puts the error
-            // on a field they never touched.
-            end.min = laterOf(start.value, hasWindow ? regEnd.value : '');
-            end.setCustomValidity(
-                start.value && end.value && end.value <= start.value ? MESSAGES.endAfterStart : ''
-            );
-
-            if (!hasWindow) {
-                return;
-            }
-
-            // registration_end_at: after_or_equal registration_start_at,
-            //                      before_or_equal end_at.
-            regEnd.min = regStart.value || '';
-            regEnd.max = end.value || '';
-
-            // The reciprocal of the first of those, so "Opens" cannot be pushed
-            // past "Closes" either.
-            regStart.max = regEnd.value || '';
-
-            var outOfOrder = regStart.value && regEnd.value && regEnd.value < regStart.value;
-
-            regStart.setCustomValidity(outOfOrder ? MESSAGES.regOrder : '');
-
-            var regMessage = '';
-
-            if (outOfOrder) {
-                regMessage = MESSAGES.regOrder;
-            } else if (end.value && regEnd.value && regEnd.value > end.value) {
-                regMessage = MESSAGES.regWithin;
-            }
-
-            regEnd.setCustomValidity(regMessage);
-        }
-
+        // Same date rules as the schedule modal -- see schedules/_range-js.
         function refreshRow(row, position) {
-            enforceRange(row);
+            WellnessSessionRange.enforce(row);
             row.querySelector('.js-schedule-title').textContent = @json(__('Session')) + ' ' + position;
             row.querySelector('.js-schedule-summary').textContent = summarise(row);
 
@@ -388,12 +301,7 @@
             // Picking a start with no end yet: assume an hour, which is the common
             // case and still editable.
             if (event.target.classList.contains('js-start-at')) {
-                var end = row.querySelector('.js-end-at');
-                var stamp = Date.parse(event.target.value);
-
-                if (!end.value && !isNaN(stamp)) {
-                    end.value = toLocalValue(new Date(stamp + 60 * 60 * 1000));
-                }
+                WellnessSessionRange.defaultEnd(row);
             }
 
             refreshRow(row, Array.prototype.indexOf.call(rows.children, row) + 1);
