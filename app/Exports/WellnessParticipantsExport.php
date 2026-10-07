@@ -6,20 +6,21 @@ use App\Models\WellnessActivityRegistration;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class WellnessParticipantsExport implements FromCollection, ShouldAutoSize, WithHeadings, WithStyles
+class WellnessParticipantsExport implements FromCollection, ShouldAutoSize, WithColumnWidths, WithHeadings, WithStyles
 {
     public function __construct(protected int $scheduleId) {}
 
     public function collection(): Collection
     {
         $registrations = WellnessActivityRegistration::where('wellness_activity_schedule_id', $this->scheduleId)
-            ->with(['statusHistories', 'activity'])
+            ->with(['statusHistories', 'activity', 'feedback'])
             ->orderBy('status')
             ->orderBy('registered_at')
             ->get();
@@ -42,6 +43,9 @@ class WellnessParticipantsExport implements FromCollection, ShouldAutoSize, With
                 'Attended At' => $item->attended_at?->format('Y-m-d H:i'),
                 'Attended' => $item->attended_at ? __('Attended') : __('Not yet'),
                 'Last Remark' => $latest?->remark,
+                // Written from the mobile app after attending; one per registration.
+                'Feedback' => $item->feedback?->message,
+                'Feedback Submitted At' => $item->feedback?->submitted_at?->format('Y-m-d H:i'),
             ];
         });
     }
@@ -66,6 +70,8 @@ class WellnessParticipantsExport implements FromCollection, ShouldAutoSize, With
             __('Attended At'),
             __('Attended'),
             __('Last Remark'),
+            __('Feedback'),
+            __('Feedback Submitted At'),
         ];
     }
 
@@ -83,6 +89,17 @@ class WellnessParticipantsExport implements FromCollection, ShouldAutoSize, With
                     'startColor' => ['rgb' => 'ab2f2b'],
                 ],
             ],
+            // Feedback can run to paragraphs: wrap it in a fixed-width column
+            // instead of letting auto-size stretch it across the screen.
+            'O2:O'.$sheet->getHighestRow() => ['alignment' => ['wrapText' => true, 'vertical' => Alignment::VERTICAL_TOP]],
         ];
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function columnWidths(): array
+    {
+        return ['O' => 60];
     }
 }

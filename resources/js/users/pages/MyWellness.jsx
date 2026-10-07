@@ -105,17 +105,14 @@ export default function MyWellness() {
     };
 
     // Feedback is only offered on sessions the employee attended and that have
-    // finished -- the backend decides that, `can_submit_feedback` just mirrors it.
-    // Sending it again overwrites what they wrote before.
+    // finished, and only once -- the backend decides that, `can_submit_feedback`
+    // just mirrors it. Sent feedback is final, so the dialog says so up front.
     const handleFeedback = async (registration) => {
-        const existing = registration.feedback?.message ?? '';
-
         const result = await showAlert({
             icon: 'question',
-            title: existing ? t('wellness.feedback.editTitle') : t('wellness.feedback.title'),
+            title: t('wellness.feedback.title'),
             text: t('wellness.feedback.text'),
             input: 'textarea',
-            inputValue: existing,
             inputPlaceholder: t('wellness.feedback.placeholder'),
             inputAttributes: { maxlength: 2000 },
             showCancelButton: true,
@@ -257,7 +254,7 @@ export default function MyWellness() {
                                             className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-white text-red-700 ring-1 ring-red-700 ring-inset disabled:opacity-50"
                                         >
                                             <i className="ri-chat-1-line me-1"></i>
-                                            {registration.feedback ? t('wellness.feedback.edit') : t('wellness.feedback.give')}
+                                            {t('wellness.feedback.give')}
                                         </button>
                                     )}
 
@@ -283,7 +280,7 @@ export default function MyWellness() {
                                     </div>
                                 )}
 
-                                {registration.status === 'waitlisted' && (
+                                {registration.status === 'waiting_list' && (
                                     <p className="mt-2 text-[10px] text-stone-500 leading-relaxed">
                                         {t('wellness.waitlistNote')}
                                     </p>

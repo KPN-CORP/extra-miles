@@ -15,6 +15,7 @@ use App\Models\WellnessActivityRegistration;
 use App\Models\WellnessActivitySchedule;
 use App\Services\WellnessRegistrationService;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -348,11 +349,15 @@ class WellnessController extends Controller
             return response()->json(['error' => 'Registration not found'], 404);
         }
 
-        $registration = WellnessActivityRegistration::with('schedule')->find($registrationId);
+        $registration = WellnessActivityRegistration::with(['schedule', 'feedback'])->find($registrationId);
 
         // An employee may only leave feedback on their own registration.
         if (! $registration || $registration->employee_id !== $employeeId) {
             return response()->json(['error' => 'Registration not found'], 404);
+        }
+
+        if ($registration->feedback) {
+            return $this->feedbackAlreadySubmitted();
         }
 
         if (! $registration->canSubmitFeedback()) {
@@ -362,17 +367,21 @@ class WellnessController extends Controller
             ], 422);
         }
 
-        $feedback = WellnessActivityFeedback::updateOrCreate(
-            ['wellness_activity_registration_id' => $registration->id],
-            [
+        try {
+            $feedback = WellnessActivityFeedback::create([
+                'wellness_activity_registration_id' => $registration->id,
                 'wellness_activity_schedule_id' => $registration->wellness_activity_schedule_id,
                 'wellness_activity_id' => $registration->wellness_activity_id,
                 'employee_id' => $registration->employee_id,
                 'fullname' => $registration->fullname,
                 'message' => $request->input('message'),
                 'submitted_at' => now(),
-            ]
-        );
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            // A double tap that got past the check above: the unique index on
+            // the registration keeps the first message.
+            return $this->feedbackAlreadySubmitted();
+        }
 
         return response()->json([
             'message' => 'Thank you! Your feedback has been sent.',
@@ -462,6 +471,14 @@ class WellnessController extends Controller
             'can_confirm' => (bool) $holding?->canConfirm(),
             'confirm_due_at' => $holding?->confirm_due_at?->toDateTimeString(),
         ];
+    }
+
+    protected function feedbackAlreadySubmitted(): JsonResponse
+    {
+        return response()->json([
+            'error' => 'You have already sent feedback for this session.',
+            'reason' => 'feedback_already_submitted',
+        ], 422);
     }
 
     /**

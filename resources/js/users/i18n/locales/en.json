@@ -285,11 +285,9 @@
     },
     "feedback": {
       "give": "Give feedback",
-      "edit": "Edit feedback",
       "yours": "Your feedback",
       "title": "How was this session?",
-      "editTitle": "Edit your feedback",
-      "text": "Tell us what you thought. Only the wellness admin will read it.",
+      "text": "Tell us what you thought. Only the wellness admin will read it. Feedback cannot be changed once it is sent.",
       "placeholder": "What went well, what could be better?",
       "send": "Send feedback",
       "notNow": "Not now",
@@ -326,6 +324,9 @@
       "doneTitle": "Seat confirmed",
       "doneText": "See you there!",
       "failedTitle": "Could not confirm"
+    },
+    "errors": {
+      "feedback_already_submitted": "You have already sent feedback for this session."
     }
   },
   "evo": {

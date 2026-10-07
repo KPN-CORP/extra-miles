@@ -285,11 +285,9 @@
     },
     "feedback": {
       "give": "Beri masukan",
-      "edit": "Ubah masukan",
       "yours": "Masukan Anda",
       "title": "Bagaimana sesi ini?",
-      "editTitle": "Ubah masukan Anda",
-      "text": "Ceritakan pendapat Anda. Hanya admin wellness yang membacanya.",
+      "text": "Ceritakan pendapat Anda. Hanya admin wellness yang akan membacanya. Feedback tidak dapat diubah setelah dikirim.",
       "placeholder": "Apa yang sudah baik, apa yang bisa lebih baik?",
       "send": "Kirim masukan",
       "notNow": "Nanti saja",
@@ -326,6 +324,9 @@
       "doneTitle": "Kursi terkonfirmasi",
       "doneText": "Sampai jumpa di sana!",
       "failedTitle": "Gagal mengonfirmasi"
+    },
+    "errors": {
+      "feedback_already_submitted": "Anda sudah mengirim feedback untuk sesi ini."
     }
   },
   "evo": {

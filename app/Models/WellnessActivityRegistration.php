@@ -141,9 +141,11 @@ class WellnessActivityRegistration extends Model
     {
         $at ??= now();
 
+        // One message per registration, and it is final once sent.
         return $this->attended_at !== null
             && $this->schedule !== null
-            && $at->gte($this->schedule->end_at);
+            && $at->gte($this->schedule->end_at)
+            && $this->feedback === null;
     }
 
     public function scopeHoldingSeat($query)
