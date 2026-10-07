@@ -6,8 +6,11 @@ use App\Enums\WellnessRegistrationSource;
 use App\Enums\WellnessRegistrationStatus;
 use App\Exceptions\WellnessRegistrationException;
 use App\Exports\WellnessParticipantsExport;
+use App\Exports\WellnessParticipantsImportTemplate;
 use App\Http\Controllers\Concerns\DecryptsRouteId;
+use App\Http\Requests\ImportWellnessRegistrationRequest;
 use App\Http\Requests\StoreWellnessRegistrationRequest;
+use App\Imports\WellnessParticipantsImport;
 use App\Models\Employee;
 use App\Models\WellnessActivityRegistration;
 use App\Models\WellnessActivitySchedule;
@@ -27,8 +30,19 @@ class WellnessRegistrationController extends Controller
 
     public function index(string $encryptedId)
     {
-        $schedule = WellnessActivitySchedule::with('activity.type')
+        $schedule = WellnessActivitySchedule::withTrashed()
+            ->with('activity.type')
             ->findOrFail($this->decryptId($encryptedId));
+
+        // An archived schedule has no participant page any more; send the
+        // admin to its activity's schedule list rather than a bare 404.
+        if ($schedule->trashed()) {
+            return $schedule->activity
+                ? redirect()
+                    ->route('admin.wellness.schedules.index', $schedule->activity->encrypted_id)
+                    ->with('error', __('This schedule has been archived.'))
+                : redirect()->route('admin.wellness.activities.index');
+        }
 
         $method = $schedule->activity->registration_method;
 
@@ -97,14 +111,7 @@ class WellnessRegistrationController extends Controller
         try {
             $this->service->register(
                 schedule: $schedule,
-                employee: [
-                    'employee_id' => $employee->employee_id,
-                    'fullname' => $employee->fullname,
-                    'business_unit' => $employee->group_company,
-                    'unit' => $employee->unit,
-                    'job_level' => $employee->job_level,
-                    'location' => $employee->office_area,
-                ],
+                employee: $this->snapshotFor($employee),
                 source: WellnessRegistrationSource::Admin,
                 actorId: Auth::id(),
                 remark: $request->validated('remark'),
@@ -119,6 +126,85 @@ class WellnessRegistrationController extends Controller
         return redirect()->back()->with('success', $schedule->requiresConfirmation()
             ? __(':name has been registered and asked to confirm.', ['name' => $employee->fullname])
             : __(':name has been registered and confirmed.', ['name' => $employee->fullname]));
+    }
+
+    /**
+     * Add many employees at once from an uploaded sheet of employee IDs. Each
+     * row goes through the same service call as the single "add employee"
+     * form, one transaction per row, so a full session or a duplicate only
+     * skips that row and the report says why.
+     */
+    public function import(ImportWellnessRegistrationRequest $request, string $encryptedId)
+    {
+        $schedule = WellnessActivitySchedule::findOrFail($this->decryptId($encryptedId));
+
+        try {
+            $rows = WellnessParticipantsImport::employeeIds($request->file('file'));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()->back()->with('error', __('The import file could not be read.'));
+        }
+
+        if ($rows->isEmpty()) {
+            return redirect()->back()->with('error', __('The import file has no employee IDs.'));
+        }
+
+        if ($rows->count() > WellnessParticipantsImport::MAX_ROWS) {
+            return redirect()->back()->with('error', __('The import file can have at most :max rows.', [
+                'max' => WellnessParticipantsImport::MAX_ROWS,
+            ]));
+        }
+
+        // One query for the whole sheet instead of one per row.
+        $employees = Employee::whereIn('employee_id', $rows->pluck('employee_id')->unique())
+            ->get()
+            ->keyBy('employee_id');
+
+        $added = 0;
+        $skipped = [];
+        $seen = [];
+
+        foreach ($rows as $row) {
+            $id = $row['employee_id'];
+            $employee = $employees->get($id);
+            $reason = null;
+
+            if (isset($seen[$id])) {
+                $reason = __('Listed more than once in the file.');
+            } elseif (! $employee) {
+                $reason = __('Employee not found in the HR database.');
+            } else {
+                try {
+                    $this->service->register(
+                        schedule: $schedule,
+                        employee: $this->snapshotFor($employee),
+                        source: WellnessRegistrationSource::Admin,
+                        actorId: Auth::id(),
+                        remark: $request->validated('remark') ?: 'Imported from file.',
+                        allowOverQuota: (bool) $request->validated('allow_over_quota'),
+                    );
+                    $added++;
+                } catch (WellnessRegistrationException $e) {
+                    $reason = $e->getMessage();
+                }
+            }
+
+            $seen[$id] = true;
+
+            if ($reason) {
+                $skipped[] = ['row' => $row['row'], 'employee_id' => $id, 'reason' => $reason];
+            }
+        }
+
+        return redirect()->back()
+            ->with('success', __(':added of :total employee(s) imported.', ['added' => $added, 'total' => $rows->count()]))
+            ->with('importReport', $skipped);
+    }
+
+    public function importTemplate()
+    {
+        return Excel::download(new WellnessParticipantsImportTemplate, 'wellness_participants_import_template.xlsx');
     }
 
     /**
@@ -344,6 +430,23 @@ class WellnessRegistrationController extends Controller
             'cancelled' => __(':name has been cancelled.', $name),
             default => __(':name has been updated.', $name),
         });
+    }
+
+    /**
+     * HR snapshot stored on the registration, read from `kpncorp`.
+     *
+     * @return array<string, mixed>
+     */
+    protected function snapshotFor(Employee $employee): array
+    {
+        return [
+            'employee_id' => $employee->employee_id,
+            'fullname' => $employee->fullname,
+            'business_unit' => $employee->group_company,
+            'unit' => $employee->unit,
+            'job_level' => $employee->job_level,
+            'location' => $employee->office_area,
+        ];
     }
 
     protected function nameFor(WellnessActivityRegistration $registration): string

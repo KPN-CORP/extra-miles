@@ -22,30 +22,93 @@
                 </span>
             </small>
         </div>
-        <div class="d-flex gap-2">
-            {{-- The attendance QR belongs to the activity type, so one code covers
-                 every session of it; this is a shortcut to that code, not a
-                 per-session one. --}}
-            @if ($schedule->activity->type)
-                <a href="{{ route('wellness.types.qr', $schedule->activity->type->encrypted_id) }}" target="_blank" class="btn btn-outline-dark">
-                    <i class="ri-qr-code-line me-1"></i> {{ __('QR') }}
-                </a>
-            @endif
-            {{-- data-no-loader: this serves a file, the page never navigates, so the
-                 preloader would have nothing to clear it. --}}
-            <a href="{{ route('wellness.registrations.export', $schedule->encrypted_id) }}" class="btn btn-outline-success" data-no-loader>
-                <i class="ri-file-excel-2-line me-1"></i> {{ __('Export') }}
-            </a>
-            <a href="{{ route('admin.wellness.schedules.index', $schedule->activity->encrypted_id) }}" class="btn btn-outline-secondary">
+        {{-- Left to right: navigation, then read-only tools, then the primary
+             action last, so "add" is always the right-most and most prominent. --}}
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <a href="{{ route('admin.wellness.schedules.index', $schedule->activity->encrypted_id) }}" class="btn btn-light">
                 <i class="ri-arrow-left-line me-1"></i> {{ __('Back') }}
             </a>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addParticipantModal">
-                <i class="ri-user-add-line me-1"></i> {{ __('Add Employee') }}
-            </button>
+
+            <div class="btn-group" role="group" aria-label="{{ __('Tools') }}">
+                {{-- The attendance QR belongs to the activity type, so one code covers
+                     every session of it; this is a shortcut to that code, not a
+                     per-session one. --}}
+                @if ($schedule->activity->type)
+                    <a href="{{ route('wellness.types.qr', $schedule->activity->type->encrypted_id) }}" target="_blank" class="btn btn-outline-secondary">
+                        <i class="ri-qr-code-line me-1"></i> {{ __('QR') }}
+                    </a>
+                @endif
+                {{-- data-no-loader: this serves a file, the page never navigates, so the
+                     preloader would have nothing to clear it. --}}
+                <a href="{{ route('wellness.registrations.export', $schedule->encrypted_id) }}" class="btn btn-outline-secondary" data-no-loader>
+                    <i class="ri-file-excel-2-line me-1"></i> {{ __('Export') }}
+                </a>
+            </div>
+
+            {{-- One "add" control: the main button adds a single employee, the
+                 caret offers the bulk import. --}}
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addParticipantModal">
+                    <i class="ri-user-add-line me-1"></i> {{ __('Add Employee') }}
+                </button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">{{ __('More ways to add') }}</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addParticipantModal">
+                            <i class="ri-user-add-line me-1"></i> {{ __('Add one employee') }}
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#importParticipantModal">
+                            <i class="ri-upload-2-line me-1"></i> {{ __('Import from file') }}
+                        </button>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('wellness.registrations.importTemplate') }}" data-no-loader>
+                            <i class="ri-download-2-line me-1"></i> {{ __('Download import template') }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
     @include('pages.admin.wellness.partials.errors')
+
+    {{-- Rows the last import skipped, with the reason for each. --}}
+    @if (session('importReport'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading mb-2">
+                <i class="ri-error-warning-line me-1"></i>
+                {{ __(':count row(s) were not imported', ['count' => count(session('importReport'))]) }}
+            </h5>
+            <div class="table-responsive" style="max-height: 240px; overflow-y: auto;">
+                <table class="table table-sm table-borderless mb-0 small">
+                    <thead>
+                        <tr>
+                            <th>{{ __('Row') }}</th>
+                            <th>{{ __('Employee ID') }}</th>
+                            <th>{{ __('Reason') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (session('importReport') as $item)
+                            <tr>
+                                <td>{{ $item['row'] }}</td>
+                                <td>{{ $item['employee_id'] }}</td>
+                                <td>{{ $item['reason'] }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
+        </div>
+    @endif
 
     <div class="alert alert-light border d-flex align-items-start gap-2" role="alert">
         <i class="{{ $method->icon() }} mt-1"></i>
@@ -267,40 +330,52 @@
             });
 
             // ---- confirm / requeue / cancel ---------------------------------
-            document.querySelectorAll('.js-action').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    document.getElementById('actionForm').action = this.dataset.url;
-                    document.getElementById('actionModalTitle').textContent = this.dataset.title;
-                    document.getElementById('actionModalBody').textContent = this.dataset.body;
-                    document.getElementById('action-remark').value = '';
+            // Row buttons below are delegated, not bound per button: DataTables
+            // keeps rows of other pages (and re-sorted or collapsed ones) outside
+            // the document when this runs, so a direct listener would miss them.
+            document.addEventListener('click', function (event) {
+                var button = event.target.closest('.js-action');
+                if (!button) {
+                    return;
+                }
 
-                    var submit = document.getElementById('actionSubmit');
-                    submit.textContent = this.dataset.confirm;
-                    submit.className = 'btn ' + (this.dataset.variant || 'btn-primary');
-                });
+                document.getElementById('actionForm').action = button.dataset.url;
+                document.getElementById('actionModalTitle').textContent = button.dataset.title;
+                document.getElementById('actionModalBody').textContent = button.dataset.body;
+                document.getElementById('action-remark').value = '';
+
+                var submit = document.getElementById('actionSubmit');
+                submit.textContent = button.dataset.confirm;
+                submit.className = 'btn ' + (button.dataset.variant || 'btn-primary');
             });
 
             // ---- blacklist --------------------------------------------------
-            document.querySelectorAll('.js-blacklist').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    document.getElementById('blacklistForm').action = this.dataset.url;
-                    document.getElementById('blacklistName').textContent = this.dataset.name;
-                    document.getElementById('blacklist-reason').value = '';
-                    document.getElementById('blacklist-end-date').value = '';
-                    document.getElementById('blacklist-add-master').checked = true;
-                });
+            document.addEventListener('click', function (event) {
+                var button = event.target.closest('.js-blacklist');
+                if (!button) {
+                    return;
+                }
+
+                document.getElementById('blacklistForm').action = button.dataset.url;
+                document.getElementById('blacklistName').textContent = button.dataset.name;
+                document.getElementById('blacklist-reason').value = '';
+                document.getElementById('blacklist-end-date').value = '';
+                document.getElementById('blacklist-add-master').checked = true;
             });
 
             // ---- status history ---------------------------------------------
-            document.querySelectorAll('.js-history').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    var template = document.getElementById('history-' + this.dataset.registration);
-                    var body = document.getElementById('historyBody');
-                    body.innerHTML = '';
-                    if (template) {
-                        body.appendChild(template.content.cloneNode(true));
-                    }
-                });
+            document.addEventListener('click', function (event) {
+                var button = event.target.closest('.js-history');
+                if (!button) {
+                    return;
+                }
+
+                var template = document.getElementById('history-' + button.dataset.registration);
+                var body = document.getElementById('historyBody');
+                body.innerHTML = '';
+                if (template) {
+                    body.appendChild(template.content.cloneNode(true));
+                }
             });
 
             // ---- employee typeahead -----------------------------------------

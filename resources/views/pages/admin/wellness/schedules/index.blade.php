@@ -384,29 +384,35 @@
             var scopeThis = document.getElementById('edit-scope-this');
             var editSubtitle = document.querySelector('.js-edit-subtitle');
 
-            document.querySelectorAll('.js-edit-schedule').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    var data = this.dataset;
-                    document.getElementById('editScheduleForm').action = data.url;
-                    document.getElementById('edit-start_at').value = data.start || '';
-                    document.getElementById('edit-end_at').value = data.end || '';
-                    document.getElementById('edit-location').value = data.location || '';
-                    document.getElementById('edit-quota').value = data.quota || '';
-                    document.getElementById('edit-registration_start_at').value = data.regstart || '';
-                    document.getElementById('edit-registration_end_at').value = data.regend || '';
-                    document.getElementById('edit-confirmation_deadline').value = data.confirmby || '';
-                    document.getElementById('edit-status').value = data.status || 'open';
-                    editSubtitle.textContent = data.label || '';
-                    syncEditDuration();
-                    syncEditConfirm();
+            // Delegated, not bound per button: DataTables keeps rows of other
+            // pages (and re-sorted or collapsed ones) outside the document when
+            // this runs, so a direct listener would miss them.
+            document.addEventListener('click', function (event) {
+                var button = event.target.closest('.js-edit-schedule');
+                if (!button) {
+                    return;
+                }
 
-                    // The choice is only offered when there is something after
-                    // this occurrence to carry the edit to.
-                    var following = parseInt(data.following || '0', 10);
-                    scopeWrapper.classList.toggle('d-none', following < 1);
-                    scopeCount.textContent = following > 0 ? '(+' + following + ')' : '';
-                    scopeThis.checked = true;
-                });
+                var data = button.dataset;
+                document.getElementById('editScheduleForm').action = data.url;
+                document.getElementById('edit-start_at').value = data.start || '';
+                document.getElementById('edit-end_at').value = data.end || '';
+                document.getElementById('edit-location').value = data.location || '';
+                document.getElementById('edit-quota').value = data.quota || '';
+                document.getElementById('edit-registration_start_at').value = data.regstart || '';
+                document.getElementById('edit-registration_end_at').value = data.regend || '';
+                document.getElementById('edit-confirmation_deadline').value = data.confirmby || '';
+                document.getElementById('edit-status').value = data.status || 'open';
+                editSubtitle.textContent = data.label || '';
+                syncEditDuration();
+                syncEditConfirm();
+
+                // The choice is only offered when there is something after
+                // button occurrence to carry the edit to.
+                var following = parseInt(data.following || '0', 10);
+                scopeWrapper.classList.toggle('d-none', following < 1);
+                scopeCount.textContent = following > 0 ? '(+' + following + ')' : '';
+                scopeThis.checked = true;
             });
 
             syncCreateDuration();

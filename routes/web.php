@@ -195,6 +195,8 @@ Route::prefix('admin')->group(function () {
             // Wellness -- participants of one schedule
             Route::get('/wellness/schedules/{encryptedId}/participants', [WellnessRegistrationController::class, 'index'])->name('admin.wellness.registrations.index');
             Route::post('/wellness/schedules/{encryptedId}/participants', [WellnessRegistrationController::class, 'store'])->name('wellness.registrations.store');
+            Route::post('/wellness/schedules/{encryptedId}/participants/import', [WellnessRegistrationController::class, 'import'])->name('wellness.registrations.import');
+            Route::get('/wellness/participants/import-template', [WellnessRegistrationController::class, 'importTemplate'])->name('wellness.registrations.importTemplate');
             Route::get('/wellness/schedules/{encryptedId}/export', [WellnessRegistrationController::class, 'export'])->name('wellness.registrations.export');
             Route::post('/wellness/registrations/{encryptedId}/confirm', [WellnessRegistrationController::class, 'confirm'])->name('wellness.registrations.confirm');
             Route::post('/wellness/registrations/{encryptedId}/reject', [WellnessRegistrationController::class, 'reject'])->name('wellness.registrations.reject');

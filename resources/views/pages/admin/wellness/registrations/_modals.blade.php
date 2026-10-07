@@ -43,6 +43,54 @@
     </div>
 </div>
 
+{{-- Import employees from a sheet of employee IDs --}}
+<div class="modal fade" id="importParticipantModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('wellness.registrations.import', $schedule->encrypted_id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('Import Employees') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="import-file" class="form-label">{{ __('File') }} <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="import-file" name="file" required
+                            accept=".xlsx,.xls,.csv">
+                        <div class="form-text">
+                            {{ __('One employee ID per row under an "Employee ID" header. Up to :max rows.', ['max' => \App\Imports\WellnessParticipantsImport::MAX_ROWS]) }}
+                            {{-- data-no-loader: serves a file, the page never navigates. --}}
+                            <a href="{{ route('wellness.registrations.importTemplate') }}" data-no-loader>
+                                <i class="ri-download-2-line"></i> {{ __('Download template') }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="import-remark" class="form-label">{{ __('Remark') }}</label>
+                        <textarea class="form-control" id="import-remark" name="remark" rows="2"
+                            placeholder="{{ __('Why are these employees being added?') }}"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="import-allow-over-quota" name="allow_over_quota" value="1">
+                        <label class="form-check-label" for="import-allow-over-quota">{{ __('Allow over quota') }}</label>
+                        <div class="form-text">
+                            {{ __('Without this, rows past the remaining quota are skipped.') }}
+                        </div>
+                    </div>
+                    <div class="alert alert-light border small mt-3 mb-0">
+                        {{ __('Every imported employee gets a seat, as with Add Employee. Rows that cannot be added are listed after the import.') }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('Import & Confirm') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {{-- Confirm / requeue / cancel, with a remark --}}
 <div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">

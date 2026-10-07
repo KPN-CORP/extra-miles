@@ -131,6 +131,12 @@ class WellnessActivityScheduleController extends Controller
 
         $schedule->delete();
 
-        return redirect()->back()->with('success', __('Schedule archived.'));
+        // Not back(): if the previous page was this schedule's participant
+        // list, going back there would now 404 on the archived schedule.
+        $target = $schedule->activity
+            ? redirect()->route('admin.wellness.schedules.index', $schedule->activity->encrypted_id)
+            : redirect()->route('admin.wellness.activities.index');
+
+        return $target->with('success', __('Schedule archived.'));
     }
 }

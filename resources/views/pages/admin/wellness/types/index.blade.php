@@ -270,15 +270,21 @@
     @include('pages.admin.wellness.partials.confirm-js')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.js-edit-type').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    document.getElementById('editTypeForm').action = this.dataset.url;
-                    document.getElementById('edit-type-name').value = this.dataset.name;
-                    document.getElementById('edit-type-description').value = this.dataset.description || '';
-                    document.getElementById('edit-type-active').checked = this.dataset.active === '1';
-                    document.getElementById('edit-type-before').value = this.dataset.before || '';
-                    document.getElementById('edit-type-after').value = this.dataset.after || '';
-                });
+            // Delegated, not bound per button: DataTables keeps rows of other
+            // pages (and re-sorted or collapsed ones) outside the document when
+            // this runs, so a direct listener would miss them.
+            document.addEventListener('click', function (event) {
+                var button = event.target.closest('.js-edit-type');
+                if (!button) {
+                    return;
+                }
+
+                document.getElementById('editTypeForm').action = button.dataset.url;
+                document.getElementById('edit-type-name').value = button.dataset.name;
+                document.getElementById('edit-type-description').value = button.dataset.description || '';
+                document.getElementById('edit-type-active').checked = button.dataset.active === '1';
+                document.getElementById('edit-type-before').value = button.dataset.before || '';
+                document.getElementById('edit-type-after').value = button.dataset.after || '';
             });
         });
     </script>

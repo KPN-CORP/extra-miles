@@ -278,15 +278,21 @@
     @include('pages.admin.wellness.partials.confirm-js')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.js-edit-blacklist').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    var d = this.dataset;
-                    document.getElementById('editBlacklistForm').action = d.url;
-                    document.getElementById('edit-bl-name').value = (d.fullname || '') + ' (' + d.employee + ')';
-                    document.getElementById('edit-bl-employee-id').value = d.employee;
-                    document.getElementById('edit-bl-reason').value = d.reason || '';
-                    document.getElementById('edit-bl-end').value = d.end || '';
-                });
+            // Delegated, not bound per button: DataTables keeps rows of other
+            // pages (and re-sorted or collapsed ones) outside the document when
+            // this runs, so a direct listener would miss them.
+            document.addEventListener('click', function (event) {
+                var button = event.target.closest('.js-edit-blacklist');
+                if (!button) {
+                    return;
+                }
+
+                var d = button.dataset;
+                document.getElementById('editBlacklistForm').action = d.url;
+                document.getElementById('edit-bl-name').value = (d.fullname || '') + ' (' + d.employee + ')';
+                document.getElementById('edit-bl-employee-id').value = d.employee;
+                document.getElementById('edit-bl-reason').value = d.reason || '';
+                document.getElementById('edit-bl-end').value = d.end || '';
             });
 
             // Employee typeahead, shared with the participants screen.
