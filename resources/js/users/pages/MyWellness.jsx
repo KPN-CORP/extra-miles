@@ -11,7 +11,7 @@ import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
 import WellnessQrScannerModal from '../components/Helper/WellnessQrScannerModal';
-import { formatSession, statusLabel, statusStyle, wellnessError } from '../components/Helper/wellnessHelper';
+import { formatDateTime, formatSession, statusLabel, statusStyle, wellnessError } from '../components/Helper/wellnessHelper';
 import {
     ACTIVITIES_KEY,
     getCached,
@@ -61,6 +61,49 @@ export default function MyWellness() {
     const refreshAfterWrite = () => {
         invalidateWellness(ACTIVITIES_KEY);
         return fetchRegistrations({ force: true });
+    };
+
+    // Same dialog as the activity page: accept a seat offered under a
+    // confirmation deadline before it passes to the next person.
+    const handleConfirm = async (registration) => {
+        const confirmed = await showAlert({
+            icon: 'question',
+            title: t('wellness.confirmSeat.title'),
+            text: t('wellness.confirmSeat.text'),
+            showCancelButton: true,
+            confirmButtonText: t('wellness.confirmSeat.yes'),
+            cancelButtonText: t('wellness.confirmSeat.no'),
+        });
+
+        if (!confirmed.isConfirmed) return;
+
+        setBusyId(registration.id);
+
+        try {
+            await axios.post(
+                `${apiUrl}/api/wellness/registrations/confirm`,
+                { registration_id: registration.id },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            await showAlert({
+                icon: 'success',
+                title: t('wellness.confirmSeat.doneTitle'),
+                text: t('wellness.confirmSeat.doneText'),
+                timer: 2200,
+                showConfirmButton: false,
+            });
+
+            refreshAfterWrite();
+        } catch (err) {
+            showAlert({
+                icon: 'error',
+                title: t('wellness.confirmSeat.failedTitle'),
+                text: wellnessError(err),
+            });
+        } finally {
+            setBusyId(null);
+        }
     };
 
     const handleCancel = async (registration) => {
@@ -267,7 +310,24 @@ export default function MyWellness() {
                                             {busy ? t('common.pleaseWait') : t('wellness.cancel')}
                                         </button>
                                     )}
+
+                                    {registration.can_confirm && (
+                                        <button
+                                            disabled={busy}
+                                            onClick={() => handleConfirm(registration)}
+                                            className="tap px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white shadow-sm disabled:opacity-50"
+                                        >
+                                            {busy ? t('common.pleaseWait') : t('wellness.confirmSeat.button')}
+                                        </button>
+                                    )}
                                 </div>
+
+                                {registration.can_confirm && registration.confirm_due_at && (
+                                    <p className="mt-2 text-[10px] text-stone-500">
+                                        <i className="ri-timer-line me-1"></i>
+                                        {t('wellness.confirmBy', { date: formatDateTime(registration.confirm_due_at) })}
+                                    </p>
+                                )}
 
                                 {registration.feedback && (
                                     <div className="mt-2 rounded-lg bg-stone-50 p-2">
