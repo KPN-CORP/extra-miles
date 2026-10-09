@@ -10,7 +10,8 @@ import { useApiUrl } from '../components/Context/ApiContext';
 import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
-import { formatDateTime, formatSession, seatLabel, statusLabel, statusStyle, wellnessError } from '../components/Helper/wellnessHelper';
+import { formatDateTime, formatSession, seatLabel, wellnessError } from '../components/Helper/wellnessHelper';
+import { ActionButton, ActionRow, CardNote, DateBadge, MetaLine, StatusPill } from '../components/Cards/WellnessSession';
 import { getImageUrl } from '../components/Helper/imagePath';
 import AppShell from '../components/Layout/AppShell';
 import {
@@ -232,33 +233,34 @@ export default function WellnessDetails() {
                     <img
                         src={getImageUrl(apiUrl, activity.image)}
                         alt={activity.name}
-                        className="w-full h-40 object-cover rounded-xl shadow-sm"
+                        className="w-full h-48 object-cover rounded-2xl shadow-card"
                     />
                 )}
 
-                <div className="bg-white rounded-xl shadow-sm p-4">
+                <div className="bg-white rounded-2xl shadow-card p-4">
                     {activity.type && (
-                        <span className="inline-block px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-[10px] font-semibold mb-2">
+                        <span className="inline-block px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 text-[12px] font-bold mb-2">
                             {activity.type}
                         </span>
                     )}
-                    <h1 className="text-stone-800 text-base font-semibold">{activity.name}</h1>
+                    <h1 className="text-stone-800 text-[19px] font-extrabold leading-tight">{activity.name}</h1>
                     {activity.description && (
                         // Admin-authored rich text from CKEditor, same as News.
-                        <div className="mt-2 text-stone-600 text-xs leading-relaxed wellness-richtext">
+                        <div className="mt-2 text-stone-600 text-[14px] leading-relaxed wellness-richtext">
                             {parse(activity.description)}
                         </div>
                     )}
                 </div>
 
-                <div className="text-stone-700 text-xs font-semibold">{t('wellness.availableSessions')}</div>
+                <h2 className="mt-1 text-stone-800 text-[16px] font-extrabold">{t('wellness.availableSessions')}</h2>
 
                 {activity.schedules.length === 0 ? (
-                    <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                        <p className="text-stone-500 text-xs">{t('wellness.noSessions')}</p>
+                    <div className="bg-white rounded-2xl p-6 text-center shadow-card">
+                        <p className="text-stone-500 text-[14px]">{t('wellness.noSessions')}</p>
                     </div>
                 ) : (
-                    activity.schedules.map((schedule) => {
+                    <div className="grid gap-4 rail:grid-cols-2">
+                    {activity.schedules.map((schedule) => {
                         const when = formatSession(schedule);
                         const busy = submitting === schedule.id;
                         // Masked by the API: a blacklisted registration arrives as
@@ -266,79 +268,79 @@ export default function WellnessDetails() {
                         const registered = Boolean(schedule.my_status);
 
                         return (
-                            <div key={schedule.id} className="bg-white rounded-xl shadow-sm p-3">
+                            <div key={schedule.id} className="bg-white rounded-2xl shadow-card p-4">
                                 <div className="flex gap-3">
-                                    <div className="w-14 shrink-0 rounded-lg bg-red-700 text-white flex flex-col items-center justify-center py-2">
-                                        <span className="text-lg font-bold leading-none">{when.day}</span>
-                                        <span className="text-[10px] uppercase">{when.month}</span>
-                                    </div>
+                                    <DateBadge day={when.day} month={when.month} />
 
-                                    <div className="flex-1 min-w-0 text-[11px] text-stone-600 flex flex-col gap-0.5">
-                                        <span className="text-stone-800 font-semibold text-xs">{when.weekday}</span>
-                                        <span><i className="ri-time-line me-1"></i>{when.time}</span>
+                                    <div className="flex-1 min-w-0 flex flex-col gap-1">
+                                        <span className="text-stone-800 text-[16px] font-bold leading-tight">{when.weekday}</span>
+                                        <MetaLine icon="ri-time-line">{when.time}</MetaLine>
                                         {schedule.location && (
-                                            <span className="truncate"><i className="ri-map-pin-line me-1"></i>{schedule.location}</span>
+                                            <MetaLine icon="ri-map-pin-line" truncate>{schedule.location}</MetaLine>
                                         )}
-                                        <span><i className="ri-group-line me-1"></i>{seatLabel(schedule)}</span>
+                                        <MetaLine icon="ri-group-line">{seatLabel(schedule)}</MetaLine>
                                     </div>
                                 </div>
 
-                                <div className="mt-3 flex items-center gap-2">
-                                    {registered && (
-                                        <div className="flex flex-col gap-0.5 min-w-0">
-                                            <span className={`self-start px-2 py-1 rounded-full text-[10px] font-semibold ${statusStyle(schedule.my_status)}`}>
-                                                {statusLabel(schedule.my_status, schedule.my_status_label)}
-                                            </span>
-                                            {schedule.can_confirm && schedule.confirm_due_at && (
-                                                <span className="text-[10px] text-stone-500">
-                                                    {t('wellness.confirmBy', { date: formatDateTime(schedule.confirm_due_at) })}
-                                                </span>
-                                            )}
-                                        </div>
-                                    )}
+                                {registered && (
+                                    <div className="mt-3">
+                                        <StatusPill status={schedule.my_status} fallback={schedule.my_status_label} />
+                                    </div>
+                                )}
 
-                                    <div className="flex-1"></div>
+                                {schedule.can_confirm && schedule.confirm_due_at && (
+                                    <CardNote icon="ri-timer-line" tone="warning">
+                                        {t('wellness.confirmBy', { date: formatDateTime(schedule.confirm_due_at) })}
+                                    </CardNote>
+                                )}
 
-                                    {/* Already registered: never offer Register again,
-                                        only what can be done with the seat they have. */}
-                                    {registered ? (
-                                        <div className="flex gap-2">
-                                            {schedule.can_cancel && (
-                                                <button
-                                                    disabled={busy}
-                                                    onClick={() => handleCancel(schedule)}
-                                                    className="tap px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-white text-red-700 ring-1 ring-red-700 ring-inset disabled:opacity-50"
-                                                >
-                                                    {busy ? t('common.pleaseWait') : t('wellness.cancel')}
-                                                </button>
-                                            )}
-                                            {schedule.can_confirm && (
-                                                <button
-                                                    disabled={busy}
-                                                    onClick={() => handleConfirm(schedule)}
-                                                    className="tap px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white shadow-sm disabled:opacity-50"
-                                                >
-                                                    {busy ? t('common.pleaseWait') : t('wellness.confirmSeat.button')}
-                                                </button>
-                                            )}
-                                        </div>
-                                    ) : schedule.can_register ? (
-                                        <button
-                                            disabled={busy}
+                                {/* Already registered: never offer Register again, only
+                                    what can be done with the seat they have. Secondary
+                                    action on the left, the main one on the right. */}
+                                {registered ? (
+                                    <ActionRow>
+                                        {schedule.can_cancel && (
+                                            <ActionButton
+                                                variant="secondary"
+                                                busy={busy}
+                                                busyLabel={t('common.pleaseWait')}
+                                                onClick={() => handleCancel(schedule)}
+                                            >
+                                                {t('wellness.cancel')}
+                                            </ActionButton>
+                                        )}
+                                        {schedule.can_confirm && (
+                                            <ActionButton
+                                                icon="ri-check-line"
+                                                busy={busy}
+                                                busyLabel={t('common.pleaseWait')}
+                                                onClick={() => handleConfirm(schedule)}
+                                            >
+                                                {t('wellness.confirmSeat.button')}
+                                            </ActionButton>
+                                        )}
+                                    </ActionRow>
+                                ) : schedule.can_register ? (
+                                    <ActionRow>
+                                        <ActionButton
+                                            icon={schedule.is_full ? 'ri-time-line' : 'ri-user-add-line'}
+                                            busy={busy}
+                                            busyLabel={t('common.pleaseWait')}
                                             onClick={() => handleRegister(schedule)}
-                                            className="tap px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white shadow-sm disabled:opacity-50"
                                         >
-                                            {busy ? t('common.pleaseWait') : schedule.is_full ? t('wellness.joinWaitlist') : t('wellness.register')}
-                                        </button>
-                                    ) : (
-                                        <span className="text-[10px] text-stone-400">
-                                            {schedule.registration_open ? t('wellness.notAvailable') : t('wellness.registrationClosed')}
-                                        </span>
-                                    )}
-                                </div>
+                                            {schedule.is_full ? t('wellness.joinWaitlist') : t('wellness.register')}
+                                        </ActionButton>
+                                    </ActionRow>
+                                ) : (
+                                    <p className="mt-3 pt-3 border-t border-stone-100 text-center text-[13px] font-semibold text-stone-400">
+                                        <i className="ri-lock-line me-1" aria-hidden="true" />
+                                        {schedule.registration_open ? t('wellness.notAvailable') : t('wellness.registrationClosed')}
+                                    </p>
+                                )}
                             </div>
                         );
-                    })
+                    })}
+                    </div>
                 )}
             </div>
         </AppShell>

@@ -157,7 +157,7 @@ export default function Wellness() {
             />
 
             <div className="px-5 pt-4 flex flex-col gap-4">
-                <p className="text-stone-600 text-[11.5px] leading-relaxed">
+                <p className="text-stone-600 text-[14px] leading-relaxed">
                     {t('wellness.intro')}
                 </p>
 
@@ -168,7 +168,7 @@ export default function Wellness() {
                             <button
                                 key={type}
                                 onClick={() => setSelectedType(type)}
-                                className={`tap px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap ${
+                                className={`tap min-h-[38px] px-4 rounded-full text-[13px] font-bold whitespace-nowrap ${
                                     selectedType === type
                                         ? 'bg-brand-700 text-white shadow-card'
                                         : 'bg-white text-brand-700 ring-1 ring-brand-700 ring-inset'
@@ -205,26 +205,26 @@ export default function Wellness() {
                             <button
                                 key={activity.id}
                                 onClick={() => openActivity(activity.id)}
-                                className="tap w-full bg-white rounded-2xl shadow-card p-2.5 flex items-center gap-3 text-left"
+                                className="tap w-full bg-white rounded-2xl shadow-card p-3.5 flex items-center gap-3 text-left"
                             >
-                                <span className="w-12 shrink-0 rounded-xl bg-brand-50 text-brand-700 flex flex-col items-center justify-center py-1.5">
-                                    <span className="text-[19px] font-extrabold leading-none">{when.day || '-'}</span>
-                                    <span className="mt-0.5 text-[9px] font-extrabold uppercase tracking-[0.07em] leading-none">
+                                <span className="w-16 shrink-0 rounded-xl bg-brand-50 text-brand-700 flex flex-col items-center justify-center py-2.5">
+                                    <span className="text-[24px] font-extrabold leading-none">{when.day || '-'}</span>
+                                    <span className="mt-1 text-[12px] font-extrabold uppercase tracking-[0.06em] leading-none">
                                         {when.month}
                                     </span>
                                 </span>
 
                                 <span className="flex-1 min-w-0">
-                                    <span className="block text-stone-800 text-[14px] font-extrabold tracking-[-0.012em] leading-tight clamp-1">
+                                    <span className="block text-stone-800 text-[16px] font-extrabold tracking-[-0.012em] leading-tight clamp-1">
                                         {activity.name}
                                     </span>
                                     {activity.type && (
-                                        <span className="block mt-0.5 text-brand-700 text-[10.5px] font-bold leading-tight">
+                                        <span className="block mt-1 text-brand-700 text-[12.5px] font-bold leading-tight">
                                             {activity.type}
                                         </span>
                                     )}
                                     {session && (
-                                        <span className="mt-1 flex flex-col gap-0.5 text-stone-500 text-[11px] leading-tight">
+                                        <span className="mt-1.5 flex flex-col gap-1 text-stone-600 text-[13px] leading-snug">
                                             <span className="clamp-1">
                                                 <i className="ri-time-line me-1" aria-hidden="true" />
                                                 {when.time}
@@ -242,13 +242,13 @@ export default function Wellness() {
                                         </span>
                                     )}
                                     {others > 0 && (
-                                        <span className="block mt-1 text-stone-400 text-[10px] leading-tight">
+                                        <span className="block mt-1.5 text-stone-500 text-[12px] font-semibold leading-tight">
                                             {t('wellness.moreSessions', { count: others })}
                                         </span>
                                     )}
                                 </span>
 
-                                <i className="ri-arrow-right-s-line text-stone-300 text-lg shrink-0" aria-hidden="true" />
+                                <i className="ri-arrow-right-s-line text-stone-400 text-2xl shrink-0" aria-hidden="true" />
                             </button>
                         );
                     })}
@@ -262,9 +262,9 @@ export default function Wellness() {
                             setSelectedType('All');
                             setSelectedDate(null);
                         }}
-                        className="tap self-center text-brand-700 text-[12px] font-extrabold inline-flex items-center gap-1"
+                        className="tap self-center min-h-[44px] px-4 text-brand-700 text-[14px] font-extrabold inline-flex items-center gap-1.5"
                     >
-                        <i className="ri-refresh-line text-sm" aria-hidden="true" />
+                        <i className="ri-refresh-line text-base" aria-hidden="true" />
                         {t('filters.reset')}
                     </button>
                 )}

@@ -11,7 +11,8 @@ import { useAuth } from '../components/Context/AuthContext';
 import { showAlert } from '../components/Helper/alertHelper';
 import CardLoader from '../components/Loader/CardLoader';
 import WellnessQrScannerModal from '../components/Helper/WellnessQrScannerModal';
-import { formatDateTime, formatSession, statusLabel, statusStyle, wellnessError } from '../components/Helper/wellnessHelper';
+import { formatDateTime, formatSession, wellnessError } from '../components/Helper/wellnessHelper';
+import { ActionButton, ActionRow, CardNote, DateBadge, MetaLine, StatusPill } from '../components/Cards/WellnessSession';
 import {
     ACTIVITIES_KEY,
     getCached,
@@ -212,9 +213,9 @@ export default function MyWellness() {
                 {checkInAvailable && (
                     <button
                         onClick={() => setScannerOpen(true)}
-                        className="tap w-full p-3 bg-brand-700 rounded-2xl shadow-float text-white text-xs font-semibold flex items-center justify-center gap-2"
+                        className="tap w-full min-h-[52px] px-4 bg-brand-700 rounded-2xl shadow-float text-white text-[15px] font-bold flex items-center justify-center gap-2"
                     >
-                        <i className="ri-qr-scan-2-line"></i> {t('wellness.scanToCheckIn')}
+                        <i className="ri-qr-scan-2-line text-[20px]" aria-hidden="true"></i> {t('wellness.scanToCheckIn')}
                     </button>
                 )}
 
@@ -224,12 +225,12 @@ export default function MyWellness() {
                         <CardLoader />
                     </>
                 ) : registrations.length === 0 ? (
-                    <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                        <i className="ri-calendar-line text-3xl text-stone-300"></i>
-                        <p className="mt-2 text-stone-500 text-xs">{t('wellness.noRegistrations')}</p>
+                    <div className="bg-white rounded-2xl p-6 text-center shadow-card flex flex-col items-center">
+                        <i className="ri-calendar-line text-4xl text-stone-300" aria-hidden="true"></i>
+                        <p className="mt-2 text-stone-500 text-[14px]">{t('wellness.noRegistrations')}</p>
                         <button
                             onClick={() => navigate('/wellness')}
-                            className="mt-3 px-4 py-2 rounded-lg bg-red-700 text-white text-[10px] font-semibold"
+                            className="tap mt-4 min-h-[44px] px-5 rounded-xl bg-brand-700 text-white text-[14px] font-bold"
                         >
                             {t('wellness.browseActivities')}
                         </button>
@@ -241,110 +242,98 @@ export default function MyWellness() {
                         const busy = busyId === registration.id;
 
                         return (
-                            <div key={registration.id} className="bg-white rounded-xl shadow-sm p-3">
+                            <div key={registration.id} className="bg-white rounded-2xl shadow-card p-4">
                                 <div className="flex gap-3">
-                                    <div className="w-14 shrink-0 rounded-lg bg-red-700 text-white flex flex-col items-center justify-center py-2">
-                                        <span className="text-lg font-bold leading-none">{when.day}</span>
-                                        <span className="text-[10px] uppercase">{when.month}</span>
-                                    </div>
+                                    <DateBadge day={when.day} month={when.month} />
 
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-stone-800 text-sm font-semibold truncate">
+                                    <div className="flex-1 min-w-0 flex flex-col gap-1">
+                                        <span className="text-stone-800 text-[16px] font-bold leading-tight truncate">
                                             {registration.activity?.name}
-                                        </div>
+                                        </span>
                                         {registration.activity?.type && (
-                                            <div className="text-[10px] text-red-700 font-medium">
+                                            <span className="text-[12.5px] text-brand-700 font-bold leading-tight">
                                                 {registration.activity.type}
-                                            </div>
+                                            </span>
                                         )}
-                                        <div className="mt-1 text-[10px] text-stone-500 flex flex-col gap-0.5">
-                                            <span><i className="ri-time-line me-1"></i>{when.time}</span>
-                                            {registration.schedule?.location && (
-                                                <span className="truncate">
-                                                    <i className="ri-map-pin-line me-1"></i>{registration.schedule.location}
-                                                </span>
-                                            )}
-                                        </div>
+                                        <MetaLine icon="ri-time-line">{when.time}</MetaLine>
+                                        {registration.schedule?.location && (
+                                            <MetaLine icon="ri-map-pin-line" truncate>{registration.schedule.location}</MetaLine>
+                                        )}
                                     </div>
                                 </div>
 
-                                <div className="mt-3 flex items-center gap-2 flex-wrap">
-                                    <span className={`px-2 py-1 rounded-full text-[10px] font-semibold ${statusStyle(registration.status)}`}>
-                                        {statusLabel(registration.status, registration.status_label)}
-                                    </span>
-
+                                <div className="mt-3 flex flex-wrap items-center gap-2">
+                                    <StatusPill status={registration.status} fallback={registration.status_label} />
                                     {registration.attended_at && (
-                                        <span className="px-2 py-1 rounded-full text-[10px] font-semibold bg-green-100 text-green-700">
-                                            <i className="ri-check-double-line me-1"></i>{t('wellness.attended')}
-                                        </span>
-                                    )}
-
-                                    <div className="flex-1"></div>
-
-                                    {registration.can_check_in && (
-                                        <button
-                                            onClick={() => setScannerOpen(true)}
-                                            className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white"
-                                        >
-                                            <i className="ri-qr-scan-2-line me-1"></i>{t('wellness.checkIn')}
-                                        </button>
-                                    )}
-
-                                    {registration.can_submit_feedback && (
-                                        <button
-                                            disabled={busy}
-                                            onClick={() => handleFeedback(registration)}
-                                            className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-white text-red-700 ring-1 ring-red-700 ring-inset disabled:opacity-50"
-                                        >
-                                            <i className="ri-chat-1-line me-1"></i>
-                                            {t('wellness.feedback.give')}
-                                        </button>
-                                    )}
-
-                                    {registration.can_cancel && !registration.attended_at && (
-                                        <button
-                                            disabled={busy}
-                                            onClick={() => handleCancel(registration)}
-                                            className="px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-white text-red-700 ring-1 ring-red-700 ring-inset disabled:opacity-50"
-                                        >
-                                            {busy ? t('common.pleaseWait') : t('wellness.cancel')}
-                                        </button>
-                                    )}
-
-                                    {registration.can_confirm && (
-                                        <button
-                                            disabled={busy}
-                                            onClick={() => handleConfirm(registration)}
-                                            className="tap px-3 py-1.5 rounded-lg text-[10px] font-semibold bg-red-700 text-white shadow-sm disabled:opacity-50"
-                                        >
-                                            {busy ? t('common.pleaseWait') : t('wellness.confirmSeat.button')}
-                                        </button>
+                                        <StatusPill
+                                            icon="ri-check-double-line"
+                                            fallback={t('wellness.attended')}
+                                            className="bg-green-100 text-green-700"
+                                        />
                                     )}
                                 </div>
 
                                 {registration.can_confirm && registration.confirm_due_at && (
-                                    <p className="mt-2 text-[10px] text-stone-500">
-                                        <i className="ri-timer-line me-1"></i>
+                                    <CardNote icon="ri-timer-line" tone="warning">
                                         {t('wellness.confirmBy', { date: formatDateTime(registration.confirm_due_at) })}
-                                    </p>
+                                    </CardNote>
+                                )}
+
+                                {registration.status === 'waiting_list' && (
+                                    <CardNote icon="ri-information-line">{t('wellness.waitlistNote')}</CardNote>
                                 )}
 
                                 {registration.feedback && (
-                                    <div className="mt-2 rounded-lg bg-stone-50 p-2">
-                                        <div className="text-[10px] font-semibold text-stone-600">
-                                            <i className="ri-chat-quote-line me-1"></i>{t('wellness.feedback.yours')}
+                                    <div className="mt-3 rounded-lg bg-stone-50 px-3 py-2">
+                                        <div className="text-[12.5px] font-bold text-stone-700">
+                                            <i className="ri-chat-quote-line me-1" aria-hidden="true"></i>{t('wellness.feedback.yours')}
                                         </div>
-                                        <p className="mt-0.5 text-[10px] text-stone-500 leading-relaxed whitespace-pre-line">
+                                        <p className="mt-1 text-[13px] text-stone-600 leading-relaxed whitespace-pre-line">
                                             {registration.feedback.message}
                                         </p>
                                     </div>
                                 )}
 
-                                {registration.status === 'waiting_list' && (
-                                    <p className="mt-2 text-[10px] text-stone-500 leading-relaxed">
-                                        {t('wellness.waitlistNote')}
-                                    </p>
-                                )}
+                                {/* Secondary actions on the left, the main one on
+                                    the right, all at a thumb-sized height. */}
+                                <ActionRow>
+                                    {registration.can_cancel && !registration.attended_at && (
+                                        <ActionButton
+                                            variant="secondary"
+                                            busy={busy}
+                                            busyLabel={t('common.pleaseWait')}
+                                            onClick={() => handleCancel(registration)}
+                                        >
+                                            {t('wellness.cancel')}
+                                        </ActionButton>
+                                    )}
+                                    {registration.can_submit_feedback && (
+                                        <ActionButton
+                                            variant="secondary"
+                                            icon="ri-chat-1-line"
+                                            busy={busy}
+                                            busyLabel={t('common.pleaseWait')}
+                                            onClick={() => handleFeedback(registration)}
+                                        >
+                                            {t('wellness.feedback.give')}
+                                        </ActionButton>
+                                    )}
+                                    {registration.can_check_in && (
+                                        <ActionButton icon="ri-qr-scan-2-line" onClick={() => setScannerOpen(true)}>
+                                            {t('wellness.checkIn')}
+                                        </ActionButton>
+                                    )}
+                                    {registration.can_confirm && (
+                                        <ActionButton
+                                            icon="ri-check-line"
+                                            busy={busy}
+                                            busyLabel={t('common.pleaseWait')}
+                                            onClick={() => handleConfirm(registration)}
+                                        >
+                                            {t('wellness.confirmSeat.button')}
+                                        </ActionButton>
+                                    )}
+                                </ActionRow>
                             </div>
                         );
                     })}
